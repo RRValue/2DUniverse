@@ -1,0 +1,59 @@
+MACRO(BASICCONFIGURATION)
+    # set project name
+    SET(PrjName HalfEdge2D)
+
+    # define libraries
+    SET(PrjLibraries)
+
+    # define executables
+    SET(PrjExecutables HalfEdge2D)
+ENDMACRO(BASICCONFIGURATION)
+
+MACRO(INITIALIZEEXTERNAL)
+    # external defines/finds ... are going here
+ENDMACRO(INITIALIZEEXTERNAL)
+
+MACRO(DEFINEMODULEQTDEPENDENCY)
+    SETMODULEQTTARGETSLIST(HalfEdge2D Core Widgets Gui)
+ENDMACRO(DEFINEMODULEQTDEPENDENCY)
+
+MACRO(DEFINEMODULELINKDEPENDENCY)
+    # SETMODULELINKTARGETSLIST(modul modul)
+ENDMACRO(DEFINEMODULELINKDEPENDENCY)
+
+MACRO(DEFINEEXTERNALINCLUDEDEPENDENCIES)
+    # external includes are going here
+ENDMACRO(DEFINEEXTERNALINCLUDEDEPENDENCIES)
+
+MACRO(DEFINEEXTERNALLINKDEPENDENCIES)
+    # external includes are going here
+ENDMACRO(DEFINEEXTERNALLINKDEPENDENCIES)
+
+FUNCTION(COLLECTDEPBINS dbg_bins rel_bins)
+    SET(TMP_DBG_LIST)
+    SET(TMP_REL_LIST)
+    
+    # set here
+    
+    SET(${dbg_bins} ${${dbg_bins}} ${TMP_DBG_LIST} PARENT_SCOPE)
+    SET(${rel_bins} ${${rel_bins}} ${TMP_REL_LIST} PARENT_SCOPE)
+ENDFUNCTION(COLLECTDEPBINS dbg_bins rel_bins)
+
+MACRO(CHECKQT5DIRSET)
+    IF("${QT5_PATH}" STREQUAL "")
+        SET(QT5_PATH $ENV{QTDIR})
+        
+        IF("${QT5_PATH}" STREQUAL "")
+            IF(NOT DOCQ_QT_DIR)
+                SET(DOCQ_QT_DIR "" CACHE PATH "Path to the Qt")
+                STRING(REGEX REPLACE  "\\\\"  "/"  QT5_PATH ${QT5_PATH})
+            ELSE(NOT DOCQ_QT_DIR)
+                SET(QT5_PATH ${DOCQ_QT_DIR})
+            ENDIF(NOT DOCQ_QT_DIR)
+        ENDIF("${QT5_PATH}" STREQUAL "")
+    ENDIF("${QT5_PATH}" STREQUAL "")
+    
+    IF("${QT5_PATH}" STREQUAL "")
+        MESSAGE(FATAL_ERROR "QT5 Dir not set")
+    ENDIF("${QT5_PATH}" STREQUAL "")
+ENDMACRO(CHECKQT5DIRSET)
