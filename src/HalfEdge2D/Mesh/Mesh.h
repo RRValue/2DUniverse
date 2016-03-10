@@ -15,13 +15,16 @@ public:
 
     // getter
     const std::vector<Vertex*>& getVertices() const;
-    Vertex* getVertix(const size_t& idx) const;
+    Vertex* const getVertex(const size_t& idx) const;
 
     // vertices
     virtual void addVertex(const Vec2f& pos, const Vec2f& normal);
     void removeVertex(const size_t& idx);
 
-private:
+protected:
+    void addVertex(Vertex* const vertex);
+
+protected:
     std::vector<Vertex*> m_Vertices;
 };
 

@@ -7,7 +7,7 @@ class Vertex
 {
 public:
     Vertex();
-    ~Vertex();
+    virtual ~Vertex();
 
     // getter
     const Vec2f& getPosition() const;

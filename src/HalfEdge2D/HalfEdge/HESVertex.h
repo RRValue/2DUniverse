@@ -11,7 +11,7 @@ class HESVertex : public Vertex
 {
 public:
     HESVertex();
-    ~HESVertex();
+    virtual ~HESVertex();
 
     // getter
     const std::set<HESEdge*>& getIncidentEdges() const;

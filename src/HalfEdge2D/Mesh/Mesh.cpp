@@ -19,11 +19,16 @@ const std::vector<Vertex*>& Mesh::getVertices() const
     return m_Vertices;
 }
 
-Vertex* Mesh::getVertix(const size_t& idx) const
+Vertex* const Mesh::getVertex(const size_t& idx) const
 {
     assert(idx >= 0 && idx < m_Vertices.size());
 
     return m_Vertices[idx];
+}
+
+void Mesh::addVertex(Vertex* const vertex)
+{
+    m_Vertices.push_back(vertex);
 }
 
 void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
@@ -32,7 +37,7 @@ void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
     new_vertex->setPosition(pos);
     new_vertex->setNormal(normal);
 
-    m_Vertices.push_back(new_vertex);
+    addVertex(new_vertex);
 }
 
 void Mesh::removeVertex(const size_t& idx)
