@@ -1,11 +1,13 @@
 #ifndef _HALFEDGESTRUCTURE_VERTEX_H_
 #define _HALFEDGESTRUCTURE_VERTEX_H_
 
+#include "HalfEdge2D/Mesh/Vertex.h"
+
 #include <set>
 
 class HESEdge;
 
-class HESVertex
+class HESVertex : public Vertex
 {
 public:
     HESVertex();
