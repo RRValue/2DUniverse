@@ -15,7 +15,7 @@ HESMesh::~HESMesh()
 
 HESVertex* HESMesh::getHESVertix(const size_t& idx) const
 {
-    return static_cast<HESVertex*>(getVertex(idx));
+    return dynamic_cast<HESVertex*>(getVertex(idx));
 }
 
 void HESMesh::addVertex(const Vec2f& pos, const Vec2f& normal)
