@@ -58,7 +58,11 @@ void Mesh::removeVertex(const size_t& idx)
 {
     assert(idx >= 0 && idx < m_Vertices.size());
 
-    m_Vertices.erase(m_Vertices.begin() + idx);
+    std::vector<Vertex*>::iterator iter = m_Vertices.begin() + idx;
+
+    delete *iter;
+
+    m_Vertices.erase(iter);
 }
 
 void Mesh::addTriangle(const size_t& idx0, const size_t& idx1, const size_t& idx2)
@@ -75,5 +79,9 @@ void Mesh::removeTriangle(const size_t& idx)
 {
     assert(idx >= 0 && idx < m_Triangles.size());
 
-    m_Triangles.erase(m_Triangles.begin() + idx);
+    std::vector<Triangle*>::iterator iter = m_Triangles.begin() + idx;
+
+    delete *iter;
+
+    m_Triangles.erase(iter);
 }
