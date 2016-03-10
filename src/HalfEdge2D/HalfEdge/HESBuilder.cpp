@@ -36,73 +36,80 @@ bool HESBuilder::build()
         HESEdge* e1 = new HESEdge();
         HESEdge* e2 = new HESEdge();
 
-        // on edges
-        //// set prev and next
-        e0->setNext(e1);
-        e1->setNext(e2);
-        e2->setNext(e0);
-
-        e0->setPrev(e2);
-        e1->setPrev(e0);
-        e2->setPrev(e1);
-
-        // set faces
-        e0->setFace(f);
-        e1->setFace(f);
-        e2->setFace(f);
-
-        // set from and to vertices
-        e0->setFrom(v0);
-        e1->setFrom(v1);
-        e2->setFrom(v2);
-
-        e0->setTo(v1);
-        e1->setTo(v2);
-        e2->setTo(v0);
-
-        // on faces
-        //// set bound edges
-        f->addEdge(e0);
-        f->addEdge(e1);
-        f->addEdge(e2);
-
-        // on vertices
-        //// set outgoing edges
-        v0->addEdge(e0);
-        v1->addEdge(e1);
-        v2->addEdge(e2);
-
-        ////////////////////////
-
-        // check if one of the edges of to has from from
-        for(const auto& e : {e0, e1, e2})
-        {
-            HESVertex* const org_from = e->from();
-            HESVertex* const org_to = e->to();
-
-            HESEdge* edge_curre = e;
-            HESEdge* edge_found = nullptr;
-            
-            bool found = false;
-
-            for(const auto& outgoing : org_to->getEdges())
-            {
-                if(outgoing->to() != org_from)
-                    continue;
-
-                edge_found = outgoing;
-                found = true;
-
-                break;
-            }
-
-            if(!found)
-                continue;
-
-            edge_curre->setOpposite(edge_found);
-            edge_found->setOpposite(edge_curre);
-        }
+        buildFace({v0, v1, v2}, {e0, e1, e2}, f);
+        connectEdges({e0, e1, e2});
     }
 
     return true;
+}
+
+void HESBuilder::buildFace(const std::array<HESVertex* const, 3>& vertices, const std::array<HESEdge* const, 3>& edges, HESFace* const face)
+{
+    // on edges
+    //// set prev and next
+    edges[0]->setNext(edges[1]);
+    edges[1]->setNext(edges[2]);
+    edges[2]->setNext(edges[0]);
+
+    edges[0]->setPrev(edges[2]);
+    edges[1]->setPrev(edges[0]);
+    edges[2]->setPrev(edges[1]);
+
+    // set faces
+    edges[0]->setFace(face);
+    edges[1]->setFace(face);
+    edges[2]->setFace(face);
+
+    // set from and to vertices
+    edges[0]->setFrom(vertices[0]);
+    edges[1]->setFrom(vertices[1]);
+    edges[2]->setFrom(vertices[2]);
+
+    edges[0]->setTo(vertices[1]);
+    edges[1]->setTo(vertices[2]);
+    edges[2]->setTo(vertices[0]);
+
+    // on faces
+    //// set bound edges
+    face->addEdge(edges[0]);
+    face->addEdge(edges[1]);
+    face->addEdge(edges[2]);
+
+    // on vertices
+    //// set outgoing edges
+    vertices[0]->addEdge(edges[0]);
+    vertices[1]->addEdge(edges[1]);
+    vertices[2]->addEdge(edges[2]);
+}
+
+void HESBuilder::connectEdges(const std::initializer_list<HESEdge* const>& edges)
+{
+    // check if one of the edges of to has from from
+    for(const auto& e : edges)
+    {
+        HESVertex* const org_from = e->from();
+        HESVertex* const org_to = e->to();
+
+        HESEdge* edge_curre = e;
+        HESEdge* edge_found = nullptr;
+
+        bool found = false;
+
+        for(const auto& outgoing : org_to->getEdges())
+        {
+            if(outgoing->to() != org_from)
+                continue;
+
+            edge_found = outgoing;
+            found = true;
+
+            break;
+        }
+
+        if(!found)
+            continue;
+
+        edge_curre->setOpposite(edge_found);
+        edge_found->setOpposite(edge_curre);
+    }
 }

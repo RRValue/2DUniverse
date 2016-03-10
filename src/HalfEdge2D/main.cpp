@@ -14,9 +14,11 @@ int main(int argc, char** argv)
         mesh.addVertex();
         mesh.addVertex();
         mesh.addVertex();
+        mesh.addVertex();
 
         mesh.addTriangle(0, 1, 2);
         mesh.addTriangle(0, 2, 3);
+        mesh.addTriangle(4, 3, 2);
 
         HESBuilder builder(&mesh);
         builder.build();
