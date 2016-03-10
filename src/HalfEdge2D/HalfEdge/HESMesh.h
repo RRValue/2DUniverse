@@ -12,7 +12,7 @@ public:
     virtual ~HESMesh();
 
     // getter
-    HESVertex* getHESVertix(const size_t& idx) const;
+    HESVertex* getHESVertex(const size_t& idx) const;
     const bool& hasChanged() const;
 
 protected:

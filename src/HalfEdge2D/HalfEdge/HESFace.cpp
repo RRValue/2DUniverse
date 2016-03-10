@@ -10,39 +10,39 @@ HESFace::~HESFace()
 
 }
 
-const std::set<HESEdge*>& HESFace::getBoundingEdges() const
+const std::set<HESEdge*>& HESFace::getEdges() const
 {
-    return m_BoundingEdges;
+    return m_Edges;
 }
 
-void HESFace::addBoundingEdge(HESEdge* const edge)
+void HESFace::addEdge(HESEdge* const edge)
 {
     if(edge == nullptr)
         return;
 
-    if(findBoundingEdge(edge) != m_BoundingEdges.end())
+    if(findEdge(edge) != m_Edges.end())
         return;
 
-    m_BoundingEdges.insert(edge);
+    m_Edges.insert(edge);
 }
 
-void HESFace::removeBoundingEdge(HESEdge* const edge)
+void HESFace::removeEdge(HESEdge* const edge)
 {
     if(edge == nullptr)
         return;
 
-    const std::set<HESEdge*>::const_iterator& find_iter = findBoundingEdge(edge);
+    const std::set<HESEdge*>::const_iterator& find_iter = findEdge(edge);
 
-    if(find_iter == m_BoundingEdges.end())
+    if(find_iter == m_Edges.end())
         return;
 
-    m_BoundingEdges.erase(find_iter);
+    m_Edges.erase(find_iter);
 }
 
-std::set<HESEdge*>::const_iterator HESFace::findBoundingEdge(HESEdge* const edge)
+std::set<HESEdge*>::const_iterator HESFace::findEdge(HESEdge* const edge)
 {
     if(edge == nullptr)
-        return m_BoundingEdges.end();
+        return m_Edges.end();
 
-    return m_BoundingEdges.find(edge);
+    return m_Edges.find(edge);
 }

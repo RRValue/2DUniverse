@@ -13,7 +13,7 @@ HESMesh::~HESMesh()
 
 }
 
-HESVertex* HESMesh::getHESVertix(const size_t& idx) const
+HESVertex* HESMesh::getHESVertex(const size_t& idx) const
 {
     return dynamic_cast<HESVertex*>(getVertex(idx));
 }

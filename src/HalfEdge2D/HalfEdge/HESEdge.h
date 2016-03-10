@@ -11,27 +11,30 @@ public:
     ~HESEdge();
 
     // getter
-    HESVertex* const getSourceVertex() const;
-    HESFace* const getIncidentFace() const;
-    HESEdge* const getOppositeEdge() const;
-    HESEdge* const getPrevEdge() const;
-    HESEdge* const getNextEdge() const;
+    HESVertex* const from() const;
+    HESVertex* const to() const;
+    HESFace* const face() const;
+    HESEdge* const opposite() const;
+    HESEdge* const prev() const;
+    HESEdge* const next() const;
 
     // setter
-    void setSourceVertex(HESVertex* const vertex);
-    void setIncidentFace(HESFace* const face);
-    void setOppositeEdge(HESEdge* const oppositeEdge);
-    void setPrevEdge(HESEdge* const prevEdge);
-    void setNextEdge(HESEdge* const nextEdge);
+    void setFrom(HESVertex* const vertex);
+    void setTo(HESVertex* const vertex);
+    void setFace(HESFace* const face);
+    void setOpposite(HESEdge* const oppositeEdge);
+    void setPrev(HESEdge* const prevEdge);
+    void setNext(HESEdge* const nextEdge);
 
 private:
-    HESVertex* m_SourceVertex;
+    HESVertex* m_From;
+    HESVertex* m_To;
     
-    HESFace* m_IncidentFace;
+    HESFace* m_Face;
 
-    HESEdge* m_OppositeEdge;
-    HESEdge* m_PrevEdge;
-    HESEdge* m_NextEdge;
+    HESEdge* m_Opposite;
+    HESEdge* m_Prev;
+    HESEdge* m_Next;
 };
 
 #endif //_HALFEDGESTRUCTURE_EDGE_H_

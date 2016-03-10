@@ -14,17 +14,17 @@ public:
     virtual ~HESVertex();
 
     // getter
-    const std::set<HESEdge*>& getIncidentEdges() const;
+    const std::set<HESEdge*>& getEdges() const;
 
     // edges
-    void addIncidentEdge(HESEdge* const edge);
-    void removeIncidentEdge(HESEdge* const edge);
+    void addEdge(HESEdge* const edge);
+    void removeEdge(HESEdge* const edge);
 
 private:
-    std::set<HESEdge*>::const_iterator findIncidentEdge(HESEdge* const edge);
+    std::set<HESEdge*>::const_iterator findEdge(HESEdge* const edge);
 
 private:
-    std::set<HESEdge*> m_IncidentEdges;
+    std::set<HESEdge*> m_Edges;
 };
 
 #endif //_HALFEDGESTRUCTURE_VERTEX_H_

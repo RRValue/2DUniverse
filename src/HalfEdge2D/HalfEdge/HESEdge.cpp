@@ -2,11 +2,12 @@
 
 HESEdge::HESEdge()
 {
-    m_SourceVertex = nullptr;
-    m_IncidentFace = nullptr;
-    m_OppositeEdge = nullptr;
-    m_PrevEdge = nullptr;
-    m_NextEdge = nullptr;
+    m_From = nullptr;
+    m_To = nullptr;
+    m_Face = nullptr;
+    m_Opposite = nullptr;
+    m_Prev = nullptr;
+    m_Next = nullptr;
 }
 
 HESEdge::~HESEdge()
@@ -14,67 +15,80 @@ HESEdge::~HESEdge()
 
 }
 
-HESVertex* const HESEdge::getSourceVertex() const
+HESVertex* const HESEdge::from() const
 {
-    return m_SourceVertex;
+    return m_From;
 }
 
-HESFace* const HESEdge::getIncidentFace() const
+HESVertex* const HESEdge::to() const
 {
-    return m_IncidentFace;
+    return m_To;
 }
 
-HESEdge* const HESEdge::getOppositeEdge() const
+HESFace* const HESEdge::face() const
 {
-    return m_OppositeEdge;
+    return m_Face;
 }
 
-HESEdge* const HESEdge::getPrevEdge() const
+HESEdge* const HESEdge::opposite() const
 {
-    return m_PrevEdge;
+    return m_Opposite;
 }
 
-HESEdge* const HESEdge::getNextEdge() const
+HESEdge* const HESEdge::prev() const
 {
-    return m_NextEdge;
+    return m_Prev;
 }
 
-void HESEdge::setSourceVertex(HESVertex* const vertex)
+HESEdge* const HESEdge::next() const
+{
+    return m_Next;
+}
+
+void HESEdge::setFrom(HESVertex* const vertex)
 {
     if(vertex == nullptr)
         return;
 
-    m_SourceVertex = vertex;
+    m_From = vertex;
 }
 
-void HESEdge::setIncidentFace(HESFace* const face)
+void HESEdge::setTo(HESVertex* const vertex)
+{
+    if(vertex == nullptr)
+        return;
+
+    m_To = vertex;
+}
+
+void HESEdge::setFace(HESFace* const face)
 {
     if(face == nullptr)
         return;
 
-    m_IncidentFace = face;
+    m_Face = face;
 }
 
-void HESEdge::setOppositeEdge(HESEdge* const oppositeEdge)
+void HESEdge::setOpposite(HESEdge* const oppositeEdge)
 {
     if(oppositeEdge == nullptr)
         return;
 
-    m_OppositeEdge = oppositeEdge;
+    m_Opposite = oppositeEdge;
 }
 
-void HESEdge::setPrevEdge(HESEdge* const prevEdge)
+void HESEdge::setPrev(HESEdge* const prevEdge)
 {
     if(prevEdge == nullptr)
         return;
 
-    m_PrevEdge = prevEdge;
+    m_Prev = prevEdge;
 }
 
-void HESEdge::setNextEdge(HESEdge* const nextEdge)
+void HESEdge::setNext(HESEdge* const nextEdge)
 {
     if(nextEdge == nullptr)
         return;
 
-    m_NextEdge = nextEdge;
+    m_Next = nextEdge;
 }

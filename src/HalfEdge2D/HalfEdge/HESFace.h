@@ -12,17 +12,17 @@ public:
     ~HESFace();
 
     // getter
-    const std::set<HESEdge*>& getBoundingEdges() const;
+    const std::set<HESEdge*>& getEdges() const;
 
     // edges
-    void addBoundingEdge(HESEdge* const edge);
-    void removeBoundingEdge(HESEdge* const edge);
+    void addEdge(HESEdge* const edge);
+    void removeEdge(HESEdge* const edge);
 
 private:
-    std::set<HESEdge*>::const_iterator findBoundingEdge(HESEdge* const edge);
+    std::set<HESEdge*>::const_iterator findEdge(HESEdge* const edge);
 
 private:
-    std::set<HESEdge*> m_BoundingEdges;
+    std::set<HESEdge*> m_Edges;
 };
 
 #endif //_HALFEDGESTRUCTURE_FACE_H_

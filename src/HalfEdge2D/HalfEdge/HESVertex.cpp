@@ -10,39 +10,39 @@ HESVertex::~HESVertex()
 
 }
 
-const std::set<HESEdge*>& HESVertex::getIncidentEdges() const
+const std::set<HESEdge*>& HESVertex::getEdges() const
 {
-    return m_IncidentEdges;
+    return m_Edges;
 }
 
-void HESVertex::addIncidentEdge(HESEdge* const edge)
+void HESVertex::addEdge(HESEdge* const edge)
 {
     if(edge == nullptr)
         return;
 
-    if(findIncidentEdge(edge) != m_IncidentEdges.end())
+    if(findEdge(edge) != m_Edges.end())
         return;
 
-    m_IncidentEdges.insert(edge);
+    m_Edges.insert(edge);
 }
 
-void HESVertex::removeIncidentEdge(HESEdge* const edge)
+void HESVertex::removeEdge(HESEdge* const edge)
 {
     if(edge == nullptr)
         return;
 
-    const std::set<HESEdge*>::const_iterator& find_iter = findIncidentEdge(edge);
+    const std::set<HESEdge*>::const_iterator& find_iter = findEdge(edge);
 
-    if(find_iter == m_IncidentEdges.end())
+    if(find_iter == m_Edges.end())
         return;
 
-    m_IncidentEdges.erase(find_iter);
+    m_Edges.erase(find_iter);
 }
 
-std::set<HESEdge*>::const_iterator HESVertex::findIncidentEdge(HESEdge* const edge)
+std::set<HESEdge*>::const_iterator HESVertex::findEdge(HESEdge* const edge)
 {
     if(edge == nullptr)
-        return m_IncidentEdges.end();
+        return m_Edges.end();
 
-    return m_IncidentEdges.find(edge);
+    return m_Edges.find(edge);
 }
