@@ -1,5 +1,7 @@
 #include "HalfEdge2D/Mesh/Mesh.h"
+
 #include "HalfEdge2D/Mesh/Vertex.h"
+#include "HalfEdge2D/Mesh/Triangle.h"
 
 #include <cassert>
 
@@ -19,11 +21,23 @@ const std::vector<Vertex*>& Mesh::getVertices() const
     return m_Vertices;
 }
 
+const std::vector<Triangle*>& Mesh::getTriangles() const
+{
+    return m_Triangles;
+}
+
 Vertex* const Mesh::getVertex(const size_t& idx) const
 {
     assert(idx >= 0 && idx < m_Vertices.size());
 
     return m_Vertices[idx];
+}
+
+Triangle* const Mesh::getTriangle(const size_t& idx) const
+{
+    assert(idx >= 0 && idx < m_Triangles.size());
+
+    return m_Triangles[idx];
 }
 
 Vertex* Mesh::allocateVertex()
@@ -45,4 +59,21 @@ void Mesh::removeVertex(const size_t& idx)
     assert(idx >= 0 && idx < m_Vertices.size());
 
     m_Vertices.erase(m_Vertices.begin() + idx);
+}
+
+void Mesh::addTriangle(const size_t& idx0, const size_t& idx1, const size_t& idx2)
+{
+    Triangle* new_tris = new Triangle();
+    new_tris->data()[0] = idx0;
+    new_tris->data()[1] = idx1;
+    new_tris->data()[2] = idx2;
+
+    m_Triangles.push_back(new_tris);
+}
+
+void Mesh::removeTriangle(const size_t& idx)
+{
+    assert(idx >= 0 && idx < m_Triangles.size());
+
+    m_Triangles.erase(m_Triangles.begin() + idx);
 }
