@@ -22,6 +22,8 @@ public:
     Triangle* const getTriangle(const size_t& idx) const;
 
     // vertices
+    void addVertex();
+    void addVertex(const Vec2f& pos);
     void addVertex(const Vec2f& pos, const Vec2f& normal);
     void removeVertex(const size_t& idx);
 

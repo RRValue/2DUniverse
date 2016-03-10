@@ -45,6 +45,19 @@ Vertex* Mesh::allocateVertex()
     return new Vertex();
 }
 
+void Mesh::addVertex()
+{
+    m_Vertices.push_back(allocateVertex());
+}
+
+void Mesh::addVertex(const Vec2f& pos)
+{
+    Vertex* new_vertex = allocateVertex();
+    new_vertex->setPosition(pos);
+    
+    m_Vertices.push_back(new_vertex);
+}
+
 void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
 {
     Vertex* new_vertex = allocateVertex();
