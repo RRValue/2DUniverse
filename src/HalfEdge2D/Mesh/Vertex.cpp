@@ -11,3 +11,23 @@ Vertex::~Vertex()
 {
 
 }
+
+const Vec2f& Vertex::getPosition() const
+{
+    return m_Position;
+}
+
+const Vec2f& Vertex::getNormal() const
+{
+    return m_Normal;
+}
+
+void Vertex::setPosition(const Vec2f& position)
+{
+    m_Position = position;
+}
+
+void Vertex::setNormal(const Vec2f& normal)
+{
+    m_Normal = normal;
+}
