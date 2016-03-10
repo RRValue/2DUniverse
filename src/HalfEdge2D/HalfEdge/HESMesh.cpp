@@ -23,13 +23,7 @@ const bool& HESMesh::hasChanged() const
     return m_Changed;
 }
 
-void HESMesh::addVertex(const Vec2f& pos, const Vec2f& normal)
+Vertex* HESMesh::allocateVertex()
 {
-    Vertex* new_vertex = new HESVertex();
-    new_vertex->setPosition(pos);
-    new_vertex->setNormal(normal);
-
-    Mesh::addVertex(new_vertex);
-    
-    m_Changed = true;
+    return new HESVertex();
 }

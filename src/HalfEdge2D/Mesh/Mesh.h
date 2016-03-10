@@ -18,11 +18,11 @@ public:
     Vertex* const getVertex(const size_t& idx) const;
 
     // vertices
-    virtual void addVertex(const Vec2f& pos, const Vec2f& normal);
+    void addVertex(const Vec2f& pos, const Vec2f& normal);
     void removeVertex(const size_t& idx);
 
 protected:
-    void addVertex(Vertex* const vertex);
+    virtual Vertex* allocateVertex();
 
 protected:
     std::vector<Vertex*> m_Vertices;

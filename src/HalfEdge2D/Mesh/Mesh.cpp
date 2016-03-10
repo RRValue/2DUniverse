@@ -26,18 +26,18 @@ Vertex* const Mesh::getVertex(const size_t& idx) const
     return m_Vertices[idx];
 }
 
-void Mesh::addVertex(Vertex* const vertex)
+Vertex* Mesh::allocateVertex()
 {
-    m_Vertices.push_back(vertex);
+    return new Vertex();
 }
 
 void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
 {
-    Vertex* new_vertex = new Vertex();
+    Vertex* new_vertex = allocateVertex();
     new_vertex->setPosition(pos);
     new_vertex->setNormal(normal);
 
-    addVertex(new_vertex);
+    m_Vertices.push_back(new_vertex);
 }
 
 void Mesh::removeVertex(const size_t& idx)

@@ -15,8 +15,8 @@ public:
     HESVertex* getHESVertix(const size_t& idx) const;
     const bool& hasChanged() const;
 
-    // vertices
-    virtual void addVertex(const Vec2f& pos, const Vec2f& normal);
+protected:
+    virtual Vertex* allocateVertex();
 
 private:
     bool m_Changed;
