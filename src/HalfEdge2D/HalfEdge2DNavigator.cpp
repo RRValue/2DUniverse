@@ -15,6 +15,7 @@ HalfEdge2DNavigator::HalfEdge2DNavigator(HalfEdge2DWidget* const widget) : m_Wid
     m_Navigatin = false;
     m_Scene = nullptr;
     m_ActiveCamera = nullptr;
+    m_ZoomFactor = 1.05f;
 }
 
 HalfEdge2DNavigator::~HalfEdge2DNavigator()
@@ -40,7 +41,7 @@ void HalfEdge2DNavigator::updateCameraInformation()
 
 bool HalfEdge2DNavigator::handleMousePressEvent(QMouseEvent* const event)
 {
-    void updateCameraInformation();
+    updateCameraInformation();
 
     if(m_ActiveCamera == nullptr)
         return false;
@@ -56,13 +57,13 @@ bool HalfEdge2DNavigator::handleMousePressEvent(QMouseEvent* const event)
 
     QPoint pos_px = event->pos();
 
-    if(!inCanvas(pos_px))
+    if(!m_Scene->inCanvas(pos_px))
         m_Navigatin = false;
 
     if(!m_Navigatin)
         return false;
 
-    m_CamMoveInitMousePos = invTransform(pos_px);
+    m_CamMoveInitMousePos = m_Scene->invTransform(pos_px);
     m_CamMoveInitCamPos = m_ActiveCamera->getPosition();
 
     qDebug() << "Start Navigate";
@@ -72,6 +73,8 @@ bool HalfEdge2DNavigator::handleMousePressEvent(QMouseEvent* const event)
 
 bool HalfEdge2DNavigator::handleMouseMoveEvent(QMouseEvent* const event)
 {
+    updateCameraInformation();
+
     if(m_ActiveCamera == nullptr)
         return false;
 
@@ -80,8 +83,8 @@ bool HalfEdge2DNavigator::handleMouseMoveEvent(QMouseEvent* const event)
 
     m_ActiveCamera->setPosition(m_CamMoveInitCamPos);
 
-    QPoint pos = keepInCanvas(event->pos());
-    QPointF current_delta = m_CamMoveInitMousePos - invTransform(pos);
+    QPoint pos = m_Scene->keepInCanvas(event->pos());
+    QPointF current_delta = m_CamMoveInitMousePos - m_Scene->invTransform(pos);
 
     m_ActiveCamera->setPosition(m_CamMoveInitCamPos + current_delta);
 
@@ -95,6 +98,8 @@ bool HalfEdge2DNavigator::handleMouseMoveEvent(QMouseEvent* const event)
 
 bool HalfEdge2DNavigator::handleMouseReleaseEvent(QMouseEvent* const event)
 {
+    updateCameraInformation();
+
     if(m_ActiveCamera == nullptr)
         return false;
 
@@ -110,6 +115,8 @@ bool HalfEdge2DNavigator::handleMouseReleaseEvent(QMouseEvent* const event)
 
 bool HalfEdge2DNavigator::handleResizeEvent(QResizeEvent* const event)
 {
+    updateCameraInformation();
+
     if(m_ActiveCamera == nullptr)
         return false;
 
@@ -122,6 +129,8 @@ bool HalfEdge2DNavigator::handleResizeEvent(QResizeEvent* const event)
 
 bool HalfEdge2DNavigator::handleWheelEvent(QWheelEvent* const event)
 {
+    updateCameraInformation();
+
     if(m_ActiveCamera == nullptr)
         return false;
 
@@ -147,11 +156,11 @@ void HalfEdge2DNavigator::zoom(const int& step, const QPoint& pos_px)
     if(step == 0)
         return;
 
-    QPointF mouse_pos = invTransform(pos_px);
+    QPointF mouse_pos = m_Scene->invTransform(pos_px);
 
     // adjust zoom
     QPointF ortho_size = m_ActiveCamera->getOrthoSize();
-    
+
     if(step > 0)
         ortho_size *= float(step) * m_ZoomFactor;
     else
@@ -177,97 +186,4 @@ void HalfEdge2DNavigator::zoom(const int& step, const QPoint& pos_px)
 
     // update widget
     m_Widget->update();
-}
-
-QPointF HalfEdge2DNavigator::toView(const QPointF& p)
-{
-    const QPointF& cam_pos = m_ActiveCamera->getPosition();
-    const QPointF& ortho_size = m_ActiveCamera->getPosition();
-
-    return QPointF(
-        (p - cam_pos).x() * ortho_size.x(),
-        (p - cam_pos).y() * ortho_size.y());
-}
-
-QPointF HalfEdge2DNavigator::fromView(const QPointF& p)
-{
-    const QPointF& cam_pos = m_ActiveCamera->getPosition();
-    const QPointF& ortho_size = m_ActiveCamera->getPosition();
-
-    return QPointF(
-        p.x() / ortho_size.x(),
-        p.y() / ortho_size.y()) + cam_pos;
-}
-
-QPointF HalfEdge2DNavigator::toDeviceCoords(const QPointF& point)
-{
-    return QPointF(
-        ((point.x() * m_ActiveCamera->getCanvas()->getAspectRatio()) + 1.0f) / 2.0f,
-        (point.y() + 1.0f) / 2.0f);
-}
-
-QPointF HalfEdge2DNavigator::fromDeviceCoords(const QPointF& point)
-{
-    return QPointF(
-        ((point.x() * 2.0f) - 1.0f) / m_ActiveCamera->getCanvas()->getAspectRatio(),
-        (point.y() * 2.0f) - 1.0f);
-}
-
-QPointF HalfEdge2DNavigator::toWidgetCoords(const QPointF& p)
-{
-    const QSize& canvas_size = m_ActiveCamera->getCanvas()->getSize();
-
-    return QPointF(
-        p.x() * (float)canvas_size.width(),
-        (1.0f - p.y()) * (float)canvas_size.height());
-}
-
-QPointF HalfEdge2DNavigator::fromWidgetCoords(const QPointF& p)
-{
-    const QSize& canvas_size = m_ActiveCamera->getCanvas()->getSize();
-
-    return QPointF(
-        p.x() / (float)canvas_size.width(),
-        1.0f - (p.y() / (float)canvas_size.height()));
-}
-
-QPointF HalfEdge2DNavigator::transform(const QPointF& point)
-{
-    return toWidgetCoords(toDeviceCoords(toView(point)));
-}
-
-QPointF HalfEdge2DNavigator::invTransform(const QPointF& point)
-{
-    return fromView(fromDeviceCoords(fromWidgetCoords(point)));
-}
-
-bool HalfEdge2DNavigator::inCanvas(const QPoint& point)
-{
-    const QSize& canvas_size = m_ActiveCamera->getCanvas()->getSize();
-
-    if(point.x() < 0 || point.x() >= canvas_size.width())
-        return false;
-
-    if(point.y() < 0 || point.y() >= canvas_size.height())
-        return false;
-
-    return true;
-}
-
-QPoint HalfEdge2DNavigator::keepInCanvas(const QPoint& point)
-{
-    const QSize& canvas_size = m_ActiveCamera->getCanvas()->getSize();
-    QPoint pos = point;
-
-    if(pos.x() > canvas_size.width())
-        pos.setX(canvas_size.width());
-    if(pos.x() < 0)
-        pos.setX(0);
-
-    if(pos.y() > canvas_size.height())
-        pos.setY(canvas_size.height());
-    if(pos.y() < 0)
-        pos.setY(0);
-
-    return pos;
 }

@@ -31,21 +31,6 @@ private:
     void updateCameraInformation();
 
 private:
-    bool inCanvas(const QPoint& point);
-    QPoint keepInCanvas(const QPoint& point);
-
-    QPointF toView(const QPointF& p);
-    QPointF fromView(const QPointF& p);
-
-    QPointF toDeviceCoords(const QPointF& point);
-    QPointF fromDeviceCoords(const QPointF& point);
-
-    QPointF toWidgetCoords(const QPointF& point);
-    QPointF fromWidgetCoords(const QPointF& point);
-
-    QPointF transform(const QPointF& point);
-    QPointF invTransform(const QPointF& point);
-
     int getHitPoint(const QPointF& pos);
 
     void zoom(const int& step, const QPoint& pos_px);

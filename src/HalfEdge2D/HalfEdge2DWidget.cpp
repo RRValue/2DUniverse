@@ -54,6 +54,14 @@ void HalfEdge2DWidget::resizeEvent(QResizeEvent* event)
     m_EventInterface->handleResizeEvent(event);
 }
 
+void HalfEdge2DWidget::wheelEvent(QWheelEvent* event)
+{
+    if(m_EventInterface == nullptr)
+        return;
+
+    m_EventInterface->handleWheelEvent(event);
+}
+
 void HalfEdge2DWidget::paintEvent(QPaintEvent* event)
 {
     /*QPainter painter(this);

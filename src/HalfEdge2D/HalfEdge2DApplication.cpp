@@ -50,6 +50,7 @@ void HalfEdge2DApplication::init()
 
     // set camera in navigator
     m_Navigator->setScene(m_Scene);
+    m_Controller->setScene(m_Scene);
 
     // create event handler
     m_EventHandler = new HalfEdge2DEventHandler();
