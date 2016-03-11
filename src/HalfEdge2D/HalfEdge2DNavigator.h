@@ -3,10 +3,11 @@
 
 #include "HalfEdge2D/HalfEdge2DEventInterface.h"
 
-#include <QtCore/QPointF>
 #include <QtCore/QSize>
+#include <QtCore/QPointF>
 
 class HalfEdge2DWidget;
+class Camera;
 
 class HalfEdge2DNavigator : public HalfEdge2DEventInterface
 {
@@ -14,6 +15,8 @@ public:
     HalfEdge2DNavigator() = delete;
     HalfEdge2DNavigator(HalfEdge2DWidget* const widget);
     virtual ~HalfEdge2DNavigator();
+
+    void setCamera(Camera* const camera);
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -23,10 +26,8 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    bool inWidget(const QPoint& point);
-    QPoint keepInWidget(const QPoint& point);
-
-    void updateRelativeBases();
+    bool inCanvas(const QPoint& point);
+    QPoint keepInCanvas(const QPoint& point);
 
     QPointF toView(const QPointF& p);
     QPointF fromView(const QPointF& p);
@@ -47,15 +48,9 @@ private:
 private:
     HalfEdge2DWidget* m_Widget;
 
+    Camera* m_Camera;
+
     bool m_Navigatin;
-
-    // widget size
-    QSize m_CurrentSize;
-    float m_AspectRatio;
-
-    // camera
-    QPointF m_OrthoSize;
-    QPointF m_CameraPosition;
 
     // scene manipulation
     float m_ZoomFactor;

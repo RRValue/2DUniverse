@@ -21,6 +21,11 @@ const QPointF& Camera::getPosition() const
     return m_Position;
 }
 
+Canvas* const Camera::getCanvas() const
+{
+    return m_Canvas;
+}
+
 void Camera::setOrthoSize(const QPointF& orthoSize)
 {
     m_OrthoSize = orthoSize;

@@ -24,9 +24,5 @@ const float& Canvas::getAspectRatio() const
 void Canvas::setSize(const QSize& size)
 {
     m_Size = size;
-}
-
-void Canvas::setAspectRatio(const float& aspectRatio)
-{
-    m_AspectRatio = aspectRatio;
+    m_AspectRatio = float(m_Size.height()) / float(m_Size.width());
 }

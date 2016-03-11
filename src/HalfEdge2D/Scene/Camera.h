@@ -15,6 +15,7 @@ public:
     // getter
     const QPointF& getOrthoSize() const;
     const QPointF& getPosition() const;
+    Canvas* const getCanvas() const;
 
     // setter
     void setOrthoSize(const QPointF& orthoSize);

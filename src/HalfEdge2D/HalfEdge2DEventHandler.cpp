@@ -7,8 +7,7 @@ HalfEdge2DEventHandler::HalfEdge2DEventHandler()
 
 HalfEdge2DEventHandler::~HalfEdge2DEventHandler()
 {
-    for(const auto& iface : m_EventInterfaces)
-        delete iface;
+
 }
 
 void HalfEdge2DEventHandler::addEventInterface(HalfEdge2DEventInterface* const eventInterface)

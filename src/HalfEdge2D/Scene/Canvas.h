@@ -15,7 +15,6 @@ public:
 
     // setter
     void setSize(const QSize& size);
-    void setAspectRatio(const float& aspectRatio);
 
 private:
     QSize m_Size;
