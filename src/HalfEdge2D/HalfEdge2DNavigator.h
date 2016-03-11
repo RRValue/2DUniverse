@@ -7,6 +7,8 @@
 #include <QtCore/QPointF>
 
 class HalfEdge2DWidget;
+
+class Scene;
 class Camera;
 
 class HalfEdge2DNavigator : public HalfEdge2DEventInterface
@@ -16,7 +18,7 @@ public:
     HalfEdge2DNavigator(HalfEdge2DWidget* const widget);
     virtual ~HalfEdge2DNavigator();
 
-    void setCamera(Camera* const camera);
+    void setScene(Scene* const scene);
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -24,6 +26,9 @@ protected:
     virtual bool handleMouseReleaseEvent(QMouseEvent* const event) final override;
     virtual bool handleResizeEvent(QResizeEvent* const event) final override;
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
+
+private:
+    void updateCameraInformation();
 
 private:
     bool inCanvas(const QPoint& point);
@@ -48,7 +53,8 @@ private:
 private:
     HalfEdge2DWidget* m_Widget;
 
-    Camera* m_Camera;
+    Scene* m_Scene;
+    Camera* m_ActiveCamera;
 
     bool m_Navigatin;
 
