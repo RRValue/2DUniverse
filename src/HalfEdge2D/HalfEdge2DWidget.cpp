@@ -5,8 +5,6 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
-#include <qdebug.h>
-
 HalfEdge2DWidget::HalfEdge2DWidget(QWidget* parent, Qt::WindowFlags f) : 
     QWidget(parent, f), 
     m_EventInterface(nullptr)
