@@ -25,35 +25,8 @@ protected:
     virtual void paintEvent(QPaintEvent* event) final override;
     virtual void wheelEvent(QWheelEvent* event) final override;
 
-    //int getHitPoint(const QPointF& pos);
-
 private:
     HalfEdge2DEventInterface* m_EventInterface;
-
-    //// widget
-    //QSize _current_size;
-    //float _aspect_ratio;
-    //
-    //// camera
-    //QPointF _ortho_size;
-    //QPointF _camera_position;
-
-    //// points
-    //QVector<QPointF> _points;
-    //float _point_size_px;
-
-    //// point movment
-    //int _current_idx;
-    //QPointF _current_hit_distance;
-
-    //// flag manip process
-    //bool _move_point_mode;
-    //bool _move_cam_mode;
-
-    //// scene manipulation
-    //float _zoom_factor;
-    //QPointF _cam_move_init_mouse_pos;
-    //QPointF _cam_move_init_cam_pos;
 };
 
 #endif //_HALFEDGE_WIDGET_H_
