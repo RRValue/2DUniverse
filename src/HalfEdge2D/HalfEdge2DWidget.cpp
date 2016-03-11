@@ -11,13 +11,13 @@ HalfEdge2DWidget::HalfEdge2DWidget(QWidget* parent, Qt::WindowFlags f) :
     QWidget(parent, f), 
     m_EventInterface(nullptr)
 {
-    _ortho_size = QPointF(1.0f, 1.0f);
+    /*_ortho_size = QPointF(1.0f, 1.0f);
     _camera_position = QPointF(0.0, 0.0f);
     _aspect_ratio = 1.0f;
     _point_size_px = 5.0f;
     _zoom_factor = 1.05f;
     _move_point_mode = false;
-    _move_cam_mode = false;
+    _move_cam_mode = false;*/
 }
 
 HalfEdge2DWidget::~HalfEdge2DWidget()
@@ -37,9 +37,7 @@ void HalfEdge2DWidget::mouseMoveEvent(QMouseEvent* event)
 
     m_EventInterface->handleMouseMoveEvent(event);
 
-    return;
-
-    if(!_move_cam_mode && !_move_point_mode)
+    /*if(!_move_cam_mode && !_move_point_mode)
         return;
 
     if(_move_point_mode)
@@ -60,22 +58,17 @@ void HalfEdge2DWidget::mouseMoveEvent(QMouseEvent* event)
 
     repaint();
 
-    event->accept();
+    event->accept();*/
 }
 
 void HalfEdge2DWidget::mousePressEvent(QMouseEvent* event)
 {
-    if(m_EventInterface == nullptr)
+    if(m_EventInterface == nullptr || event == nullptr)
         return;
 
     m_EventInterface->handleMousePressEvent(event);
 
-    return;
-
-    if(event == nullptr)
-        return;
-
-    if(_move_cam_mode || _move_point_mode)
+    /*if(_move_cam_mode || _move_point_mode)
         return;
 
     // set to move mode
@@ -132,7 +125,7 @@ void HalfEdge2DWidget::mousePressEvent(QMouseEvent* event)
         _cam_move_init_cam_pos = _camera_position;
     }
 
-    event->accept();
+    event->accept();*/
 }
 
 void HalfEdge2DWidget::mouseReleaseEvent(QMouseEvent* event)
@@ -142,9 +135,7 @@ void HalfEdge2DWidget::mouseReleaseEvent(QMouseEvent* event)
 
     m_EventInterface->handleMouseReleaseEvent(event);
 
-    return;
-
-    if(event == nullptr)
+    /*if(event == nullptr)
         return;
 
     if(!_move_point_mode && !_move_cam_mode)
@@ -156,7 +147,7 @@ void HalfEdge2DWidget::mouseReleaseEvent(QMouseEvent* event)
     if(_move_cam_mode)
         _move_cam_mode = false;
 
-    event->accept();
+    event->accept();*/
 }
 
 void HalfEdge2DWidget::wheelEvent(QWheelEvent* event)
@@ -166,9 +157,7 @@ void HalfEdge2DWidget::wheelEvent(QWheelEvent* event)
 
     m_EventInterface->handleWheelEvent(event);
 
-    return;
-
-    if(event == nullptr)
+    /*if(event == nullptr)
         return;
 
     QPoint numPixels = event->pixelDelta();
@@ -183,7 +172,7 @@ void HalfEdge2DWidget::wheelEvent(QWheelEvent* event)
         zoom(numSteps.y(), event->pos());
     }
 
-    event->accept();
+    event->accept();*/
 }
 
 void HalfEdge2DWidget::resizeEvent(QResizeEvent* event)
@@ -193,143 +182,26 @@ void HalfEdge2DWidget::resizeEvent(QResizeEvent* event)
 
     m_EventInterface->handleResizeEvent(event);
 
-    return;
-
-    if(event == nullptr)
+    /*if(event == nullptr)
         return;
 
     _current_size = event->size();
 
-    updateRelativeBases();
+    updateRelativeBases();*/
 }
 
 void HalfEdge2DWidget::paintEvent(QPaintEvent* event)
 {
-    QPainter painter(this);
+    /*QPainter painter(this);
 
     for(const auto& p : _points)
         painter.drawEllipse(transform(p), _point_size_px, _point_size_px);
 
     painter.drawLine(transform(QPointF(-1.0f, 0.0f)), transform(QPointF(1.0f, 0.0f)));
-    painter.drawLine(transform(QPointF(0.0f, -1.0f)), transform(QPointF(0.0f, 1.0f)));
+    painter.drawLine(transform(QPointF(0.0f, -1.0f)), transform(QPointF(0.0f, 1.0f)));*/
 }
 
-void HalfEdge2DWidget::zoom(const int& step, const QPoint& pos_px)
-{
-    if(step == 0)
-        return;
-
-    QPointF mouse_pos = invTransform(pos_px);
-
-    // adjust zoom
-    if(step > 0)
-        _ortho_size *= float(step) * _zoom_factor;
-    else
-        _ortho_size /= std::abs(float(step)) * _zoom_factor;
-
-    // adjust pos (new pos is _zoom_factor / or * delta_pos_scene, cam_pos)
-    QPointF d_cam_mouse = _camera_position - mouse_pos;
-    float d_cam_mouse_length = std::sqrt(std::pow(d_cam_mouse.x(), 2.0f) + std::pow(d_cam_mouse.y(), 2.0f));
-    float d_cam_mouse_length_new = 1.0f;
-
-    if(step > 0)
-        d_cam_mouse_length_new /= float(step) * _zoom_factor;
-    else
-        d_cam_mouse_length_new *= std::abs(float(step)) * _zoom_factor;
-
-    _camera_position = QPointF(
-        mouse_pos.x() + (d_cam_mouse_length_new * d_cam_mouse.x()),
-        mouse_pos.y() + (d_cam_mouse_length_new * d_cam_mouse.y()));
-
-    repaint();
-}
-
-void HalfEdge2DWidget::updateRelativeBases()
-{
-    _aspect_ratio = float(_current_size.height()) / float(_current_size.width());
-}
-
-QPointF HalfEdge2DWidget::toView(const QPointF& p)
-{
-    return QPointF(
-        (p - _camera_position).x() * _ortho_size.x(),
-        (p - _camera_position).y() * _ortho_size.y());
-}
-
-QPointF HalfEdge2DWidget::fromView(const QPointF& p)
-{
-    return QPointF(
-        p.x() / _ortho_size.x(),
-        p.y() / _ortho_size.y()) + _camera_position;
-}
-
-QPointF HalfEdge2DWidget::toDeviceCoords(const QPointF& point)
-{
-    return QPointF(
-        ((point.x() * _aspect_ratio) + 1.0f) / 2.0f,
-        (point.y() + 1.0f) / 2.0f);
-}
-
-QPointF HalfEdge2DWidget::fromDeviceCoords(const QPointF& point)
-{
-    return QPointF(
-        ((point.x() * 2.0f) - 1.0f) / _aspect_ratio, 
-        (point.y() * 2.0f) - 1.0f);
-}
-
-QPointF HalfEdge2DWidget::toWidgetCoords(const QPointF& p)
-{
-    return QPointF(
-        p.x() * (float)_current_size.width(),
-        (1.0f - p.y()) * (float)_current_size.height());
-}
-
-QPointF HalfEdge2DWidget::fromWidgetCoords(const QPointF& p)
-{
-    return QPointF(
-        p.x() / (float)_current_size.width(),
-        1.0f - (p.y() / (float)_current_size.height()));
-}
-
-QPointF HalfEdge2DWidget::transform(const QPointF& point)
-{
-    return toWidgetCoords(toDeviceCoords(toView(point)));
-}
-
-QPointF HalfEdge2DWidget::invTransform(const QPointF& point)
-{
-    return fromView(fromDeviceCoords(fromWidgetCoords(point)));
-}
-
-bool HalfEdge2DWidget::inWidget(const QPoint& point)
-{
-    if(point.x() < 0 || point.x() >= _current_size.width())
-        return false;
-
-    if(point.y() < 0 || point.y() >= _current_size.height())
-        return false;
-
-    return true;
-}
-
-QPoint HalfEdge2DWidget::keepInWidget(const QPoint& point)
-{
-    QPoint pos = point;
-
-    if(pos.x() > _current_size.width())
-        pos.setX(_current_size.width());
-    if(pos.x() < 0)
-        pos.setX(0);
-
-    if(pos.y() > _current_size.height())
-        pos.setY(_current_size.height());
-    if(pos.y() < 0)
-        pos.setY(0);
-
-    return pos;
-}
-
-int HalfEdge2DWidget::getHitPoint(const QPointF& pos)
+/*int HalfEdge2DWidget::getHitPoint(const QPointF& pos)
 {
     if(_points.empty())
         return -1;
@@ -345,4 +217,4 @@ int HalfEdge2DWidget::getHitPoint(const QPointF& pos)
     }
 
     return -1;
-}
+}*/
