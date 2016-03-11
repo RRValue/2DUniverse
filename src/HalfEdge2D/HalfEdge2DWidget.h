@@ -5,6 +5,8 @@
 
 #include <QtCore/QVector>
 
+class HalfEdge2DEventInterface;
+
 class HalfEdge2DWidget : public QWidget
 {
     Q_OBJECT
@@ -12,6 +14,8 @@ class HalfEdge2DWidget : public QWidget
 public:
     HalfEdge2DWidget(QWidget* parent = nullptr, Qt::WindowFlags f = 0);
     ~HalfEdge2DWidget();
+
+    void setEventHandler(HalfEdge2DEventInterface* const eventInterface);
 
 protected:
     virtual void mouseMoveEvent(QMouseEvent* event) final override;
@@ -44,6 +48,8 @@ private:
     void zoom(const int& step, const QPoint& pos_px);
 
 private:
+    HalfEdge2DEventInterface* m_EventInterface;
+
     // widget
     QSize _current_size;
     float _aspect_ratio;

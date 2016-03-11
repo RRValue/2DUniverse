@@ -4,7 +4,7 @@
 #include <QtWidgets/QApplication>
 
 class HalfEdge2DWidget;
-class HESMesh;
+class HalfEdge2DEventHandler;
 
 class HalfEdge2DApplication : public QApplication
 {
@@ -23,8 +23,7 @@ private:
 
 private:
     HalfEdge2DWidget* m_MainWidget;
-
-    HESMesh* m_Mesh;
+    HalfEdge2DEventHandler* m_EventHandler;
 };
 
 #endif //_HALFEDGE_APPLICATION_H_

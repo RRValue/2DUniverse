@@ -1,17 +1,16 @@
-#ifndef _HALFEDGE_CONTROLLER_H_
-#define _HALFEDGE_CONTROLLER_H_
+#ifndef _HALFEDGE_NAVIGATOR_H_
+#define _HALFEDGE_NAVIGATOR_H_
 
 #include "HalfEdge2D/HalfEdge2DEventInterface.h"
 
-class HESMesh;
 class HalfEdge2DWidget;
 
-class HalfEdge2DController : public HalfEdge2DEventInterface
+class HalfEdge2DNavigator : public HalfEdge2DEventInterface
 {
 public:
-    HalfEdge2DController() = delete;
-    HalfEdge2DController(HalfEdge2DWidget* const widget);
-    virtual ~HalfEdge2DController();
+    HalfEdge2DNavigator() = delete;
+    HalfEdge2DNavigator(HalfEdge2DWidget* const widget);
+    virtual ~HalfEdge2DNavigator();
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -21,8 +20,7 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    HESMesh* m_Mesh;
     HalfEdge2DWidget* m_Widget;
 };
 
-#endif //_HALFEDGE_CONTROLLER_H_
+#endif //_HALFEDGE_NAVIGATOR_H_
