@@ -1,13 +1,23 @@
 #include "HalfEdge2D/HalfEdge2DEventHandler.h"
 
+#include "HalfEdge2D/HalfEdge2DRenderer.h"
+
 HalfEdge2DEventHandler::HalfEdge2DEventHandler()
 {
-
+    m_Renderer = nullptr;
 }
 
 HalfEdge2DEventHandler::~HalfEdge2DEventHandler()
 {
 
+}
+
+void HalfEdge2DEventHandler::setRenderer(HalfEdge2DRenderer* const renderer)
+{
+    if(renderer == nullptr)
+        return;
+
+    m_Renderer = renderer;
 }
 
 void HalfEdge2DEventHandler::addEventInterface(HalfEdge2DEventInterface* const eventInterface)
@@ -80,4 +90,12 @@ bool HalfEdge2DEventHandler::handleWheelEvent(QWheelEvent* const event)
             return true;
 
     return true;
+}
+
+void HalfEdge2DEventHandler::handlePaintEvent(QPaintEvent* const event)
+{
+    if(m_Renderer == nullptr)
+        return;
+
+    m_Renderer->render(event);
 }

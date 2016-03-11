@@ -7,6 +7,7 @@
 
 class HalfEdge2DNavigator;
 class HalfEdge2DController;
+class HalfEdge2DRenderer;
 
 class HalfEdge2DEventHandler : public HalfEdge2DEventInterface
 {
@@ -15,6 +16,7 @@ public:
     ~HalfEdge2DEventHandler();
 
     void addEventInterface(HalfEdge2DEventInterface* const eventInterface);
+    void setRenderer(HalfEdge2DRenderer* const renderer);
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -23,8 +25,11 @@ protected:
     virtual bool handleResizeEvent(QResizeEvent* const event) final override;
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
+    virtual void handlePaintEvent(QPaintEvent* const event) final override;
+
 private:
     std::vector<HalfEdge2DEventInterface* const> m_EventInterfaces;
+    HalfEdge2DRenderer* m_Renderer;
 };
 
 #endif //_HALFEDGE_EVENTHANDLER_H_

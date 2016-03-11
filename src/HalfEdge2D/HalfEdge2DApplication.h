@@ -6,6 +6,7 @@
 class HalfEdge2DWidget;
 class HalfEdge2DEventHandler;
 class HalfEdge2DEventInterface;
+class HalfEdge2DRenderer;
 
 class HalfEdge2DNavigator;
 class HalfEdge2DController;
@@ -35,6 +36,8 @@ private:
 
     HalfEdge2DNavigator* m_Navigator;
     HalfEdge2DController* m_Controller;
+
+    HalfEdge2DRenderer* m_Renderer;
 
     Scene* m_Scene;
     Camera* m_Camera;

@@ -33,6 +33,16 @@ const QPointF& Scene::getPoint(const size_t& idx) const
     return m_Points[idx];
 }
 
+const QVector<QPointF>& Scene::getPoints() const
+{
+    return m_Points;
+}
+
+const float& Scene::getPointSize() const
+{
+    return m_PointSizePx;
+}
+
 int Scene::getPointAtPos(const QPointF& pos) const
 {
     if(!hasPoints())
@@ -64,7 +74,7 @@ void Scene::setCamera(Camera* const camera)
 QPointF Scene::toView(const QPointF& p) const
 {
     const QPointF& cam_pos = m_Camera->getPosition();
-    const QPointF& ortho_size = m_Camera->getPosition();
+    const QPointF& ortho_size = m_Camera->getOrthoSize();
 
     return QPointF(
         (p - cam_pos).x() * ortho_size.x(),

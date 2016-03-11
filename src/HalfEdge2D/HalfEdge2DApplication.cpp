@@ -4,6 +4,7 @@
 #include "HalfEdge2D/HalfEdge2DEventhandler.h"
 #include "HalfEdge2D/HalfEdge2DController.h"
 #include "HalfEdge2D/HalfEdge2DNavigator.h"
+#include "HalfEdge2D/HalfEdge2DRenderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -52,10 +53,16 @@ void HalfEdge2DApplication::init()
     m_Navigator->setScene(m_Scene);
     m_Controller->setScene(m_Scene);
 
+    // create renderer
+    m_Renderer = new HalfEdge2DRenderer();
+    m_Renderer->setScene(m_Scene);
+    m_Renderer->setWidget(m_MainWidget);
+
     // create event handler
     m_EventHandler = new HalfEdge2DEventHandler();
     m_EventHandler->addEventInterface(m_Navigator);
     m_EventHandler->addEventInterface(m_Controller);
+    m_EventHandler->setRenderer(m_Renderer);
     
     m_MainWidget->setEventHandler(m_EventHandler);
     m_MainWidget->show();

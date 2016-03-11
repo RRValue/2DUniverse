@@ -20,7 +20,9 @@ public:
     void setPointPos(const size_t& idx, const QPointF& pos);
     void addPoint(const QPointF& pos);
     const QPointF& getPoint(const size_t& idx) const;
+    const QVector<QPointF>& getPoints() const;
     int getPointAtPos(const QPointF& pos) const;
+    const float& getPointSize() const;
 
     bool inCanvas(const QPoint& point) const;
     QPoint keepInCanvas(const QPoint& point) const;

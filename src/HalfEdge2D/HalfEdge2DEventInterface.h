@@ -4,6 +4,7 @@
 class QMouseEvent;
 class QResizeEvent;
 class QWheelEvent;
+class QPaintEvent;
 
 class HalfEdge2DEventHandler;
 
@@ -21,6 +22,8 @@ public:
     virtual bool handleMouseReleaseEvent(QMouseEvent* const event) = 0;
     virtual bool handleResizeEvent(QResizeEvent* const event) = 0;
     virtual bool handleWheelEvent(QWheelEvent* const event) = 0;
+    
+    virtual void handlePaintEvent(QPaintEvent* const event) {};
 };
 
 #endif //_HALFEDGE_EVENTHANDLER_H_

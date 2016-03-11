@@ -53,6 +53,8 @@ bool HalfEdge2DController::handleMouseMoveEvent(QMouseEvent* const event)
 
     QPointF pos = m_Scene->keepInCanvas(event->pos()) + m_CurrentHitDistance;
     m_Scene->setPointPos(m_CurrentIdx, m_Scene->invTransform(pos));
+
+    m_Widget->update();
     
     return true;
 }

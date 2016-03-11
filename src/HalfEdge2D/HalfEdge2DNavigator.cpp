@@ -8,8 +8,6 @@
 
 #include <QtGui/QMouseEvent>
 
-#include <qdebug.h>
-
 HalfEdge2DNavigator::HalfEdge2DNavigator(HalfEdge2DWidget* const widget) : m_Widget(widget)
 {
     m_Navigatin = false;
@@ -66,8 +64,6 @@ bool HalfEdge2DNavigator::handleMousePressEvent(QMouseEvent* const event)
     m_CamMoveInitMousePos = m_Scene->invTransform(pos_px);
     m_CamMoveInitCamPos = m_ActiveCamera->getPosition();
 
-    qDebug() << "Start Navigate";
-
     return true;
 }
 
@@ -91,8 +87,6 @@ bool HalfEdge2DNavigator::handleMouseMoveEvent(QMouseEvent* const event)
     // update widget
     m_Widget->update();
 
-    qDebug() << "Navigate";
-
     return true;
 }
 
@@ -108,8 +102,6 @@ bool HalfEdge2DNavigator::handleMouseReleaseEvent(QMouseEvent* const event)
 
     m_Navigatin = false;
 
-    qDebug() << "Stop Navigate";
-
     return true;
 }
 
@@ -121,8 +113,6 @@ bool HalfEdge2DNavigator::handleResizeEvent(QResizeEvent* const event)
         return false;
 
     m_ActiveCamera->getCanvas()->setSize(event->size());
-
-    qDebug() << "Resize";
 
     return true;
 }
@@ -145,8 +135,6 @@ bool HalfEdge2DNavigator::handleWheelEvent(QWheelEvent* const event)
 
         zoom(numSteps.y(), event->pos());
     }
-
-    qDebug() << "Wheel";
 
     return true;
 }
