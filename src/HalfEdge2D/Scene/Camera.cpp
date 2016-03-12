@@ -2,8 +2,9 @@
 
 Camera::Camera(Canvas* const canvas) : m_Canvas(canvas)
 {
-    m_OrthoSize = QPointF(1.0f, 1.0f);
+    m_Zoom= 1.0f;
     m_Position = QPointF(0.0, 0.0f);
+    m_Viewport = QRectF(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
 Camera::~Camera()
@@ -11,9 +12,9 @@ Camera::~Camera()
 
 }
 
-const QPointF& Camera::getOrthoSize() const
+const float& Camera::getZoom() const
 {
-    return m_OrthoSize;
+    return m_Zoom;
 }
 
 const QPointF& Camera::getPosition() const
@@ -26,9 +27,9 @@ Canvas* const Camera::getCanvas() const
     return m_Canvas;
 }
 
-void Camera::setOrthoSize(const QPointF& orthoSize)
+void Camera::setZoom(const float& zoom)
 {
-    m_OrthoSize = orthoSize;
+    m_Zoom = zoom;
 }
 
 void Camera::setPosition(const QPointF& position)

@@ -74,21 +74,17 @@ void Scene::setCamera(Camera* const camera)
 QPointF Scene::toView(const QPointF& p) const
 {
     const QPointF& cam_pos = m_Camera->getPosition();
-    const QPointF& ortho_size = m_Camera->getOrthoSize();
+    const float& zoom = m_Camera->getZoom();
 
-    return QPointF(
-        (p - cam_pos).x() * ortho_size.x(),
-        (p - cam_pos).y() * ortho_size.y());
+    return (p - cam_pos) * zoom;
 }
 
 QPointF Scene::fromView(const QPointF& p) const
 {
     const QPointF& cam_pos = m_Camera->getPosition();
-    const QPointF& ortho_size = m_Camera->getOrthoSize();
+    const float& zoom = m_Camera->getZoom();
 
-    return QPointF(
-        p.x() / ortho_size.x(),
-        p.y() / ortho_size.y()) + cam_pos;
+    return (p / zoom) + cam_pos;
 }
 
 QPointF Scene::toDeviceCoords(const QPointF& point) const

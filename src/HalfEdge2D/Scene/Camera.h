@@ -2,6 +2,7 @@
 #define _SCENE_CAMERA_H_
 
 #include <QtCore/QPointF>
+#include <QtCore/QRectF>
 
 class Canvas;
 
@@ -13,18 +14,20 @@ public:
     ~Camera();
 
     // getter
-    const QPointF& getOrthoSize() const;
+    const float& getZoom() const;
     const QPointF& getPosition() const;
     Canvas* const getCanvas() const;
 
     // setter
-    void setOrthoSize(const QPointF& orthoSize);
+    void setZoom(const float& zoom);
     void setPosition(const QPointF& position);
 
 private:
     Canvas* const m_Canvas;
-    QPointF m_OrthoSize;
+    
+    float m_Zoom;
     QPointF m_Position;
+    QRectF m_Viewport;
 };
 
 #endif //_SCENE_CAMERA_H_

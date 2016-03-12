@@ -147,14 +147,14 @@ void HalfEdge2DNavigator::zoom(const int& step, const QPoint& pos_px)
     QPointF mouse_pos = m_Scene->invTransform(pos_px);
 
     // adjust zoom
-    QPointF ortho_size = m_ActiveCamera->getOrthoSize();
+    float zoom = m_ActiveCamera->getZoom();
 
     if(step > 0)
-        ortho_size *= float(step) * m_ZoomFactor;
+        zoom *= float(step) * m_ZoomFactor;
     else
-        ortho_size /= std::abs(float(step)) * m_ZoomFactor;
+        zoom /= std::abs(float(step)) * m_ZoomFactor;
 
-    m_ActiveCamera->setOrthoSize(ortho_size);
+    m_ActiveCamera->setZoom(zoom);
 
     // adjust pos (new pos is _zoom_factor / or * delta_pos_scene, cam_pos)
     QPointF d_cam_mouse = m_ActiveCamera->getPosition() - mouse_pos;
