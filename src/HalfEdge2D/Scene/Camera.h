@@ -16,11 +16,13 @@ public:
     // getter
     const float& getZoom() const;
     const QPointF& getPosition() const;
+    const QRectF& getViewport() const;
     Canvas* const getCanvas() const;
 
     // setter
     void setZoom(const float& zoom);
     void setPosition(const QPointF& position);
+    void setViewport(const QRectF& viewport);
 
 private:
     Canvas* const m_Canvas;

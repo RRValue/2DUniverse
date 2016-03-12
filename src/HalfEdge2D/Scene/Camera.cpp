@@ -22,6 +22,11 @@ const QPointF& Camera::getPosition() const
     return m_Position;
 }
 
+const QRectF& Camera::getViewport() const
+{ 
+    return m_Viewport;
+}
+
 Canvas* const Camera::getCanvas() const
 {
     return m_Canvas;
@@ -35,4 +40,9 @@ void Camera::setZoom(const float& zoom)
 void Camera::setPosition(const QPointF& position)
 {
     m_Position = position;
+}
+
+void Camera::setViewport(const QRectF& viewport)
+{
+    m_Viewport = viewport;
 }
