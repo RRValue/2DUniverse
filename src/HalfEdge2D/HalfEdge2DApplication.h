@@ -3,7 +3,8 @@
 
 #include <QtWidgets/QApplication>
 
-class HalfEdge2DWidget;
+class QPaintTarget;
+
 class HalfEdge2DEventHandler;
 class HalfEdge2DEventInterface;
 class HalfEdge2DRenderer;
@@ -31,7 +32,7 @@ private:
     void init();
 
 private:
-    HalfEdge2DWidget* m_MainWidget;
+    QPaintTarget* m_PaintTarget;
     HalfEdge2DEventHandler* m_EventHandler;
 
     HalfEdge2DNavigator* m_Navigator;

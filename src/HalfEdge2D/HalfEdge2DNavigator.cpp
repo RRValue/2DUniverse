@@ -1,14 +1,13 @@
 #include "HalfEdge2D/HalfEdge2DNavigator.h"
 
-#include "HalfEdge2D/HalfEdge2DWidget.h"
-
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
 #include "HalfEdge2D/Scene/Canvas.h"
+#include "HalfEdge2D/Scene/RenderTarget.h"
 
 #include <QtGui/QMouseEvent>
 
-HalfEdge2DNavigator::HalfEdge2DNavigator(HalfEdge2DWidget* const widget) : m_Widget(widget)
+HalfEdge2DNavigator::HalfEdge2DNavigator(RenderTarget* const target) : m_Target(target)
 {
     m_Navigatin = false;
     m_Scene = nullptr;
@@ -85,7 +84,7 @@ bool HalfEdge2DNavigator::handleMouseMoveEvent(QMouseEvent* const event)
     m_ActiveCamera->setPosition(m_CamMoveInitCamPos + current_delta);
 
     // update widget
-    m_Widget->update();
+    m_Target->render();
 
     return true;
 }
@@ -137,7 +136,7 @@ bool HalfEdge2DNavigator::handleWheelEvent(QWheelEvent* const event)
         m_ActiveCamera->setRotation(rot);
 
         // update widget
-        m_Widget->update();
+        m_Target->render();
     }
     else
     {
@@ -188,5 +187,5 @@ void HalfEdge2DNavigator::zoom(const int& step, const QPoint& pos_px)
     m_ActiveCamera->setPosition(new_pos);
 
     // update widget
-    m_Widget->update();
+    m_Target->render();
 }

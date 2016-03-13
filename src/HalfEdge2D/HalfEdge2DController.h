@@ -6,14 +6,14 @@
 #include <QtCore/QPointF>
 
 class HESMesh;
-class HalfEdge2DWidget;
+class RenderTarget;
 class Scene;
 
 class HalfEdge2DController : public HalfEdge2DEventInterface
 {
 public:
     HalfEdge2DController() = delete;
-    HalfEdge2DController(HalfEdge2DWidget* const widget);
+    HalfEdge2DController(RenderTarget* const target);
     virtual ~HalfEdge2DController();
 
     void setScene(Scene* const scene);
@@ -31,7 +31,7 @@ private:
     bool m_MovePoint;
 
     HESMesh* m_Mesh;
-    HalfEdge2DWidget* m_Widget;
+    RenderTarget* m_Target;
 
     int m_CurrentIdx;
     QPointF m_CurrentHitDistance;

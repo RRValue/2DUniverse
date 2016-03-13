@@ -1,6 +1,5 @@
 #include "HalfEdge2D/HalfEdge2DApplication.h"
 
-#include "HalfEdge2D/HalfEdge2DWidget.h"
 #include "HalfEdge2D/HalfEdge2DEventhandler.h"
 #include "HalfEdge2D/HalfEdge2DController.h"
 #include "HalfEdge2D/HalfEdge2DNavigator.h"
@@ -9,6 +8,7 @@
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
 #include "HalfEdge2D/Scene/Canvas.h"
+#include "HalfEdge2D/Scene/QPaintTarget.h"
 
 HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplication(argc, argv)
 {
@@ -17,7 +17,7 @@ HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplicat
 
 HalfEdge2DApplication::~HalfEdge2DApplication()
 {
-    delete m_MainWidget;
+    delete m_PaintTarget;
     delete m_EventHandler;
 
     delete m_Navigator;
@@ -43,11 +43,11 @@ void HalfEdge2DApplication::init()
     m_Scene->setCamera(m_Camera);
 
     // allocate widget
-    m_MainWidget = new HalfEdge2DWidget();
+    m_PaintTarget = new QPaintTarget();
     
     // allocate event handler and add controller and navigator
-    m_Navigator = new HalfEdge2DNavigator(m_MainWidget);
-    m_Controller = new HalfEdge2DController(m_MainWidget);
+    m_Navigator = new HalfEdge2DNavigator(m_PaintTarget);
+    m_Controller = new HalfEdge2DController(m_PaintTarget);
 
     // set camera in navigator
     m_Navigator->setScene(m_Scene);
@@ -56,7 +56,7 @@ void HalfEdge2DApplication::init()
     // create renderer
     m_Renderer = new HalfEdge2DRenderer();
     m_Renderer->setScene(m_Scene);
-    m_Renderer->setWidget(m_MainWidget);
+    m_Renderer->setWidget(m_PaintTarget);
 
     // create event handler
     m_EventHandler = new HalfEdge2DEventHandler();
@@ -64,6 +64,6 @@ void HalfEdge2DApplication::init()
     m_EventHandler->addEventInterface(m_Controller);
     m_EventHandler->setRenderer(m_Renderer);
     
-    m_MainWidget->setEventHandler(m_EventHandler);
-    m_MainWidget->show();
+    m_PaintTarget->setEventHandler(m_EventHandler);
+    m_PaintTarget->show();
 }

@@ -6,7 +6,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QPointF>
 
-class HalfEdge2DWidget;
+class RenderTarget;
 
 class Scene;
 class Camera;
@@ -15,7 +15,7 @@ class HalfEdge2DNavigator : public HalfEdge2DEventInterface
 {
 public:
     HalfEdge2DNavigator() = delete;
-    HalfEdge2DNavigator(HalfEdge2DWidget* const widget);
+    HalfEdge2DNavigator(RenderTarget* const target);
     virtual ~HalfEdge2DNavigator();
 
     void setScene(Scene* const scene);
@@ -36,7 +36,7 @@ private:
     void zoom(const int& step, const QPoint& pos_px);
 
 private:
-    HalfEdge2DWidget* m_Widget;
+    RenderTarget* m_Target;
 
     Scene* m_Scene;
     Camera* m_ActiveCamera;

@@ -1,15 +1,14 @@
 #include "HalfEdge2D/HalfEdge2DController.h"
 
-#include "HalfEdge2D/HalfEdge2DWidget.h"
-
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
+#include "HalfEdge2D/Scene/RenderTarget.h"
 
 #include <QtGui/QMouseEvent>
 
-HalfEdge2DController::HalfEdge2DController(HalfEdge2DWidget* const widget) : m_Widget(widget)
+HalfEdge2DController::HalfEdge2DController(RenderTarget* const target) : m_Target(target)
 {
     m_Mesh = new HESMesh();
 
@@ -54,7 +53,7 @@ bool HalfEdge2DController::handleMouseMoveEvent(QMouseEvent* const event)
     QPointF pos = m_Scene->keepInCanvas(event->pos()) + m_CurrentHitDistance;
     m_Scene->setPointPos(m_CurrentIdx, m_Scene->invTransform(pos));
 
-    m_Widget->update();
+    m_Target->render();
     
     return true;
 }
@@ -85,7 +84,7 @@ bool HalfEdge2DController::handleMousePressEvent(QMouseEvent* const event)
 
         m_MovePoint = false;
 
-        m_Widget->update();
+        m_Target->render();
     }
     else
     {
