@@ -1,12 +1,10 @@
 #ifndef _SCENE_CAMERA_H_
 #define _SCENE_CAMERA_H_
 
+#include "HalfEdge2D/Base/Vector.h"
+
 #include <QtCore/QPointF>
 #include <QtCore/QRectF>
-
-#define _USE_MATH_DEFINES
-
-#include <math.h>
 
 class Canvas;
 
@@ -23,6 +21,8 @@ public:
     const QPointF& getPosition() const;
     const QRectF& getViewport() const;
     Canvas* const getCanvas() const;
+    const Mat3f& getViewMatrix();
+    const Mat3f& getInvViewMatrix();
 
     // setter
     void setZoom(const float& zoom);
@@ -31,12 +31,19 @@ public:
     void setViewport(const QRectF& viewport);
 
 private:
+    void updateViewMatrix();
+
+private:
     Canvas* const m_Canvas;
     
     float m_Zoom;
     float m_Rotation;
     QPointF m_Position;
     QRectF m_Viewport;
+
+    bool m_ViewDirty;
+    Mat3f m_ViewMatrix;
+    Mat3f m_InvViewMatrix;
 
     const float m_2Pi;
 };

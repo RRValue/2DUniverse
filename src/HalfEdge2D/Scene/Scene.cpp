@@ -73,24 +73,16 @@ void Scene::setCamera(Camera* const camera)
 
 QPointF Scene::toView(const QPointF& p) const
 {
-    const QPointF& cam_pos = m_Camera->getPosition();
-    const QRectF& vp= m_Camera->getViewport();
-    const float& zoom = m_Camera->getZoom();
+    Vec3f trans_p = m_Camera->getViewMatrix() * Vec3f(p.x(), p.y(), 1.0f);
 
-    return QPointF(
-        (p.x() - cam_pos.x()) * zoom,
-        (p.y() - cam_pos.y()) * zoom);
+    return QPointF(trans_p(0), trans_p(1));
 }
 
 QPointF Scene::fromView(const QPointF& p) const
 {
-    const QPointF& cam_pos = m_Camera->getPosition();
-    const QRectF& vp = m_Camera->getViewport();
-    const float& zoom = m_Camera->getZoom();
+    Vec3f trans_p = m_Camera->getInvViewMatrix() * Vec3f(p.x(), p.y(), 1.0f);
 
-    return QPointF(
-        (p.x() / zoom) + cam_pos.x(),
-        (p.y() / zoom) + cam_pos.y());
+    return QPointF(trans_p(0), trans_p(1));
 }
 
 QPointF Scene::toDeviceCoords(const QPointF& point) const

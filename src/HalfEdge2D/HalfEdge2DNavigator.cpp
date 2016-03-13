@@ -127,13 +127,28 @@ bool HalfEdge2DNavigator::handleWheelEvent(QWheelEvent* const event)
     QPoint numPixels = event->pixelDelta();
     QPoint numDegrees = event->angleDelta() / 8;
 
-    if(!numPixels.isNull())
-        zoom(numPixels.y(), event->pos());
-    else if(!numDegrees.isNull())
-    {
-        QPoint numSteps = numDegrees / 15;
+    bool controll_pressed = event->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier);
 
-        zoom(numSteps.y(), event->pos());
+    if(controll_pressed)
+    {
+        float rot_step = (float)(2.0 * M_PI / (2.0 * 360.0));
+        float rot = m_ActiveCamera->getRotation();
+        rot += rot_step * (float)(numDegrees.y() / 15);
+        m_ActiveCamera->setRotation(rot);
+
+        // update widget
+        m_Widget->update();
+    }
+    else
+    {
+        if(!numPixels.isNull())
+            zoom(numPixels.y(), event->pos());
+        else if(!numDegrees.isNull())
+        {
+            QPoint numSteps = numDegrees / 15;
+
+            zoom(numSteps.y(), event->pos());
+        }
     }
 
     return true;
