@@ -4,6 +4,10 @@
 #include <QtCore/QPointF>
 #include <QtCore/QRectF>
 
+#define _USE_MATH_DEFINES
+
+#include <math.h>
+
 class Canvas;
 
 class Camera
@@ -15,12 +19,14 @@ public:
 
     // getter
     const float& getZoom() const;
+    const float& getRotation() const;
     const QPointF& getPosition() const;
     const QRectF& getViewport() const;
     Canvas* const getCanvas() const;
 
     // setter
     void setZoom(const float& zoom);
+    void setRotation(const float& rotation);
     void setPosition(const QPointF& position);
     void setViewport(const QRectF& viewport);
 
@@ -28,8 +34,11 @@ private:
     Canvas* const m_Canvas;
     
     float m_Zoom;
+    float m_Rotation;
     QPointF m_Position;
     QRectF m_Viewport;
+
+    const float m_2Pi;
 };
 
 #endif //_SCENE_CAMERA_H_
