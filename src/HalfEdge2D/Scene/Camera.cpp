@@ -6,6 +6,7 @@ Camera::Camera(Canvas* const canvas) : m_Canvas(canvas), m_2Pi((float)(2.0 * M_P
     m_Rotation = 0.0f;
     m_Position = QPointF(0.0, 0.0f);
     m_Viewport = QRectF(0.0f, 0.0f, 0.5f, 0.5f);
+    m_ViewDirty = true;
 }
 
 Camera::~Camera()
