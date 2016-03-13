@@ -115,4 +115,6 @@ void Camera::updateViewMatrix()
 
     m_ViewMatrix = S * T * R;
     m_InvViewMatrix = m_ViewMatrix.inverse();
+
+    m_ViewDirty = false;
 }
