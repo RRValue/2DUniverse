@@ -5,7 +5,7 @@
 
 Viewport::Viewport()
 {
-    m_Size = QRectF(0.0f, 0.0f, 0.5f, 0.5f);
+    m_Size = QRectF(0.1f, 0.1f, 0.9f, 0.9f);
     m_Camera = nullptr;
     m_ProjectionDirty = true;
 }
@@ -79,13 +79,11 @@ void Viewport::updateProjectionMatrix()
 
     float vpw_half = m_Size.width() / 2.0f;
     float vph_half = m_Size.height() / 2.0f;
-    float vpx_half = m_Size.x() / 2.0f;
-    float vpy_half = m_Size.y() / 2.0f;
 
     float A = vpw_half * ar;
-    float B = vpw_half + vpx_half;
+    float B = vpw_half + m_Size.x();
     float C = vph_half;
-    float D = vph_half + vpy_half;
+    float D = vph_half + m_Size.y();
 
     m_ProjectionMatrix <<
         A, 0.0f, B,

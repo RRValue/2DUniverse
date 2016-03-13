@@ -107,8 +107,8 @@ QPointF Scene::fromDeviceCoords(const QPointF& point) const
     float ar = (sizef.height() * vp.height()) / (sizef.width() * vp.width());
 
     return QPointF(
-    ((((point.x() - vp.x()) / vp.width()) * 2.0f) - 1.0f) / ar,
-    (((point.y() - vp.y()) / vp.height()) * 2.0f) - 1.0f);
+        ((((point.x() - vp.x()) / vp.width()) * 2.0f) - 1.0f) / ar,
+        (((point.y() - vp.y()) / vp.height()) * 2.0f) - 1.0f);
 }
 
 QPointF Scene::toWidgetCoords(const QPointF& p) const
