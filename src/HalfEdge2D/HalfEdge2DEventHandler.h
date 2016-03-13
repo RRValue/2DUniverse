@@ -8,11 +8,13 @@
 class HalfEdge2DNavigator;
 class HalfEdge2DController;
 class HalfEdge2DRenderer;
+class RenderTarget;
 
 class HalfEdge2DEventHandler : public HalfEdge2DEventInterface
 {
 public:
-    HalfEdge2DEventHandler();
+    HalfEdge2DEventHandler() = delete;
+    HalfEdge2DEventHandler(RenderTarget* const renderTarget);
     ~HalfEdge2DEventHandler();
 
     void addEventInterface(HalfEdge2DEventInterface* const eventInterface);
@@ -28,6 +30,7 @@ protected:
     virtual void handlePaintEvent(QPaintEvent* const event) final override;
 
 private:
+    RenderTarget* const m_RenderTarget;
     std::vector<HalfEdge2DEventInterface* const> m_EventInterfaces;
     HalfEdge2DRenderer* m_Renderer;
 };

@@ -2,7 +2,7 @@
 
 #include "HalfEdge2D/HalfEdge2DRenderer.h"
 
-HalfEdge2DEventHandler::HalfEdge2DEventHandler()
+HalfEdge2DEventHandler::HalfEdge2DEventHandler(RenderTarget* const renderTarget) : m_RenderTarget(renderTarget)
 {
     m_Renderer = nullptr;
 }
@@ -97,5 +97,5 @@ void HalfEdge2DEventHandler::handlePaintEvent(QPaintEvent* const event)
     if(m_Renderer == nullptr)
         return;
 
-    m_Renderer->render(event);
+    m_Renderer->render(event, m_RenderTarget);
 }

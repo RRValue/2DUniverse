@@ -3,34 +3,34 @@
 #include "HalfEdge2D/Scene/Camera.h"
 #include "HalfEdge2D/Scene/Canvas.h"
 
-Viewport::Viewport()
+ViewPort::ViewPort()
 {
-    m_Size = QRectF(0.1f, 0.1f, 0.9f, 0.9f);
+    m_Size = QRectF(0.25f, 0.25f, 0.5f, 0.5f);
     m_Camera = nullptr;
     m_ProjectionDirty = true;
 }
 
-Viewport::~Viewport()
+ViewPort::~ViewPort()
 {
 
 }
 
-const QRectF& Viewport::getSize() const
+const QRectF& ViewPort::getSize() const
 {
     return m_Size;
 }
 
-const QSizeF& Viewport::getTargetSize() const
+const QSizeF& ViewPort::getTargetSize() const
 {
     return m_TargetSize;
 }
 
-Camera* const Viewport::getCamera() const
+Camera* const ViewPort::getCamera() const
 {
     return m_Camera;
 }
 
-const Mat3f& Viewport::getProjectionMatrix()
+const Mat3f& ViewPort::getProjectionMatrix()
 {
     if(m_ProjectionDirty)
         updateProjectionMatrix();
@@ -38,7 +38,7 @@ const Mat3f& Viewport::getProjectionMatrix()
     return m_ProjectionMatrix;
 }
 
-const Mat3f& Viewport::getInvProjectionMatrix()
+const Mat3f& ViewPort::getInvProjectionMatrix()
 {
     if(m_ProjectionDirty)
         updateProjectionMatrix();
@@ -46,7 +46,7 @@ const Mat3f& Viewport::getInvProjectionMatrix()
     return m_InvProjectionMatrix;
 }
 
-void Viewport::setSize(const QRectF& size)
+void ViewPort::setSize(const QRectF& size)
 {
     if(size == m_Size)
         return;
@@ -56,7 +56,7 @@ void Viewport::setSize(const QRectF& size)
     m_ProjectionDirty = true;
 }
 
-void Viewport::setTargetSize(const QSizeF& targetSize)
+void ViewPort::setTargetSize(const QSizeF& targetSize)
 {
     if(targetSize == m_TargetSize)
         return;
@@ -66,12 +66,12 @@ void Viewport::setTargetSize(const QSizeF& targetSize)
     m_ProjectionDirty = true;
 }
 
-void Viewport::setCamera(Camera* const camera)
+void ViewPort::setCamera(Camera* const camera)
 {
     m_Camera = camera;
 }
 
-void Viewport::updateProjectionMatrix()
+void ViewPort::updateProjectionMatrix()
 {
     const QSize& size = m_Camera->getCanvas()->getSize();
     QSizeF sizef = QSizeF(float(size.width()), float(size.height()));

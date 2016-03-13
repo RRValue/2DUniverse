@@ -5,6 +5,7 @@ class QPaintEvent;
 
 class QWidget;
 class Scene;
+class RenderTarget;
 
 class HalfEdge2DRenderer
 {
@@ -12,7 +13,7 @@ public:
     HalfEdge2DRenderer();
     ~HalfEdge2DRenderer();
 
-    void render(QPaintEvent* const event);
+    void render(QPaintEvent* const event, RenderTarget* const renderTarget);
 
     void setWidget(QWidget* const widget);
     void setScene(Scene* const scene);

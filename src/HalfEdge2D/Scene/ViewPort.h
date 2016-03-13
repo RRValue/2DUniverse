@@ -8,11 +8,11 @@
 
 class Camera;
 
-class Viewport
+class ViewPort
 {
 public:
-    Viewport();
-    ~Viewport();
+    ViewPort();
+    ~ViewPort();
 
     // getter
     const QRectF& getSize() const;

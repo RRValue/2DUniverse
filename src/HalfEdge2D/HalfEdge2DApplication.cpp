@@ -8,6 +8,7 @@
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
 #include "HalfEdge2D/Scene/Canvas.h"
+#include "HalfEdge2D/Scene/ViewPort.h"
 #include "HalfEdge2D/Scene/QPaintTarget.h"
 
 HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplication(argc, argv)
@@ -40,6 +41,9 @@ void HalfEdge2DApplication::init()
     m_Canvas = new Canvas();
     m_Camera = new Camera(m_Canvas);
 
+    m_ViewPort = new ViewPort();
+    m_ViewPort->setCamera(m_Camera);
+
     m_Scene->setCamera(m_Camera);
 
     // allocate widget
@@ -59,11 +63,12 @@ void HalfEdge2DApplication::init()
     m_Renderer->setWidget(m_PaintTarget);
 
     // create event handler
-    m_EventHandler = new HalfEdge2DEventHandler();
+    m_EventHandler = new HalfEdge2DEventHandler(m_PaintTarget);
     m_EventHandler->addEventInterface(m_Navigator);
     m_EventHandler->addEventInterface(m_Controller);
     m_EventHandler->setRenderer(m_Renderer);
     
     m_PaintTarget->setEventHandler(m_EventHandler);
+    m_PaintTarget->addViewPort(m_ViewPort);
     m_PaintTarget->show();
 }
