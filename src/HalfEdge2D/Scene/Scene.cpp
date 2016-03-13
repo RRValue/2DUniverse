@@ -78,8 +78,8 @@ QPointF Scene::toView(const QPointF& p) const
     const float& zoom = m_Camera->getZoom();
 
     return QPointF(
-        (p.x() - cam_pos.x()) * zoom * vp.width(),
-        (p.y() - cam_pos.y()) * zoom * vp.height());
+        (p.x() - cam_pos.x()) * zoom,
+        (p.y() - cam_pos.y()) * zoom);
 }
 
 QPointF Scene::fromView(const QPointF& p) const
@@ -89,8 +89,8 @@ QPointF Scene::fromView(const QPointF& p) const
     const float& zoom = m_Camera->getZoom();
 
     return QPointF(
-        (p.x() / zoom * vp.width()) + cam_pos.x(),
-        (p.y() / zoom * vp.height()) + cam_pos.y());
+        (p.x() / zoom) + cam_pos.x(),
+        (p.y() / zoom) + cam_pos.y());
 }
 
 QPointF Scene::toDeviceCoords(const QPointF& point) const
@@ -102,8 +102,8 @@ QPointF Scene::toDeviceCoords(const QPointF& point) const
     float ar = (sizef.height() * vp.height()) / (sizef.width() * vp.width());
     
     return QPointF(
-        ((point.x() * ar) + 1.0f) / 2.0f,
-        (point.y() + 1.0f) / 2.0f);
+        ((((point.x() * ar) + 1.0f) / 2.0f) * vp.width()) + vp.x(),
+        (((point.y() + 1.0f) / 2.0f) * vp.height()) + vp.y());
 }
 
 QPointF Scene::fromDeviceCoords(const QPointF& point) const
@@ -113,10 +113,10 @@ QPointF Scene::fromDeviceCoords(const QPointF& point) const
     QSizeF sizef = QSizeF(float(size.width()), float(size.height()));
 
     float ar = (sizef.height() * vp.height()) / (sizef.width() * vp.width());
-    
+
     return QPointF(
-        ((point.x() * 2.0f) - 1.0f) / ar,
-        (point.y() * 2.0f) - 1.0f);
+    ((((point.x() - vp.x()) / vp.width()) * 2.0f) - 1.0f) / ar,
+    (((point.y() - vp.y()) / vp.height()) * 2.0f) - 1.0f);
 }
 
 QPointF Scene::toWidgetCoords(const QPointF& p) const
@@ -125,15 +125,9 @@ QPointF Scene::toWidgetCoords(const QPointF& p) const
     const QSize& size = m_Camera->getCanvas()->getSize();
     QSizeF sizef = QSizeF(float(size.width()), float(size.height()));
 
-    float Ax = sizef.width() * vp.width();
-    float Ay = sizef.height() * vp.height();
-
-    float Bx = vp.x() * sizef.width();
-    float By = vp.y() * sizef.height();
-
     return QPointF(
-        ((0.0f + p.x()) * Ax) + Bx,
-        ((1.0f - p.y()) * Ay) + By);
+        p.x() * sizef.width(),
+        (1.0f - p.y()) * sizef.height());
 }
 
 QPointF Scene::fromWidgetCoords(const QPointF& p) const
@@ -142,15 +136,9 @@ QPointF Scene::fromWidgetCoords(const QPointF& p) const
     const QSize& size = m_Camera->getCanvas()->getSize();
     QSizeF sizef = QSizeF(float(size.width()), float(size.height()));
 
-    float Ax = sizef.width() * vp.width();
-    float Ay = sizef.height() * vp.height();
-
-    float Bx = vp.x() * sizef.width();
-    float By = vp.y() * sizef.height();
-
     return QPointF(
-        0.0f + ((p.x() - Bx) / Ax),
-        1.0f - ((p.y() - By) / Ay));
+        p.x() / sizef.width(),
+        1.0f - (p.y() / sizef.height()));
 }
 
 QPointF Scene::transform(const QPointF& point) const

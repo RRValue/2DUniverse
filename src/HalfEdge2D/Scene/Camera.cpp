@@ -4,7 +4,7 @@ Camera::Camera(Canvas* const canvas) : m_Canvas(canvas)
 {
     m_Zoom= 1.0f;
     m_Position = QPointF(0.0, 0.0f);
-    m_Viewport = QRectF(0.0f, 0.0f, 1.0f, 1.0f);
+    m_Viewport = QRectF(0.0f, 0.0f, 0.5f, 0.5f);
 }
 
 Camera::~Camera()
