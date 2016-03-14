@@ -57,7 +57,7 @@ void HalfEdge2DRenderer::render(QPaintEvent* const event, RenderTarget* const re
         painter.setClipRegion(clip_region);
         painter.setClipping(true);
 
-        //painter.fillRect(clip, Qt::GlobalColor::white);
+        painter.fillRect(clip_region, Qt::GlobalColor::white);
 
         painter.setPen(Qt::GlobalColor::black);
 
@@ -75,7 +75,7 @@ void HalfEdge2DRenderer::render(QPaintEvent* const event, RenderTarget* const re
         painter.drawLine(trans(QPointF(0.0f, -1.0f)), trans(QPointF(0.0f, 1.0f)));
 
         // render Viewport
-        painter.setPen(QPen(Qt::GlobalColor::red));
+        painter.setPen(QPen(Qt::GlobalColor::black));
 
         QPointF p0 = transToDevice(QPointF(vp_size.left(), vp_size.bottom()));
         QPointF p1 = transToDevice(QPointF(vp_size.right(), vp_size.bottom()));

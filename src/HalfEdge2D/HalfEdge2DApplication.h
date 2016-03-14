@@ -30,22 +30,7 @@ public slots:
 
 private:
     void init();
-
-private:
-    QPaintTarget* m_PaintTarget;
-    HalfEdge2DEventHandler* m_EventHandler;
-
-    HalfEdge2DNavigator* m_Navigator;
-    HalfEdge2DController* m_Controller;
-
-    HalfEdge2DRenderer* m_Renderer;
-
-    Scene* m_Scene;
-    Camera* m_Camera;
-    ViewPort* m_ViewPort0;
-    ViewPort* m_ViewPort1;
-    ViewPort* m_ViewPort2;
-    ViewPort* m_ViewPort3;
+    void initTest();
 };
 
 #endif //_HALFEDGE_APPLICATION_H_
