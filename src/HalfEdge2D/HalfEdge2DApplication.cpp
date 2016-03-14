@@ -41,8 +41,21 @@ void HalfEdge2DApplication::init()
     m_Canvas = new Canvas();
     m_Camera = new Camera(m_Canvas);
 
-    m_ViewPort = new ViewPort();
-    m_ViewPort->setCamera(m_Camera);
+    m_ViewPort0 = new ViewPort();
+    m_ViewPort0->setSize(QRectF(0.0f, 0.0f, 0.5f, 0.5f));
+    m_ViewPort0->setCamera(m_Camera);
+
+    m_ViewPort1 = new ViewPort();
+    m_ViewPort1->setSize(QRectF(0.5f, 0.0f, 0.5f, 0.5f));
+    m_ViewPort1->setCamera(m_Camera);
+
+    m_ViewPort2 = new ViewPort();
+    m_ViewPort2->setSize(QRectF(0.0f, 0.5f, 0.5f, 0.5f));
+    m_ViewPort2->setCamera(m_Camera);
+
+    m_ViewPort3 = new ViewPort();
+    m_ViewPort3->setSize(QRectF(0.5f, 0.5f, 0.5f, 0.5f));
+    m_ViewPort3->setCamera(m_Camera);
 
     m_Scene->setCamera(m_Camera);
 
@@ -69,6 +82,9 @@ void HalfEdge2DApplication::init()
     m_EventHandler->setRenderer(m_Renderer);
     
     m_PaintTarget->setEventHandler(m_EventHandler);
-    m_PaintTarget->addViewPort(m_ViewPort);
+    m_PaintTarget->addViewPort(m_ViewPort0);
+    m_PaintTarget->addViewPort(m_ViewPort1);
+    m_PaintTarget->addViewPort(m_ViewPort2);
+    m_PaintTarget->addViewPort(m_ViewPort3);
     m_PaintTarget->show();
 }

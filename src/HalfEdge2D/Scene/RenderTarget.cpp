@@ -1,5 +1,7 @@
 #include "HalfEdge2D/Scene/RenderTarget.h"
 
+#include "HalfEdge2D/Scene/ViewPort.h"
+
 #include <cassert>
 
 RenderTarget::RenderTarget()
@@ -65,4 +67,10 @@ void RenderTarget::removeViewPort(ViewPort* const viewport)
 
         break;
     }
+}
+
+void RenderTarget::updateViewPortsTargetSize()
+{
+    for(const auto& vp : m_ViewPorts)
+        vp->setTargetSize(m_Size);
 }

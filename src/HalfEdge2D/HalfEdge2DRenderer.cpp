@@ -1,6 +1,9 @@
 #include "HalfEdge2D/HalfEdge2DRenderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
+#include "HalfEdge2D/Scene/Camera.h"
+#include "HalfEdge2D/Scene/Canvas.h"
+#include "HalfEdge2D/Scene/ViewPort.h"
 #include "HalfEdge2D/Scene/RenderTarget.h"
 
 #include <QtGui/QPainter>
@@ -39,11 +42,13 @@ void HalfEdge2DRenderer::render(QPaintEvent* const event, RenderTarget* const re
 
     for(const auto& vp : renderTarget->getViewPorts())
     {
-        for(const auto& p : m_Scene->getPoints())
-            painter.drawEllipse(m_Scene->transform(p), m_Scene->getPointSize(), m_Scene->getPointSize());
+        updateMatrices(vp);
 
-        painter.drawLine(m_Scene->transform(QPointF(-1.0f, 0.0f)), m_Scene->transform(QPointF(1.0f, 0.0f)));
-        painter.drawLine(m_Scene->transform(QPointF(0.0f, -1.0f)), m_Scene->transform(QPointF(0.0f, 1.0f)));
+        for(const auto& p : m_Scene->getPoints())
+            painter.drawEllipse(transform(p), m_Scene->getPointSize(), m_Scene->getPointSize());
+
+        painter.drawLine(transform(QPointF(-1.0f, 0.0f)), transform(QPointF(1.0f, 0.0f)));
+        painter.drawLine(transform(QPointF(0.0f, -1.0f)), transform(QPointF(0.0f, 1.0f)));
 
         // TODO add clipping
 
@@ -62,4 +67,25 @@ void HalfEdge2DRenderer::render(QPaintEvent* const event, RenderTarget* const re
         painter.drawLine(p1, p3);
         painter.drawLine(p2, p3);*/
     }
+}
+
+void HalfEdge2DRenderer::updateMatrices(ViewPort* const vp)
+{
+    Mat3f V = vp->getCamera()->getViewMatrix();
+    Mat3f P = vp->getProjectionMatrix();
+    Mat3f D;
+
+    D <<
+        1.0f * (float)vp->getCamera()->getCanvas()->getSize().width(), 0.0f, 0.0f,
+        0.0f, -1.0f * (float)vp->getCamera()->getCanvas()->getSize().height(), (float)vp->getCamera()->getCanvas()->getSize().height(),
+        0.0f, 0.0f, 1.0f;
+
+    m_transMat = D * P * V;
+}
+
+QPointF HalfEdge2DRenderer::transform(const QPointF& point)
+{
+    Vec3f res = m_transMat * Vec3f(point.x(), point.y(), 1.0f);
+
+    return QPointF(res.x(), res.y());
 }

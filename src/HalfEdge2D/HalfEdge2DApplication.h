@@ -44,7 +44,10 @@ private:
     Scene* m_Scene;
     Camera* m_Camera;
     Canvas* m_Canvas;
-    ViewPort* m_ViewPort;
+    ViewPort* m_ViewPort0;
+    ViewPort* m_ViewPort1;
+    ViewPort* m_ViewPort2;
+    ViewPort* m_ViewPort3;
 };
 
 #endif //_HALFEDGE_APPLICATION_H_

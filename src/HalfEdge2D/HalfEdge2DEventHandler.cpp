@@ -1,6 +1,9 @@
 #include "HalfEdge2D/HalfEdge2DEventHandler.h"
 
 #include "HalfEdge2D/HalfEdge2DRenderer.h"
+#include "HalfEdge2D/Scene/RenderTarget.h"
+
+#include <QtGui/QResizeEvent>
 
 HalfEdge2DEventHandler::HalfEdge2DEventHandler(RenderTarget* const renderTarget) : m_RenderTarget(renderTarget)
 {
@@ -73,6 +76,8 @@ bool HalfEdge2DEventHandler::handleResizeEvent(QResizeEvent* const event)
     if(event == nullptr)
         return false;
 
+    m_RenderTarget->setSize(QSizeF(event->size()));
+
     for(const auto& idface : m_EventInterfaces)
         if(idface->handleResizeEvent(event))
             return true;
@@ -97,5 +102,6 @@ void HalfEdge2DEventHandler::handlePaintEvent(QPaintEvent* const event)
     if(m_Renderer == nullptr)
         return;
 
+    m_RenderTarget->updateViewPortsTargetSize();
     m_Renderer->render(event, m_RenderTarget);
 }

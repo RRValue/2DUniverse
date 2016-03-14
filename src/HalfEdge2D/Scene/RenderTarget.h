@@ -27,6 +27,9 @@ public:
     void addViewPort(ViewPort* const viewport);
     void removeViewPort(ViewPort* const viewport);
 
+    // tooling
+    void updateViewPortsTargetSize();
+
 protected:
     HalfEdge2DEventInterface* m_EventInterface;
 
