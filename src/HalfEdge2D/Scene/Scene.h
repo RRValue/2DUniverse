@@ -12,9 +12,6 @@ public:
     Scene();
     ~Scene();
 
-    Camera* const getCamera() const;
-    void setCamera(Camera* const camera);
-
     bool hasPoints() const;
     void setPointPos(const size_t& idx, const QPointF& pos);
     void addPoint(const QPointF& pos);
@@ -24,8 +21,6 @@ public:
     const float& getPointSize() const;
 
 private:
-    Camera* m_Camera;
-
     float m_PointSize;
     QVector<QPointF> m_Points;
 };
