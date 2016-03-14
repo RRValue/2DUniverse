@@ -2,15 +2,14 @@
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
-#include "HalfEdge2D/Scene/Canvas.h"
+#include "HalfEdge2D/Scene/ViewPort.h"
 #include "HalfEdge2D/Scene/RenderTarget.h"
 
 #include <QtGui/QMouseEvent>
 
-HalfEdge2DNavigator::HalfEdge2DNavigator(RenderTarget* const target) : m_Target(target)
+HalfEdge2DNavigator::HalfEdge2DNavigator(RenderTarget* const target) : m_RenderTarget(target)
 {
     m_Navigatin = false;
-    m_Scene = nullptr;
     m_ActiveCamera = nullptr;
     m_ZoomFactor = 1.05f;
 }
@@ -20,30 +19,17 @@ HalfEdge2DNavigator::~HalfEdge2DNavigator()
 
 }
 
-void HalfEdge2DNavigator::setScene(Scene* const scene)
-{
-    if(scene == nullptr)
-        return;
-
-    m_Scene = scene;
-}
-
-void HalfEdge2DNavigator::updateCameraInformation()
-{
-    if(m_Scene == nullptr)
-        return;
-
-    m_ActiveCamera = m_Scene->getCamera();
-}
-
 bool HalfEdge2DNavigator::handleMousePressEvent(QMouseEvent* const event)
 {
-    updateCameraInformation();
-
-    if(m_ActiveCamera == nullptr)
+    if(m_Navigatin)
         return false;
 
-    if(m_Navigatin)
+    if(m_ActiveViewPort == nullptr)
+        return false;
+
+    m_ActiveCamera = m_ActiveViewPort->getCamera();
+
+    if(m_ActiveCamera == nullptr)
         return false;
 
     if(event->button() == Qt::RightButton)
@@ -52,15 +38,17 @@ bool HalfEdge2DNavigator::handleMousePressEvent(QMouseEvent* const event)
     if(!m_Navigatin)
         return false;
 
+    updateTransMatrix();
+
     QPoint pos_px = event->pos();
 
-    if(!m_Scene->inCanvas(pos_px))
+    if(!inViewPort(pos_px))
         m_Navigatin = false;
 
     if(!m_Navigatin)
         return false;
 
-    m_CamMoveInitMousePos = m_Scene->invTransform(pos_px);
+    m_CamMoveInitMousePos = invTrans(pos_px);
     m_CamMoveInitCamPos = m_ActiveCamera->getPosition();
 
     return true;
@@ -68,8 +56,6 @@ bool HalfEdge2DNavigator::handleMousePressEvent(QMouseEvent* const event)
 
 bool HalfEdge2DNavigator::handleMouseMoveEvent(QMouseEvent* const event)
 {
-    updateCameraInformation();
-
     if(m_ActiveCamera == nullptr)
         return false;
 
@@ -78,21 +64,19 @@ bool HalfEdge2DNavigator::handleMouseMoveEvent(QMouseEvent* const event)
 
     m_ActiveCamera->setPosition(m_CamMoveInitCamPos);
 
-    QPoint pos = m_Scene->keepInCanvas(event->pos());
-    QPointF current_delta = m_CamMoveInitMousePos - m_Scene->invTransform(pos);
+    QPoint pos = keepInViewPort(event->pos());
+    QPointF current_delta = m_CamMoveInitMousePos - invTrans(pos);
 
     m_ActiveCamera->setPosition(m_CamMoveInitCamPos + current_delta);
 
     // update widget
-    m_Target->render();
+    m_RenderTarget->render();
 
     return true;
 }
 
 bool HalfEdge2DNavigator::handleMouseReleaseEvent(QMouseEvent* const event)
 {
-    updateCameraInformation();
-
     if(m_ActiveCamera == nullptr)
         return false;
 
@@ -106,22 +90,23 @@ bool HalfEdge2DNavigator::handleMouseReleaseEvent(QMouseEvent* const event)
 
 bool HalfEdge2DNavigator::handleResizeEvent(QResizeEvent* const event)
 {
-    updateCameraInformation();
-
     if(m_ActiveCamera == nullptr)
         return false;
-
-    m_ActiveCamera->getCanvas()->setSize(event->size());
 
     return true;
 }
 
 bool HalfEdge2DNavigator::handleWheelEvent(QWheelEvent* const event)
 {
-    updateCameraInformation();
+    if(m_ActiveViewPort == nullptr)
+        return false;
+
+    m_ActiveCamera = m_ActiveViewPort->getCamera();
 
     if(m_ActiveCamera == nullptr)
         return false;
+
+    updateTransMatrix();
 
     QPoint numPixels = event->pixelDelta();
     QPoint numDegrees = event->angleDelta() / 8;
@@ -136,7 +121,7 @@ bool HalfEdge2DNavigator::handleWheelEvent(QWheelEvent* const event)
         m_ActiveCamera->setRotation(rot);
 
         // update widget
-        m_Target->render();
+        m_RenderTarget->render();
     }
     else
     {
@@ -158,7 +143,7 @@ void HalfEdge2DNavigator::zoom(const int& step, const QPoint& pos_px)
     if(step == 0)
         return;
 
-    QPointF mouse_pos = m_Scene->invTransform(pos_px);
+    QPointF mouse_pos = invTrans(pos_px);
 
     // adjust zoom
     float zoom = m_ActiveCamera->getZoom();
@@ -187,5 +172,69 @@ void HalfEdge2DNavigator::zoom(const int& step, const QPoint& pos_px)
     m_ActiveCamera->setPosition(new_pos);
 
     // update widget
-    m_Target->render();
+    m_RenderTarget->render();
+}
+
+bool HalfEdge2DNavigator::inViewPort(const QPoint& point) const
+{
+    Mat3f inv_device_matrix = m_RenderTarget->getInvDeviceMatrix();
+    Vec3f dev_coord = inv_device_matrix * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+
+    const QRectF& vp_size = m_ActiveViewPort->getSize();
+
+    if(
+        dev_coord(0) >= vp_size.x() && dev_coord(0) < vp_size.x() + vp_size.width() &&
+        dev_coord(1) >= vp_size.y() && dev_coord(1) < vp_size.y() + vp_size.height())
+        return true;
+
+    return false;
+}
+
+QPoint HalfEdge2DNavigator::keepInViewPort(const QPoint& point) const
+{
+    Mat3f device_matrix = m_RenderTarget->getDeviceMatrix();
+    Mat3f inv_device_matrix = m_RenderTarget->getInvDeviceMatrix();
+    
+    Vec3f dev_coord = inv_device_matrix * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+
+    const QRectF& vp_size = m_ActiveViewPort->getSize();
+
+    if(dev_coord(0) > vp_size.right())
+        dev_coord(0) = vp_size.right();
+    if(dev_coord(0) < vp_size.left())
+        dev_coord(0) = vp_size.left();
+
+    if(dev_coord(1) > vp_size.bottom())
+        dev_coord(1) = vp_size.bottom();
+    if(dev_coord(1) < vp_size.top())
+        dev_coord(1) = vp_size.top();
+
+    dev_coord(2) = 1.0;
+    dev_coord = device_matrix * dev_coord;
+
+    return QPoint((int)(dev_coord(0) + 0.5f), (int)(dev_coord(1) + 0.5f));
+}
+
+void HalfEdge2DNavigator::updateTransMatrix()
+{
+    Mat3f V = m_ActiveCamera->getViewMatrix();
+    Mat3f P = m_ActiveViewPort->getProjectionMatrix();
+    Mat3f D = m_RenderTarget->getDeviceMatrix();
+
+    m_TransMat = D * P * V;
+    m_InvTransMat = m_TransMat.inverse();
+}
+
+QPointF HalfEdge2DNavigator::trans(const QPointF& point)
+{
+    Vec3f trans_p = m_TransMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+
+    return QPointF(trans_p.x(), trans_p.y());
+}
+
+QPointF HalfEdge2DNavigator::invTrans(const QPointF& point)
+{
+    Vec3f trans_p = m_InvTransMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+
+    return QPointF(trans_p.x(), trans_p.y());
 }

@@ -7,6 +7,7 @@ class QWheelEvent;
 class QPaintEvent;
 
 class HalfEdge2DEventHandler;
+class ViewPort;
 
 class HalfEdge2DEventInterface
 {
@@ -24,6 +25,9 @@ public:
     virtual bool handleWheelEvent(QWheelEvent* const event) = 0;
     
     virtual void handlePaintEvent(QPaintEvent* const event) {};
+
+protected:
+    ViewPort* m_ActiveViewPort;
 };
 
 #endif //_HALFEDGE_EVENTHANDLER_H_

@@ -1,6 +1,6 @@
 #include "HalfEdge2D/Scene/Camera.h"
 
-Camera::Camera(Canvas* const canvas) : m_Canvas(canvas), m_2Pi((float)(2.0 * M_PI))
+Camera::Camera() : m_2Pi((float)(2.0 * M_PI))
 {
     m_Zoom= 1.0f;
     m_Rotation = 0.0f;
@@ -32,11 +32,6 @@ const QPointF& Camera::getPosition() const
 const QRectF& Camera::getViewport() const
 { 
     return m_Viewport;
-}
-
-Canvas* const Camera::getCanvas() const
-{
-    return m_Canvas;
 }
 
 const Mat3f& Camera::getViewMatrix()

@@ -1,7 +1,6 @@
 #include "HalfEdge2D/Scene/ViewPort.h"
 
 #include "HalfEdge2D/Scene/Camera.h"
-#include "HalfEdge2D/Scene/Canvas.h"
 
 ViewPort::ViewPort()
 {
@@ -73,9 +72,7 @@ void ViewPort::setCamera(Camera* const camera)
 
 void ViewPort::updateProjectionMatrix()
 {
-    const QSize& size = m_Camera->getCanvas()->getSize();
-    QSizeF sizef = QSizeF(float(size.width()), float(size.height()));
-    float ar = (sizef.height() * m_Size.height()) / (sizef.width() * m_Size.width());
+    float ar = (m_TargetSize.height() * m_Size.height()) / (m_TargetSize.width() * m_Size.width());
 
     float vpw_half = m_Size.width() / 2.0f;
     float vph_half = m_Size.height() / 2.0f;

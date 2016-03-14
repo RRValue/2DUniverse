@@ -1,6 +1,8 @@
 #ifndef _SCENE_RENDERTARGET_H_
 #define _SCENE_RENDERTARGET_H_
 
+#include "HalfEdge2D/Base/Vector.h"
+
 #include <QtCore/QSizeF>
 
 #include <vector>
@@ -20,6 +22,8 @@ public:
     const QSizeF& getSize() const;
     const std::vector<ViewPort* const>& getViewPorts() const;
     ViewPort* const getViewPort(const size_t& idx) const;
+    const Mat3f& getDeviceMatrix();
+    const Mat3f& getInvDeviceMatrix();
 
     // setter
     void setEventHandler(HalfEdge2DEventInterface* const eventInterface);
@@ -34,8 +38,16 @@ protected:
     HalfEdge2DEventInterface* m_EventInterface;
 
 private:
+    void updateDeviceMatrices();
+
+private:
     QSizeF m_Size;
     std::vector<ViewPort* const> m_ViewPorts;
+
+    bool m_DeviceDirty;
+
+    Mat3f m_DeviceMat;
+    Mat3f m_InvDeviceMat;
 };
 
 #endif //_SCENE_RENDERTARGET_H_

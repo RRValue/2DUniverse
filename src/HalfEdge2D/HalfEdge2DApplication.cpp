@@ -7,7 +7,6 @@
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
-#include "HalfEdge2D/Scene/Canvas.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 #include "HalfEdge2D/Scene/QPaintTarget.h"
 
@@ -26,7 +25,6 @@ HalfEdge2DApplication::~HalfEdge2DApplication()
 
     delete m_Scene;
     delete m_Camera;
-    delete m_Canvas;
 }
 
 void HalfEdge2DApplication::onRun()
@@ -38,8 +36,7 @@ void HalfEdge2DApplication::init()
 {
     // create a scene, camera and canvas
     m_Scene = new Scene();
-    m_Canvas = new Canvas();
-    m_Camera = new Camera(m_Canvas);
+    m_Camera = new Camera();
 
     m_ViewPort0 = new ViewPort();
     m_ViewPort0->setSize(QRectF(0.0f, 0.0f, 0.5f, 0.5f));
@@ -66,8 +63,6 @@ void HalfEdge2DApplication::init()
     m_Navigator = new HalfEdge2DNavigator(m_PaintTarget);
     m_Controller = new HalfEdge2DController(m_PaintTarget);
 
-    // set camera in navigator
-    m_Navigator->setScene(m_Scene);
     m_Controller->setScene(m_Scene);
 
     // create renderer

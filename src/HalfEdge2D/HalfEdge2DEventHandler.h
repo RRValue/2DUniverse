@@ -3,12 +3,15 @@
 
 #include "HalfEdge2D/HalfEdge2DEventInterface.h"
 
+#include <QtCore/QPoint>
+
 #include <vector>
 
 class HalfEdge2DNavigator;
 class HalfEdge2DController;
 class HalfEdge2DRenderer;
 class RenderTarget;
+class ViewPort;
 
 class HalfEdge2DEventHandler : public HalfEdge2DEventInterface
 {
@@ -19,6 +22,7 @@ public:
 
     void addEventInterface(HalfEdge2DEventInterface* const eventInterface);
     void setRenderer(HalfEdge2DRenderer* const renderer);
+    ViewPort* const getActiveViewPort();
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -30,9 +34,14 @@ protected:
     virtual void handlePaintEvent(QPaintEvent* const event) final override;
 
 private:
+    void setActiveViewport(const QPoint& point);
+
+private:
     RenderTarget* const m_RenderTarget;
     std::vector<HalfEdge2DEventInterface* const> m_EventInterfaces;
     HalfEdge2DRenderer* m_Renderer;
+
+    ViewPort* m_ActiveViewPort;
 };
 
 #endif //_HALFEDGE_EVENTHANDLER_H_

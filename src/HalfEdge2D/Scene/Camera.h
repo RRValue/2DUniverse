@@ -6,13 +6,10 @@
 #include <QtCore/QPointF>
 #include <QtCore/QRectF>
 
-class Canvas;
-
 class Camera
 {
 public:
-    Camera() = delete;
-    Camera(Canvas* const canvas);
+    Camera();
     ~Camera();
 
     // getter
@@ -20,7 +17,6 @@ public:
     const float& getRotation() const;
     const QPointF& getPosition() const;
     const QRectF& getViewport() const;
-    Canvas* const getCanvas() const;
     const Mat3f& getViewMatrix();
     const Mat3f& getInvViewMatrix();
 
@@ -33,9 +29,7 @@ public:
 private:
     void updateViewMatrix();
 
-private:
-    Canvas* const m_Canvas;
-    
+private:    
     float m_Zoom;
     float m_Rotation;
     QPointF m_Position;

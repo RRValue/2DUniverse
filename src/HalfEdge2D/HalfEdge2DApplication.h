@@ -14,7 +14,6 @@ class HalfEdge2DController;
 
 class Scene;
 class Camera;
-class Canvas;
 class ViewPort;
 
 class HalfEdge2DApplication : public QApplication
@@ -43,7 +42,6 @@ private:
 
     Scene* m_Scene;
     Camera* m_Camera;
-    Canvas* m_Canvas;
     ViewPort* m_ViewPort0;
     ViewPort* m_ViewPort1;
     ViewPort* m_ViewPort2;
