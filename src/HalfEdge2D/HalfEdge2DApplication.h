@@ -24,6 +24,8 @@ public slots:
 
 private slots:
     void onMultiViewChanged(int state);
+    void onHSliderChanged(int value);
+    void onVSliderChanged(int value);
 
 private:
     void init();
@@ -33,11 +35,15 @@ private:
     void createViewPorts();
 
     void setUpMultiView();
+    void updateViwePortPartions();
 
 private:
     Ui_HalfEdgeAppMainWindow m_MainWindowForm;
     QWidget* m_MainWidget;
     QPaintTarget* m_RenderTarget;
+
+    QSlider* m_SldHPart;
+    QSlider* m_SldVPart;
 
     Renderer* m_Renderer;
 
@@ -52,6 +58,9 @@ private:
     Camera* m_CamVp1;
     Camera* m_CamVp2;
     Camera* m_CamVp3;
+
+    float m_HPartition;
+    float m_VPartition;
 };
 
 #endif //_HALFEDGE_APPLICATION_H_

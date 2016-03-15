@@ -27,6 +27,8 @@
 HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplication(argc, argv)
 {
     m_MultiView = false;
+    m_HPartition = 0.5f;
+    m_VPartition = 0.5f;
 }
 
 HalfEdge2DApplication::~HalfEdge2DApplication()
@@ -57,9 +59,16 @@ void HalfEdge2DApplication::createGui()
     m_MainWindowForm.setupUi(m_MainWidget);
 
     m_RenderTarget = m_MainWindowForm.m_RenderWidget;
+    m_SldHPart = m_MainWindowForm.m_SldHPart;
+    m_SldVPart = m_MainWindowForm.m_SldVPart;
+
+    m_SldHPart->setEnabled(m_MultiView);
+    m_SldVPart->setEnabled(m_MultiView);
 
     // connect
     connect(m_MainWindowForm.m_CbMultiView, &QCheckBox::stateChanged, this, &HalfEdge2DApplication::onMultiViewChanged);
+    connect(m_SldHPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onHSliderChanged);
+    connect(m_SldVPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onVSliderChanged);
 }
 
 void HalfEdge2DApplication::createViewPorts()
@@ -115,16 +124,21 @@ void HalfEdge2DApplication::onMultiViewChanged(int state)
     setUpMultiView();
 }
 
+void HalfEdge2DApplication::updateViwePortPartions()
+{
+    m_ViewPort0->setSize(QRectF(0.0f, 0.0f, m_HPartition, m_VPartition));
+    m_ViewPort1->setSize(QRectF(m_HPartition, 0.0f, 1.0f - m_HPartition, m_VPartition));
+    m_ViewPort2->setSize(QRectF(0.0f, m_VPartition, m_HPartition, 1.0f - m_VPartition));
+    m_ViewPort3->setSize(QRectF(m_HPartition, m_VPartition, 1.0f - m_HPartition, 1.0f - m_VPartition));
+}
+
 void HalfEdge2DApplication::setUpMultiView()
 {
     m_RenderTarget->clearViewPorts();
 
     if(m_MultiView)
     {
-        m_ViewPort0->setSize(QRectF(0.0f, 0.0f, 0.5f, 0.5f));
-        m_ViewPort1->setSize(QRectF(0.5f, 0.0f, 0.5f, 0.5f));
-        m_ViewPort2->setSize(QRectF(0.0f, 0.5f, 0.5f, 0.5f));
-        m_ViewPort3->setSize(QRectF(0.5f, 0.5f, 0.5f, 0.5f));
+        updateViwePortPartions();
 
         m_RenderTarget->addViewPort(m_ViewPort0);
         m_RenderTarget->addViewPort(m_ViewPort1);
@@ -137,6 +151,27 @@ void HalfEdge2DApplication::setUpMultiView()
 
         m_RenderTarget->addViewPort(m_ViewPort0);
     }
+
+    m_SldHPart->setEnabled(m_MultiView);
+    m_SldVPart->setEnabled(m_MultiView);
+
+    m_Renderer->render();
+}
+
+void HalfEdge2DApplication::onHSliderChanged(int value)
+{
+    m_HPartition = (float)value / 100.0f;
+
+    updateViwePortPartions();
+
+    m_Renderer->render();
+}
+
+void HalfEdge2DApplication::onVSliderChanged(int value)
+{
+    m_VPartition = (float)value / 100.0f;
+
+    updateViwePortPartions();
 
     m_Renderer->render();
 }
