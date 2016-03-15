@@ -36,7 +36,7 @@ HalfEdge2DApplication::~HalfEdge2DApplication()
 
 void HalfEdge2DApplication::onRun()
 {
-    init();
+    initTest();
 }
 
 void HalfEdge2DApplication::init()
@@ -79,46 +79,10 @@ void HalfEdge2DApplication::initTest()
 {
     // init gui
     QWidget* main_widget = new QWidget();
+    m_MainWindowForm.setupUi(main_widget);
 
-    QHBoxLayout* horizontalLayout = new QHBoxLayout(main_widget);
-    horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-    
-    QPaintTarget* widget_multi = new QPaintTarget(main_widget);
-    widget_multi->setObjectName(QStringLiteral("widget_multi"));
-    widget_multi->setMinimumSize(QSize(2, 0));
-
-    horizontalLayout->addWidget(widget_multi);
-
-    QPaintTarget* widget_single = new QPaintTarget(main_widget);
-    widget_single->setObjectName(QStringLiteral("widget_single"));
-    widget_single->setMinimumSize(QSize(100, 0));
-    widget_single->setMaximumSize(QSize(200, 16777215));
-
-    horizontalLayout->addWidget(widget_single);
-
-    QWidget* widget_3 = new QWidget(main_widget);
-    widget_3->setObjectName(QStringLiteral("widget_3"));
-    widget_3->setMinimumSize(QSize(100, 0));
-    widget_3->setMaximumSize(QSize(100, 16777215));
-
-    QVBoxLayout* verticalLayout = new QVBoxLayout(widget_3);
-    verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-
-    QPushButton* pushButton = new QPushButton(widget_3);
-    pushButton->setObjectName(QStringLiteral("pushButton"));
-
-    verticalLayout->addWidget(pushButton);
-
-    QPushButton* pushButton_2 = new QPushButton(widget_3);
-    pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
-
-    verticalLayout->addWidget(pushButton_2);
-
-    QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-    verticalLayout->addItem(verticalSpacer);
-
-    horizontalLayout->addWidget(widget_3);
+    QPaintTarget* widget_multi = m_MainWindowForm.m_RenderWidget0;
+    QPaintTarget* widget_single = m_MainWindowForm.m_RenderWidget1;
 
     // init scene stuff
     // create a scene, camera and canvas

@@ -3,18 +3,7 @@
 
 #include <QtWidgets/QApplication>
 
-class QPaintTarget;
-
-class EventHandler;
-class EventInterface;
-class Renderer;
-
-class Navigator;
-class Controller;
-
-class Scene;
-class Camera;
-class ViewPort;
+#include "HalfEdge2D/MainWindow_uic.h"
 
 class HalfEdge2DApplication : public QApplication
 {
@@ -31,6 +20,9 @@ public slots:
 private:
     void init();
     void initTest();
+
+private:
+    Ui_HalfEdgeAppMainWindow m_MainWindowForm;
 };
 
 #endif //_HALFEDGE_APPLICATION_H_
