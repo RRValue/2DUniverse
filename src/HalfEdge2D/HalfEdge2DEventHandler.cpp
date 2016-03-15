@@ -8,8 +8,9 @@
 
 #include <qdebug.h>
 
-HalfEdge2DEventHandler::HalfEdge2DEventHandler(RenderTarget* const renderTarget) : m_RenderTarget(renderTarget)
+HalfEdge2DEventHandler::HalfEdge2DEventHandler(RenderTarget* const renderTarget)
 {
+    m_RenderTarget = renderTarget;
     m_Renderer = nullptr;
     m_ActiveViewPort = nullptr;
 }
@@ -49,6 +50,7 @@ bool HalfEdge2DEventHandler::handleMouseMoveEvent(QMouseEvent* const event)
     if(event == nullptr)
         return false;
 
+    setActiveRenderTarget();
     setActiveViewport(event->pos());
 
     for(const auto& idface : m_EventInterfaces)
@@ -63,6 +65,7 @@ bool HalfEdge2DEventHandler::handleMousePressEvent(QMouseEvent* const event)
     if(event == nullptr)
         return false;
 
+    setActiveRenderTarget();
     setActiveViewport(event->pos());
 
     for(const auto& idface : m_EventInterfaces)
@@ -77,6 +80,7 @@ bool HalfEdge2DEventHandler::handleMouseReleaseEvent(QMouseEvent* const event)
     if(event == nullptr)
         return false;
 
+    setActiveRenderTarget();
     setActiveViewport(event->pos());
 
     for(const auto& idface : m_EventInterfaces)
@@ -90,6 +94,8 @@ bool HalfEdge2DEventHandler::handleResizeEvent(QResizeEvent* const event)
 {
     if(event == nullptr)
         return false;
+
+    setActiveRenderTarget();
 
     m_RenderTarget->setSize(QSizeF(event->size()));
 
@@ -105,6 +111,7 @@ bool HalfEdge2DEventHandler::handleWheelEvent(QWheelEvent* const event)
     if(event == nullptr)
         return false;
 
+    setActiveRenderTarget();
     setActiveViewport(event->pos());
 
     for(const auto& idface : m_EventInterfaces)
@@ -119,8 +126,16 @@ void HalfEdge2DEventHandler::handlePaintEvent(QPaintEvent* const event)
     if(m_Renderer == nullptr)
         return;
 
+    setActiveRenderTarget();
+
     m_RenderTarget->updateViewPortsTargetSize();
     m_Renderer->render(event, m_RenderTarget);
+}
+
+void HalfEdge2DEventHandler::setActiveRenderTarget()
+{
+    for(const auto& idface : m_EventInterfaces)
+        idface->m_RenderTarget = m_RenderTarget;
 }
 
 void HalfEdge2DEventHandler::setActiveViewport(const QPoint& point)

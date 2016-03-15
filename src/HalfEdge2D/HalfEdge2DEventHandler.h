@@ -10,7 +10,6 @@
 class HalfEdge2DNavigator;
 class HalfEdge2DController;
 class HalfEdge2DRenderer;
-class RenderTarget;
 class ViewPort;
 
 class HalfEdge2DEventHandler : public HalfEdge2DEventInterface
@@ -34,10 +33,10 @@ protected:
     virtual void handlePaintEvent(QPaintEvent* const event) final override;
 
 private:
+    void setActiveRenderTarget();
     void setActiveViewport(const QPoint& point);
 
 private:
-    RenderTarget* const m_RenderTarget;
     std::vector<HalfEdge2DEventInterface* const> m_EventInterfaces;
     HalfEdge2DRenderer* m_Renderer;
 

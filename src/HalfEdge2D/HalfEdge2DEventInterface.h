@@ -8,6 +8,7 @@ class QPaintEvent;
 
 class HalfEdge2DEventHandler;
 class ViewPort;
+class RenderTarget;
 
 class HalfEdge2DEventInterface
 {
@@ -27,6 +28,7 @@ public:
     virtual void handlePaintEvent(QPaintEvent* const event) {};
 
 protected:
+    RenderTarget* m_RenderTarget;
     ViewPort* m_ActiveViewPort;
 };
 

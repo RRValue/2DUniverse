@@ -10,7 +10,7 @@
 
 #include <QtGui/QMouseEvent>
 
-HalfEdge2DController::HalfEdge2DController(RenderTarget* const target) : m_RenderTarget(target)
+HalfEdge2DController::HalfEdge2DController()
 {
     m_Mesh = new HESMesh();
 

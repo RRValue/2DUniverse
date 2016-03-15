@@ -15,8 +15,7 @@ class Camera;
 class HalfEdge2DNavigator : public HalfEdge2DEventInterface
 {
 public:
-    HalfEdge2DNavigator() = delete;
-    HalfEdge2DNavigator(RenderTarget* const target);
+    HalfEdge2DNavigator();
     virtual ~HalfEdge2DNavigator();
 
 protected:
@@ -39,8 +38,6 @@ private:
     QPointF invTrans(const QPointF& point);
 
 private:
-    RenderTarget* m_RenderTarget;
-
     Camera* m_ActiveCamera;
 
     bool m_Navigatin;

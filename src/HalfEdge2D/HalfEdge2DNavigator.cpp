@@ -7,7 +7,7 @@
 
 #include <QtGui/QMouseEvent>
 
-HalfEdge2DNavigator::HalfEdge2DNavigator(RenderTarget* const target) : m_RenderTarget(target)
+HalfEdge2DNavigator::HalfEdge2DNavigator()
 {
     m_Navigatin = false;
     m_ActiveCamera = nullptr;
