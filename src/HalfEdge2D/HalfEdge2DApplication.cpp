@@ -23,11 +23,11 @@ HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplicat
     m_VPartition = 0.5f;
 
     m_Mesh = new HESMesh();
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
+    m_Mesh->addVertex(Vec2f(-1.0f, -1.0f));
+    m_Mesh->addVertex(Vec2f(-1.0f,  1.0f));
+    m_Mesh->addVertex(Vec2f( 1.0f,  1.0f));
+    m_Mesh->addVertex(Vec2f( 1.0f, -1.0f));
+    m_Mesh->addVertex(Vec2f( 2.0f,  0.0f));
 
     m_Mesh->addTriangle(0, 1, 2);
     m_Mesh->addTriangle(0, 2, 3);
