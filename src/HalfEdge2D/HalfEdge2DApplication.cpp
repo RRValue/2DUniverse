@@ -49,6 +49,9 @@ void HalfEdge2DApplication::init()
 
     // show widget
     m_MainWidget->show();
+
+    // set mesh to show
+    onMeshSelectorChanged(m_MainWindowForm.m_CbMeshSelector->currentIndex());
 }
 
 void HalfEdge2DApplication::createGui()
@@ -70,8 +73,6 @@ void HalfEdge2DApplication::createGui()
     connect(m_SldHPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onHSliderChanged);
     connect(m_SldVPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onVSliderChanged);
     connect(m_MainWindowForm.m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectorChanged(int)));
-
-    m_MainWindowForm.m_CbMeshSelector->setCurrentIndex(0);
 }
 
 void HalfEdge2DApplication::createViewPorts()
