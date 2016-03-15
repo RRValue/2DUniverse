@@ -9,6 +9,7 @@ class QPaintTarget;
 class ViewPort;
 class Camera;
 class Renderer;
+class HESMesh;
 
 class HalfEdge2DApplication : public QApplication
 {
@@ -40,6 +41,8 @@ private:
 private:
     Ui_HalfEdgeAppMainWindow m_MainWindowForm;
     QWidget* m_MainWidget;
+    
+    // rendering
     QPaintTarget* m_RenderTarget;
 
     QSlider* m_SldHPart;
@@ -61,6 +64,9 @@ private:
 
     float m_HPartition;
     float m_VPartition;
+
+    // scene
+    HESMesh* m_Mesh;
 };
 
 #endif //_HALFEDGE_APPLICATION_H_

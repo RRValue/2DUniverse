@@ -13,27 +13,33 @@
 #include "HalfEdge2D/Scene/Camera.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 
-#include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
+#include "HalfEdge2D/HalfEdge/HESMesh.h"
+#include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
 HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplication(argc, argv)
 {
     m_MultiView = false;
     m_HPartition = 0.5f;
     m_VPartition = 0.5f;
+
+    m_Mesh = new HESMesh();
+    m_Mesh->addVertex();
+    m_Mesh->addVertex();
+    m_Mesh->addVertex();
+    m_Mesh->addVertex();
+    m_Mesh->addVertex();
+
+    m_Mesh->addTriangle(0, 1, 2);
+    m_Mesh->addTriangle(0, 2, 3);
+    m_Mesh->addTriangle(4, 3, 2);
+
+    HESBuilder builder(m_Mesh);
+    builder.build();
 }
 
 HalfEdge2DApplication::~HalfEdge2DApplication()
 {
-
+    delete m_Mesh;
 }
 
 void HalfEdge2DApplication::onRun()

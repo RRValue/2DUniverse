@@ -7,7 +7,6 @@
 
 #include <QtCore/QPointF>
 
-class HESMesh;
 class Scene;
 class Camera;
 
@@ -36,8 +35,6 @@ private:
 
 private:
     bool m_MovePoint;
-
-    HESMesh* m_Mesh;
 
     Scene* m_Scene;
     Camera* m_ActiveCamera;

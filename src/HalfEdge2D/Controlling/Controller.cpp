@@ -1,8 +1,5 @@
 #include "HalfEdge2D/Controlling/Controller.h"
 
-#include "HalfEdge2D/HalfEdge/HESMesh.h"
-#include "HalfEdge2D/HalfEdge/HESBuilder.h"
-
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/Renderer.h"
 
@@ -14,21 +11,6 @@
 
 Controller::Controller()
 {
-    m_Mesh = new HESMesh();
-
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
-    m_Mesh->addVertex();
-
-    m_Mesh->addTriangle(0, 1, 2);
-    m_Mesh->addTriangle(0, 2, 3);
-    m_Mesh->addTriangle(4, 3, 2);
-
-    HESBuilder builder(m_Mesh);
-    builder.build();
-
     m_MovePoint = false;
 
     m_ActiveCamera = nullptr;
@@ -36,7 +18,7 @@ Controller::Controller()
 
 Controller::~Controller()
 {
-    delete m_Mesh;
+
 }
 
 void Controller::setScene(Scene* const scene)
