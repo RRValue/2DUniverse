@@ -9,6 +9,7 @@ class QPaintEvent;
 class EventHandler;
 class ViewPort;
 class RenderTarget;
+class Renderer;
 
 class EventInterface
 {
@@ -28,6 +29,7 @@ public:
     virtual void handlePaintEvent(QPaintEvent* const event) {};
 
 protected:
+    Renderer* m_Renderer;
     RenderTarget* m_RenderTarget;
     ViewPort* m_ActiveViewPort;
 };

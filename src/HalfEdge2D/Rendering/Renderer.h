@@ -5,9 +5,11 @@
 
 #include <QtCore/QPointF>
 
+#include <set>
+
 class QPaintEvent;
 
-class QWidget;
+class QPaintTarget;
 class Scene;
 class RenderTarget;
 class ViewPort;
@@ -18,10 +20,12 @@ public:
     Renderer();
     ~Renderer();
 
-    void render(QPaintEvent* const event, RenderTarget* const renderTarget);
+    void render();
+    void render(QPaintEvent* const event, QPaintTarget* const paintTarget);
 
-    void setWidget(QWidget* const widget);
     void setScene(Scene* const scene);
+    void addPaintTarget(QPaintTarget* const paintTarget);
+    void removePaintTarget(QPaintTarget* const paintTarget);
 
 private:
     void updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp);
@@ -29,13 +33,14 @@ private:
     QPointF transToDevice(const QPointF& point);
 
 private:
-    QWidget* m_Widget;
     Scene* m_Scene;
 
     Mat3f m_DeviceMat;
     Mat3f m_InvDeviceMat;
     Mat3f m_TransMat;
     Mat3f m_InvTransMat;
+
+    std::set<QPaintTarget* const> m_PaintTargets;
 };
 
 #endif //_RENDERING_RENDERER_H_

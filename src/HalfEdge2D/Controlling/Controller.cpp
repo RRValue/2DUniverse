@@ -4,6 +4,7 @@
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
+#include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
@@ -60,7 +61,7 @@ bool Controller::handleMouseMoveEvent(QMouseEvent* const event)
     QPointF pos = keepInViewPort(event->pos()) + m_CurrentHitDistance;
     m_Scene->setPointPos(m_CurrentIdx, invTrans(pos));
 
-    m_RenderTarget->render();
+    m_Renderer->render();
     
     return true;
 }
@@ -101,7 +102,7 @@ bool Controller::handleMousePressEvent(QMouseEvent* const event)
 
         m_MovePoint = false;
 
-        m_RenderTarget->render();
+        m_Renderer->render();
     }
     else
     {

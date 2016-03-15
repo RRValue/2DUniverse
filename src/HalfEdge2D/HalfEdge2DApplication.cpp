@@ -62,7 +62,6 @@ void HalfEdge2DApplication::init()
     // create renderer
     Renderer* renderer = new Renderer();
     renderer->setScene(scene);
-    renderer->setWidget(paintTarget);
 
     // create event handler
     EventHandler* eventHandler = new EventHandler(paintTarget);
@@ -81,10 +80,11 @@ void HalfEdge2DApplication::initTest()
     QWidget* main_widget = new QWidget();
     m_MainWindowForm.setupUi(main_widget);
 
+    // get paint target
     QPaintTarget* widget_multi = m_MainWindowForm.m_RenderWidget0;
     QPaintTarget* widget_single = m_MainWindowForm.m_RenderWidget1;
 
-    // init scene stuff
+    // init scene
     // create a scene, camera and canvas
     Scene* scene = new Scene();
 
@@ -120,24 +120,19 @@ void HalfEdge2DApplication::initTest()
     controller->setScene(scene);
 
     // create renderer
-    Renderer* renderer0 = new Renderer();
-    renderer0->setScene(scene);
-    renderer0->setWidget(widget_multi);
-
-    Renderer* renderer1 = new Renderer();
-    renderer1->setScene(scene);
-    renderer1->setWidget(widget_single);
+    Renderer* renderer = new Renderer();
+    renderer->setScene(scene);
 
     // create event handler
     EventHandler* eventHandler_multi = new EventHandler(widget_multi);
     eventHandler_multi->addEventInterface(navigator);
     eventHandler_multi->addEventInterface(controller);
-    eventHandler_multi->setRenderer(renderer0);
+    eventHandler_multi->setRenderer(renderer);
 
     EventHandler* eventHandler_single = new EventHandler(widget_single);
     eventHandler_single->addEventInterface(navigator);
     eventHandler_single->addEventInterface(controller);
-    eventHandler_single->setRenderer(renderer1);
+    eventHandler_single->setRenderer(renderer);
 
     widget_multi->setEventHandler(eventHandler_multi);
     widget_multi->addViewPort(viewPort0);

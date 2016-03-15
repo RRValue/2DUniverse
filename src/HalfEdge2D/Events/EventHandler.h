@@ -11,12 +11,13 @@ class Navigator;
 class Controller;
 class Renderer;
 class ViewPort;
+class QPaintTarget;
 
 class EventHandler : public EventInterface
 {
 public:
     EventHandler() = delete;
-    EventHandler(RenderTarget* const renderTarget);
+    EventHandler(QPaintTarget* const paintTarget);
     ~EventHandler();
 
     void addEventInterface(EventInterface* const eventInterface);
@@ -37,8 +38,9 @@ private:
     void setActiveViewport(const QPoint& point);
 
 private:
+    QPaintTarget* m_PaintTarget;
+
     std::vector<EventInterface* const> m_EventInterfaces;
-    Renderer* m_Renderer;
 
     ViewPort* m_ActiveViewPort;
 };

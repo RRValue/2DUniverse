@@ -1,5 +1,6 @@
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/RenderTarget.h"
+#include "HalfEdge2D/Rendering/QPaintTarget.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -19,14 +20,6 @@ Renderer::~Renderer()
 
 }
 
-void Renderer::setWidget(QWidget* const widget)
-{
-    if(widget == nullptr)
-        return;
-
-    m_Widget = widget;
-}
-
 void Renderer::setScene(Scene* const scene)
 {
     if(scene == nullptr)
@@ -35,19 +28,47 @@ void Renderer::setScene(Scene* const scene)
     m_Scene = scene;
 }
 
-void Renderer::render(QPaintEvent* const event, RenderTarget* const renderTarget)
+void Renderer::addPaintTarget(QPaintTarget* const paintTarget)
 {
-    QPainter painter(m_Widget);
+    if(paintTarget == nullptr)
+        return;
+
+    if(m_PaintTargets.find(paintTarget) != m_PaintTargets.end())
+        return;
+
+    m_PaintTargets.insert(paintTarget);
+}
+
+void Renderer::removePaintTarget(QPaintTarget* const paintTarget)
+{
+    if(paintTarget == nullptr)
+        return;
+
+    if(m_PaintTargets.find(paintTarget) == m_PaintTargets.end())
+        return;
+
+    m_PaintTargets.erase(m_PaintTargets.find(paintTarget));
+}
+
+void Renderer::render()
+{
+    for(const auto& pt : m_PaintTargets)
+        pt->update();
+}
+
+void Renderer::render(QPaintEvent* const event, QPaintTarget* const paintTarget)
+{
+    QPainter painter(paintTarget);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    for(const auto& vp : renderTarget->getViewPorts())
+    for(const auto& vp : paintTarget->getViewPorts())
     {
-        updateMatrices(renderTarget, vp);
+        updateMatrices(paintTarget, vp);
 
         // add clipping
         const QRectF& vp_size = vp->getSize();
-        const QSizeF& rt_size = renderTarget->getSize();
+        const QSizeF& rt_size = paintTarget->getSize();
 
         QPointF bl = transToDevice(vp_size.bottomLeft());
         QPointF tr = transToDevice(vp_size.topRight());
@@ -67,7 +88,7 @@ void Renderer::render(QPaintEvent* const event, RenderTarget* const renderTarget
             QPointF tar = trans(QPointF(m_Scene->getPointSize(), 0.0f));
 
             float point_size_px = (tar - ref).manhattanLength();
-            
+
             painter.drawEllipse(trans(p), point_size_px, point_size_px);
         }
 

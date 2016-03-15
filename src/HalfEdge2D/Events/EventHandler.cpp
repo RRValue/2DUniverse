@@ -2,6 +2,7 @@
 
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/RenderTarget.h"
+#include "HalfEdge2D/Rendering/QPaintTarget.h"
 
 #include "HalfEdge2D/Scene/ViewPort.h"
 
@@ -9,9 +10,9 @@
 
 #include <qdebug.h>
 
-EventHandler::EventHandler(RenderTarget* const renderTarget)
+EventHandler::EventHandler(QPaintTarget* const paintTarget) : m_PaintTarget(paintTarget)
 {
-    m_RenderTarget = renderTarget;
+    m_RenderTarget = paintTarget;
     m_Renderer = nullptr;
     m_ActiveViewPort = nullptr;
 }
@@ -27,6 +28,10 @@ void EventHandler::setRenderer(Renderer* const renderer)
         return;
 
     m_Renderer = renderer;
+    m_Renderer->addPaintTarget(m_PaintTarget);
+
+    for(const auto& iface : m_EventInterfaces)
+        iface->m_Renderer = m_Renderer;
 }
 
 void EventHandler::addEventInterface(EventInterface* const eventInterface)
@@ -130,7 +135,7 @@ void EventHandler::handlePaintEvent(QPaintEvent* const event)
     setActiveRenderTarget();
 
     m_RenderTarget->updateViewPortsTargetSize();
-    m_Renderer->render(event, m_RenderTarget);
+    m_Renderer->render(event, m_PaintTarget);
 }
 
 void EventHandler::setActiveRenderTarget()

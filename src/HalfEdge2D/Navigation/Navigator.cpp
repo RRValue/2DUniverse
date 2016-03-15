@@ -1,6 +1,7 @@
 #include "HalfEdge2D/Navigation/Navigator.h"
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
+#include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -71,7 +72,7 @@ bool Navigator::handleMouseMoveEvent(QMouseEvent* const event)
     m_ActiveCamera->setPosition(m_CamMoveInitCamPos + current_delta);
 
     // update widget
-    m_RenderTarget->render();
+    m_Renderer->render();
 
     return true;
 }
@@ -122,7 +123,7 @@ bool Navigator::handleWheelEvent(QWheelEvent* const event)
         m_ActiveCamera->setRotation(rot);
 
         // update widget
-        m_RenderTarget->render();
+        m_Renderer->render();
     }
     else
     {
@@ -173,7 +174,7 @@ void Navigator::zoom(const int& step, const QPoint& pos_px)
     m_ActiveCamera->setPosition(new_pos);
 
     // update widget
-    m_RenderTarget->render();
+    m_Renderer->render();
 }
 
 bool Navigator::inViewPort(const QPoint& point) const
