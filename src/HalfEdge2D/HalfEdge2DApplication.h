@@ -5,12 +5,12 @@
 
 class QPaintTarget;
 
-class HalfEdge2DEventHandler;
-class HalfEdge2DEventInterface;
-class HalfEdge2DRenderer;
+class EventHandler;
+class EventInterface;
+class Renderer;
 
-class HalfEdge2DNavigator;
-class HalfEdge2DController;
+class Navigator;
+class Controller;
 
 class Scene;
 class Camera;

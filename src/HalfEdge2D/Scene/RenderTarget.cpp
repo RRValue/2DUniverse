@@ -58,7 +58,7 @@ void RenderTarget::setSize(const QSizeF& size)
     m_DeviceDirty = true;
 }
 
-void RenderTarget::setEventHandler(HalfEdge2DEventInterface* const eventInterface)
+void RenderTarget::setEventHandler(EventInterface* const eventInterface)
 {
     m_EventInterface = eventInterface;
 }

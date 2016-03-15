@@ -1,6 +1,6 @@
 #include "HalfEdge2D/Scene/QPaintTarget.h"
 
-#include "HalfEdge2D/HalfEdge2DEventInterface.h"
+#include "HalfEdge2D/EVents/EventInterface.h"
 
 QPaintTarget::QPaintTarget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {

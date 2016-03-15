@@ -1,4 +1,4 @@
-#include "HalfEdge2D/HalfEdge2DRenderer.h"
+#include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -9,17 +9,17 @@
 
 #include <QtWidgets/QWidget>
 
-HalfEdge2DRenderer::HalfEdge2DRenderer()
+Renderer::Renderer()
 {
 
 }
 
-HalfEdge2DRenderer::~HalfEdge2DRenderer()
+Renderer::~Renderer()
 {
 
 }
 
-void HalfEdge2DRenderer::setWidget(QWidget* const widget)
+void Renderer::setWidget(QWidget* const widget)
 {
     if(widget == nullptr)
         return;
@@ -27,7 +27,7 @@ void HalfEdge2DRenderer::setWidget(QWidget* const widget)
     m_Widget = widget;
 }
 
-void HalfEdge2DRenderer::setScene(Scene* const scene)
+void Renderer::setScene(Scene* const scene)
 {
     if(scene == nullptr)
         return;
@@ -35,7 +35,7 @@ void HalfEdge2DRenderer::setScene(Scene* const scene)
     m_Scene = scene;
 }
 
-void HalfEdge2DRenderer::render(QPaintEvent* const event, RenderTarget* const renderTarget)
+void Renderer::render(QPaintEvent* const event, RenderTarget* const renderTarget)
 {
     QPainter painter(m_Widget);
 
@@ -92,7 +92,7 @@ void HalfEdge2DRenderer::render(QPaintEvent* const event, RenderTarget* const re
     }
 }
 
-void HalfEdge2DRenderer::updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp)
+void Renderer::updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp)
 {
     Mat3f V = vp->getCamera()->getViewMatrix();
     Mat3f P = vp->getProjectionMatrix();
@@ -104,14 +104,14 @@ void HalfEdge2DRenderer::updateMatrices(RenderTarget* const renderTarget, ViewPo
     m_InvTransMat = m_TransMat.inverse();
 }
 
-QPointF HalfEdge2DRenderer::trans(const QPointF& point)
+QPointF Renderer::trans(const QPointF& point)
 {
     Vec3f res = m_TransMat * Vec3f(point.x(), point.y(), 1.0f);
 
     return QPointF(res.x(), res.y());
 }
 
-QPointF HalfEdge2DRenderer::transToDevice(const QPointF& point)
+QPointF Renderer::transToDevice(const QPointF& point)
 {
     Vec3f res = m_DeviceMat * Vec3f(point.x(), point.y(), 1.0f);
 

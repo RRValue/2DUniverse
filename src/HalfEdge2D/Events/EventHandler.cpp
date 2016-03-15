@@ -1,6 +1,7 @@
-#include "HalfEdge2D/HalfEdge2DEventHandler.h"
+#include "HalfEdge2D/Events/EventHandler.h"
 
-#include "HalfEdge2D/HalfEdge2DRenderer.h"
+#include "HalfEdge2D/Rendering/Renderer.h"
+
 #include "HalfEdge2D/Scene/RenderTarget.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 
@@ -8,19 +9,19 @@
 
 #include <qdebug.h>
 
-HalfEdge2DEventHandler::HalfEdge2DEventHandler(RenderTarget* const renderTarget)
+EventHandler::EventHandler(RenderTarget* const renderTarget)
 {
     m_RenderTarget = renderTarget;
     m_Renderer = nullptr;
     m_ActiveViewPort = nullptr;
 }
 
-HalfEdge2DEventHandler::~HalfEdge2DEventHandler()
+EventHandler::~EventHandler()
 {
 
 }
 
-void HalfEdge2DEventHandler::setRenderer(HalfEdge2DRenderer* const renderer)
+void EventHandler::setRenderer(Renderer* const renderer)
 {
     if(renderer == nullptr)
         return;
@@ -28,7 +29,7 @@ void HalfEdge2DEventHandler::setRenderer(HalfEdge2DRenderer* const renderer)
     m_Renderer = renderer;
 }
 
-void HalfEdge2DEventHandler::addEventInterface(HalfEdge2DEventInterface* const eventInterface)
+void EventHandler::addEventInterface(EventInterface* const eventInterface)
 {
     if(eventInterface == nullptr)
         return;
@@ -40,12 +41,12 @@ void HalfEdge2DEventHandler::addEventInterface(HalfEdge2DEventInterface* const e
     m_EventInterfaces.push_back(eventInterface);
 }
 
-ViewPort* const HalfEdge2DEventHandler::getActiveViewPort()
+ViewPort* const EventHandler::getActiveViewPort()
 {
     return m_ActiveViewPort;
 }
 
-bool HalfEdge2DEventHandler::handleMouseMoveEvent(QMouseEvent* const event)
+bool EventHandler::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(event == nullptr)
         return false;
@@ -60,7 +61,7 @@ bool HalfEdge2DEventHandler::handleMouseMoveEvent(QMouseEvent* const event)
     return true;
 }
 
-bool HalfEdge2DEventHandler::handleMousePressEvent(QMouseEvent* const event)
+bool EventHandler::handleMousePressEvent(QMouseEvent* const event)
 {
     if(event == nullptr)
         return false;
@@ -75,7 +76,7 @@ bool HalfEdge2DEventHandler::handleMousePressEvent(QMouseEvent* const event)
     return true;
 }
 
-bool HalfEdge2DEventHandler::handleMouseReleaseEvent(QMouseEvent* const event)
+bool EventHandler::handleMouseReleaseEvent(QMouseEvent* const event)
 {
     if(event == nullptr)
         return false;
@@ -90,7 +91,7 @@ bool HalfEdge2DEventHandler::handleMouseReleaseEvent(QMouseEvent* const event)
     return true;
 }
 
-bool HalfEdge2DEventHandler::handleResizeEvent(QResizeEvent* const event)
+bool EventHandler::handleResizeEvent(QResizeEvent* const event)
 {
     if(event == nullptr)
         return false;
@@ -106,7 +107,7 @@ bool HalfEdge2DEventHandler::handleResizeEvent(QResizeEvent* const event)
     return true;
 }
 
-bool HalfEdge2DEventHandler::handleWheelEvent(QWheelEvent* const event)
+bool EventHandler::handleWheelEvent(QWheelEvent* const event)
 {
     if(event == nullptr)
         return false;
@@ -121,7 +122,7 @@ bool HalfEdge2DEventHandler::handleWheelEvent(QWheelEvent* const event)
     return true;
 }
 
-void HalfEdge2DEventHandler::handlePaintEvent(QPaintEvent* const event)
+void EventHandler::handlePaintEvent(QPaintEvent* const event)
 {
     if(m_Renderer == nullptr)
         return;
@@ -132,13 +133,13 @@ void HalfEdge2DEventHandler::handlePaintEvent(QPaintEvent* const event)
     m_Renderer->render(event, m_RenderTarget);
 }
 
-void HalfEdge2DEventHandler::setActiveRenderTarget()
+void EventHandler::setActiveRenderTarget()
 {
     for(const auto& idface : m_EventInterfaces)
         idface->m_RenderTarget = m_RenderTarget;
 }
 
-void HalfEdge2DEventHandler::setActiveViewport(const QPoint& point)
+void EventHandler::setActiveViewport(const QPoint& point)
 {
     Mat3f inv_device_matrix = m_RenderTarget->getInvDeviceMatrix();
     Vec3f dev_coord = inv_device_matrix * Vec3f((float)point.x(), (float)point.y(), 1.0f);

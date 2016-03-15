@@ -1,4 +1,4 @@
-#include "HalfEdge2D/HalfEdge2DController.h"
+#include "HalfEdge2D/Controlling/Controller.h"
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
@@ -10,7 +10,7 @@
 
 #include <QtGui/QMouseEvent>
 
-HalfEdge2DController::HalfEdge2DController()
+Controller::Controller()
 {
     m_Mesh = new HESMesh();
 
@@ -32,12 +32,12 @@ HalfEdge2DController::HalfEdge2DController()
     m_ActiveCamera = nullptr;
 }
 
-HalfEdge2DController::~HalfEdge2DController()
+Controller::~Controller()
 {
     delete m_Mesh;
 }
 
-void HalfEdge2DController::setScene(Scene* const scene)
+void Controller::setScene(Scene* const scene)
 {
     if(scene == nullptr)
         return;
@@ -48,7 +48,7 @@ void HalfEdge2DController::setScene(Scene* const scene)
     m_Scene = scene;
 }
 
-bool HalfEdge2DController::handleMouseMoveEvent(QMouseEvent* const event)
+bool Controller::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -64,7 +64,7 @@ bool HalfEdge2DController::handleMouseMoveEvent(QMouseEvent* const event)
     return true;
 }
 
-bool HalfEdge2DController::handleMousePressEvent(QMouseEvent* const event)
+bool Controller::handleMousePressEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -111,7 +111,7 @@ bool HalfEdge2DController::handleMousePressEvent(QMouseEvent* const event)
     return true;
 }
 
-bool HalfEdge2DController::handleMouseReleaseEvent(QMouseEvent* const event)
+bool Controller::handleMouseReleaseEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -127,17 +127,17 @@ bool HalfEdge2DController::handleMouseReleaseEvent(QMouseEvent* const event)
     return true;
 }
 
-bool HalfEdge2DController::handleResizeEvent(QResizeEvent* const event)
+bool Controller::handleResizeEvent(QResizeEvent* const event)
 {
     return false;
 }
 
-bool HalfEdge2DController::handleWheelEvent(QWheelEvent* const event)
+bool Controller::handleWheelEvent(QWheelEvent* const event)
 {
     return false;
 }
 
-bool HalfEdge2DController::inViewPort(const QPoint& point) const
+bool Controller::inViewPort(const QPoint& point) const
 {
     Mat3f inv_device_matrix = m_RenderTarget->getInvDeviceMatrix();
     Vec3f dev_coord = inv_device_matrix * Vec3f((float)point.x(), (float)point.y(), 1.0f);
@@ -152,7 +152,7 @@ bool HalfEdge2DController::inViewPort(const QPoint& point) const
     return false;
 }
 
-QPoint HalfEdge2DController::keepInViewPort(const QPoint& point) const
+QPoint Controller::keepInViewPort(const QPoint& point) const
 {
     Vec3f dev_coord = m_InvDeviceMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
 
@@ -174,7 +174,7 @@ QPoint HalfEdge2DController::keepInViewPort(const QPoint& point) const
     return QPoint((int)(dev_coord(0) + 0.5f), (int)(dev_coord(1) + 0.5f));
 }
 
-void HalfEdge2DController::updateTransMatrix()
+void Controller::updateTransMatrix()
 {
     Mat3f V = m_ActiveCamera->getViewMatrix();
     Mat3f P = m_ActiveViewPort->getProjectionMatrix();
@@ -186,14 +186,14 @@ void HalfEdge2DController::updateTransMatrix()
     m_InvTransMat = m_TransMat.inverse();
 }
 
-QPointF HalfEdge2DController::trans(const QPointF& point)
+QPointF Controller::trans(const QPointF& point)
 {
     Vec3f trans_p = m_TransMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
 
     return QPointF(trans_p.x(), trans_p.y());
 }
 
-QPointF HalfEdge2DController::invTrans(const QPointF& point)
+QPointF Controller::invTrans(const QPointF& point)
 {
     Vec3f trans_p = m_InvTransMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
 

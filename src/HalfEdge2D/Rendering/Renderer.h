@@ -1,5 +1,5 @@
-#ifndef _HALFEDGE_RENDERER_H_
-#define _HALFEDGE_RENDERER_H_
+#ifndef _RENDERING_RENDERER_H_
+#define _RENDERING_RENDERER_H_
 
 #include "HalfEdge2D/Base/Vector.h"
 
@@ -12,11 +12,11 @@ class Scene;
 class RenderTarget;
 class ViewPort;
 
-class HalfEdge2DRenderer
+class Renderer
 {
 public:
-    HalfEdge2DRenderer();
-    ~HalfEdge2DRenderer();
+    Renderer();
+    ~Renderer();
 
     void render(QPaintEvent* const event, RenderTarget* const renderTarget);
 
@@ -38,4 +38,4 @@ private:
     Mat3f m_InvTransMat;
 };
 
-#endif //_HALFEDGE_WIDGET_H_
+#endif //_RENDERING_RENDERER_H_

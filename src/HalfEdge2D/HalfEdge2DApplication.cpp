@@ -1,9 +1,12 @@
 #include "HalfEdge2D/HalfEdge2DApplication.h"
 
-#include "HalfEdge2D/HalfEdge2DEventhandler.h"
-#include "HalfEdge2D/HalfEdge2DController.h"
-#include "HalfEdge2D/HalfEdge2DNavigator.h"
-#include "HalfEdge2D/HalfEdge2DRenderer.h"
+#include "HalfEdge2D/Events/EventHandler.h"
+
+#include "HalfEdge2D/Controlling/Controller.h"
+
+#include "HalfEdge2D/Navigation/Navigator.h"
+
+#include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -51,18 +54,18 @@ void HalfEdge2DApplication::init()
     QPaintTarget* paintTarget = new QPaintTarget();
     
     // allocate event handler and add controller and navigator
-    HalfEdge2DNavigator* navigator = new HalfEdge2DNavigator(paintTarget);
-    HalfEdge2DController* controller = new HalfEdge2DController(paintTarget);
+    Navigator* navigator = new Navigator();
+    Controller* controller = new Controller();
 
     controller->setScene(scene);
 
     // create renderer
-    HalfEdge2DRenderer* renderer = new HalfEdge2DRenderer();
+    Renderer* renderer = new Renderer();
     renderer->setScene(scene);
     renderer->setWidget(paintTarget);
 
     // create event handler
-    HalfEdge2DEventHandler* eventHandler = new HalfEdge2DEventHandler(paintTarget);
+    EventHandler* eventHandler = new EventHandler(paintTarget);
     eventHandler->addEventInterface(navigator);
     eventHandler->addEventInterface(controller);
     eventHandler->setRenderer(renderer);
@@ -147,42 +150,38 @@ void HalfEdge2DApplication::initTest()
     viewPort4->setCamera(camera0);
 
     // allocate event handler and add controller and navigator
-    HalfEdge2DNavigator* navigator0 = new HalfEdge2DNavigator(widget_multi);
-    HalfEdge2DNavigator* navigator1 = new HalfEdge2DNavigator(widget_single);
+    Navigator* navigator = new Navigator();
+    Controller* controller = new Controller();
 
-    HalfEdge2DController* controller0 = new HalfEdge2DController(widget_multi);
-    HalfEdge2DController* controller1 = new HalfEdge2DController(widget_single);
-
-    controller0->setScene(scene);
-    controller1->setScene(scene);
+    controller->setScene(scene);
 
     // create renderer
-    HalfEdge2DRenderer* renderer0 = new HalfEdge2DRenderer();
+    Renderer* renderer0 = new Renderer();
     renderer0->setScene(scene);
     renderer0->setWidget(widget_multi);
 
-    HalfEdge2DRenderer* renderer1 = new HalfEdge2DRenderer();
+    Renderer* renderer1 = new Renderer();
     renderer1->setScene(scene);
     renderer1->setWidget(widget_single);
 
     // create event handler
-    HalfEdge2DEventHandler* eventHandler0 = new HalfEdge2DEventHandler(widget_multi);
-    eventHandler0->addEventInterface(navigator0);
-    eventHandler0->addEventInterface(controller0);
-    eventHandler0->setRenderer(renderer0);
+    EventHandler* eventHandler_multi = new EventHandler(widget_multi);
+    eventHandler_multi->addEventInterface(navigator);
+    eventHandler_multi->addEventInterface(controller);
+    eventHandler_multi->setRenderer(renderer0);
 
-    HalfEdge2DEventHandler* eventHandler1 = new HalfEdge2DEventHandler(widget_single);
-    eventHandler1->addEventInterface(navigator1);
-    eventHandler1->addEventInterface(controller1);
-    eventHandler1->setRenderer(renderer1);
+    EventHandler* eventHandler_single = new EventHandler(widget_single);
+    eventHandler_single->addEventInterface(navigator);
+    eventHandler_single->addEventInterface(controller);
+    eventHandler_single->setRenderer(renderer1);
 
-    widget_multi->setEventHandler(eventHandler0);
+    widget_multi->setEventHandler(eventHandler_multi);
     widget_multi->addViewPort(viewPort0);
     widget_multi->addViewPort(viewPort1);
     widget_multi->addViewPort(viewPort2);
     widget_multi->addViewPort(viewPort3);
 
-    widget_single->setEventHandler(eventHandler1);
+    widget_single->setEventHandler(eventHandler_single);
     widget_single->addViewPort(viewPort4);
 
     // show widget

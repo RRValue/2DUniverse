@@ -1,22 +1,22 @@
-#ifndef _HALFEDGE_EVENTINTERFACE_H_
-#define _HALFEDGE_EVENTINTERFACE_H_
+#ifndef _EVENTS_EVENTINTERFACE_H_
+#define _EVENTS_EVENTINTERFACE_H_
 
 class QMouseEvent;
 class QResizeEvent;
 class QWheelEvent;
 class QPaintEvent;
 
-class HalfEdge2DEventHandler;
+class EventHandler;
 class ViewPort;
 class RenderTarget;
 
-class HalfEdge2DEventInterface
+class EventInterface
 {
-    friend class HalfEdge2DEventHandler;
+    friend class EventHandler;
 
 public:
-    HalfEdge2DEventInterface() {}
-    virtual ~HalfEdge2DEventInterface() {}
+    EventInterface() {}
+    virtual ~EventInterface() {}
 
 public:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) = 0;
@@ -32,4 +32,4 @@ protected:
     ViewPort* m_ActiveViewPort;
 };
 
-#endif //_HALFEDGE_EVENTHANDLER_H_
+#endif //_EVENTS_EVENTINTERFACE_H_

@@ -8,7 +8,7 @@
 #include <vector>
 
 class ViewPort;
-class HalfEdge2DEventInterface;
+class EventInterface;
 
 class RenderTarget
 {
@@ -26,7 +26,7 @@ public:
     const Mat3f& getInvDeviceMatrix();
 
     // setter
-    void setEventHandler(HalfEdge2DEventInterface* const eventInterface);
+    void setEventHandler(EventInterface* const eventInterface);
     void setSize(const QSizeF& size);
     void addViewPort(ViewPort* const viewport);
     void removeViewPort(ViewPort* const viewport);
@@ -35,7 +35,7 @@ public:
     void updateViewPortsTargetSize();
 
 protected:
-    HalfEdge2DEventInterface* m_EventInterface;
+    EventInterface* m_EventInterface;
 
 private:
     void updateDeviceMatrices();

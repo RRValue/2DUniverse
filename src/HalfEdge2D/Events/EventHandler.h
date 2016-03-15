@@ -1,26 +1,26 @@
-#ifndef _HALFEDGE_EVENTHANDLER_H_
-#define _HALFEDGE_EVENTHANDLER_H_
+#ifndef _EVENTS_EVENTHANDLER_H_
+#define _EVENTS_EVENTHANDLER_H_
 
-#include "HalfEdge2D/HalfEdge2DEventInterface.h"
+#include "HalfEdge2D/Events/EventInterface.h"
 
 #include <QtCore/QPoint>
 
 #include <vector>
 
-class HalfEdge2DNavigator;
-class HalfEdge2DController;
-class HalfEdge2DRenderer;
+class Navigator;
+class Controller;
+class Renderer;
 class ViewPort;
 
-class HalfEdge2DEventHandler : public HalfEdge2DEventInterface
+class EventHandler : public EventInterface
 {
 public:
-    HalfEdge2DEventHandler() = delete;
-    HalfEdge2DEventHandler(RenderTarget* const renderTarget);
-    ~HalfEdge2DEventHandler();
+    EventHandler() = delete;
+    EventHandler(RenderTarget* const renderTarget);
+    ~EventHandler();
 
-    void addEventInterface(HalfEdge2DEventInterface* const eventInterface);
-    void setRenderer(HalfEdge2DRenderer* const renderer);
+    void addEventInterface(EventInterface* const eventInterface);
+    void setRenderer(Renderer* const renderer);
     ViewPort* const getActiveViewPort();
 
 protected:
@@ -37,10 +37,10 @@ private:
     void setActiveViewport(const QPoint& point);
 
 private:
-    std::vector<HalfEdge2DEventInterface* const> m_EventInterfaces;
-    HalfEdge2DRenderer* m_Renderer;
+    std::vector<EventInterface* const> m_EventInterfaces;
+    Renderer* m_Renderer;
 
     ViewPort* m_ActiveViewPort;
 };
 
-#endif //_HALFEDGE_EVENTHANDLER_H_
+#endif //_EVENTS_EVENTHANDLER_H_

@@ -1,22 +1,23 @@
-#ifndef _HALFEDGE_NAVIGATOR_H_
-#define _HALFEDGE_NAVIGATOR_H_
+#ifndef _CONTROLLING_CONTROLLER_H_
+#define _CONTROLLING_CONTROLLER_H_
 
-#include "HalfEdge2D/HalfEdge2DEventInterface.h"
+#include "HalfEdge2D/Events/EventInterface.h"
 
 #include "HalfEdge2D/Base/Vector.h"
 
-#include <QtCore/QSize>
 #include <QtCore/QPointF>
 
-class RenderTarget;
-
+class HESMesh;
+class Scene;
 class Camera;
 
-class HalfEdge2DNavigator : public HalfEdge2DEventInterface
+class Controller : public EventInterface
 {
 public:
-    HalfEdge2DNavigator();
-    virtual ~HalfEdge2DNavigator();
+    Controller();
+    virtual ~Controller();
+
+    void setScene(Scene* const scene);
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -26,10 +27,6 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    int getHitPoint(const QPointF& pos);
-
-    void zoom(const int& step, const QPoint& pos_px);
-
     bool inViewPort(const QPoint& point) const;
     QPoint keepInViewPort(const QPoint& point) const;
 
@@ -38,18 +35,21 @@ private:
     QPointF invTrans(const QPointF& point);
 
 private:
+    bool m_MovePoint;
+
+    HESMesh* m_Mesh;
+
+    Scene* m_Scene;
     Camera* m_ActiveCamera;
 
-    bool m_Navigatin;
+    int m_CurrentIdx;
+    QPointF m_CurrentHitDistance;
 
-    // scene manipulation
-    float m_ZoomFactor;
-    QPointF m_CamMoveInitMousePos;
-    QPointF m_CamMoveInitCamPos;
-
-    // scene matrices
+    // scene matrices    
+    Mat3f m_DeviceMat;
+    Mat3f m_InvDeviceMat;
     Mat3f m_TransMat;
     Mat3f m_InvTransMat;
 };
 
-#endif //_HALFEDGE_NAVIGATOR_H_
+#endif //_CONTROLLING_CONTROLLER_H_
