@@ -36,6 +36,12 @@ bool HESBuilder::build()
         HESEdge* e1 = new HESEdge();
         HESEdge* e2 = new HESEdge();
 
+        m_Mesh->addFace(f);
+        
+        m_Mesh->addEdge(e0);
+        m_Mesh->addEdge(e1);
+        m_Mesh->addEdge(e2);
+
         buildFace({v0, v1, v2}, {e0, e1, e2}, f);
         connectEdges({e0, e1, e2});
     }

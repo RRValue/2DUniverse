@@ -16,6 +16,10 @@
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
+#include "HalfEdge2D/Mesh/TestMesh01.h"
+#include "HalfEdge2D/Mesh/TestMesh02.h"
+#include "HalfEdge2D/Mesh/TestMesh03.h"
+
 HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplication(argc, argv)
 {
     m_MultiView = false;
@@ -23,18 +27,6 @@ HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplicat
     m_VPartition = 0.5f;
 
     m_Mesh = new HESMesh();
-    m_Mesh->addVertex(Vec2f(-1.0f, -1.0f));
-    m_Mesh->addVertex(Vec2f(-1.0f,  1.0f));
-    m_Mesh->addVertex(Vec2f( 1.0f,  1.0f));
-    m_Mesh->addVertex(Vec2f( 1.0f, -1.0f));
-    m_Mesh->addVertex(Vec2f( 2.0f,  0.0f));
-
-    m_Mesh->addTriangle(0, 1, 2);
-    m_Mesh->addTriangle(0, 2, 3);
-    m_Mesh->addTriangle(4, 3, 2);
-
-    HESBuilder builder(m_Mesh);
-    builder.build();
 }
 
 HalfEdge2DApplication::~HalfEdge2DApplication()
@@ -71,10 +63,15 @@ void HalfEdge2DApplication::createGui()
     m_SldHPart->setEnabled(m_MultiView);
     m_SldVPart->setEnabled(m_MultiView);
 
+    m_MainWindowForm.m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Clear");
+
     // connect
     connect(m_MainWindowForm.m_CbMultiView, &QCheckBox::stateChanged, this, &HalfEdge2DApplication::onMultiViewChanged);
     connect(m_SldHPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onHSliderChanged);
     connect(m_SldVPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onVSliderChanged);
+    connect(m_MainWindowForm.m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectorChanged(int)));
+
+    m_MainWindowForm.m_CbMeshSelector->setCurrentIndex(0);
 }
 
 void HalfEdge2DApplication::createViewPorts()
@@ -180,6 +177,50 @@ void HalfEdge2DApplication::onVSliderChanged(int value)
     m_VPartition = (float)value / 100.0f;
 
     updateViwePortPartions();
+
+    m_Renderer->render();
+}
+
+void HalfEdge2DApplication::onMeshSelectorChanged(int value)
+{
+    m_Mesh->clear();
+
+    if(value < 0 || value >= 3)
+    {
+        m_Renderer->render();
+
+        return;
+    }
+
+    std::vector<float> float_array;
+    std::vector<int> idx_array;
+
+    if(value == 0)
+    {
+        float_array = testVertices01;
+        idx_array = testTriangles01;
+    }
+
+    if(value == 1)
+    {
+        float_array = testVertices02;
+        idx_array = testTriangles02;
+    }
+
+    if(value == 2)
+    {
+        float_array = testVertices03;
+        idx_array = testTriangles03;
+    }
+
+    for(size_t i = 0; i < float_array.size(); i += 2)
+        m_Mesh->addVertex(Vec2f(float_array[i], float_array[i + 1]));
+
+    for(size_t i = 0; i < idx_array.size(); i += 3)
+        m_Mesh->addTriangle(idx_array[i], idx_array[i + 1], idx_array[i + 2]);
+
+    HESBuilder builder(m_Mesh);
+    builder.build();
 
     m_Renderer->render();
 }

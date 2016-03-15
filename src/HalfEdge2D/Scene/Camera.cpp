@@ -2,7 +2,7 @@
 
 Camera::Camera() : m_2Pi((float)(2.0 * M_PI))
 {
-    m_Zoom= 0.5f;
+    m_Zoom= 1.0f;
     m_Rotation = 0.0f;
     m_Position = QPointF(0.0, 0.0f);
     m_Viewport = QRectF(0.0f, 0.0f, 0.5f, 0.5f);

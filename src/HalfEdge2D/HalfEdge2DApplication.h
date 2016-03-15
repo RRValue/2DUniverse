@@ -27,6 +27,7 @@ private slots:
     void onMultiViewChanged(int state);
     void onHSliderChanged(int value);
     void onVSliderChanged(int value);
+    void onMeshSelectorChanged(int value);
 
 private:
     void init();

@@ -12,8 +12,19 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
+    clear();
+}
+
+void Mesh::clear()
+{
     for(const auto& vertex : m_Vertices)
         delete vertex;
+
+    for(const auto& triangle : m_Triangles)
+        delete triangle;
+
+    m_Vertices.clear();
+    m_Triangles.clear();
 }
 
 const std::vector<Vertex*>& Mesh::getVertices() const

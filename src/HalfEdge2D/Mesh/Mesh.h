@@ -14,6 +14,8 @@ public:
     Mesh();
     virtual ~Mesh();
 
+    virtual void clear();
+
     // getter
     const std::vector<Vertex*>& getVertices() const;
     const std::vector<Triangle*>& getTriangles() const;

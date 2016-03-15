@@ -14,7 +14,7 @@
 
 #include <QtWidgets/QWidget>
 
-Renderer::Renderer() : m_PointSize(0.05f)
+Renderer::Renderer() : m_PointSize(0.005f)
 {
 
 }
