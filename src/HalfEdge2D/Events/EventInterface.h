@@ -10,6 +10,7 @@ class EventHandler;
 class ViewPort;
 class RenderTarget;
 class Renderer;
+class Camera;
 
 class EventInterface
 {
@@ -32,6 +33,7 @@ protected:
     Renderer* m_Renderer;
     RenderTarget* m_RenderTarget;
     ViewPort* m_ActiveViewPort;
+    Camera* m_ActiveCamera;
 };
 
 #endif //_EVENTS_EVENTINTERFACE_H_

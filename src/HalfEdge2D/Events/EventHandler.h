@@ -36,6 +36,7 @@ protected:
 private:
     void setActiveRenderTarget();
     void setActiveViewport(const QPoint& point);
+    void setActiveCamera();
 
 private:
     QPaintTarget* m_PaintTarget;

@@ -58,6 +58,7 @@ bool EventHandler::handleMouseMoveEvent(QMouseEvent* const event)
 
     setActiveRenderTarget();
     setActiveViewport(event->pos());
+    setActiveCamera();
 
     for(const auto& idface : m_EventInterfaces)
         if(idface->handleMouseMoveEvent(event))
@@ -73,6 +74,7 @@ bool EventHandler::handleMousePressEvent(QMouseEvent* const event)
 
     setActiveRenderTarget();
     setActiveViewport(event->pos());
+    setActiveCamera();
 
     for(const auto& idface : m_EventInterfaces)
         if(idface->handleMousePressEvent(event))
@@ -88,6 +90,7 @@ bool EventHandler::handleMouseReleaseEvent(QMouseEvent* const event)
 
     setActiveRenderTarget();
     setActiveViewport(event->pos());
+    setActiveCamera();
 
     for(const auto& idface : m_EventInterfaces)
         if(idface->handleMouseReleaseEvent(event))
@@ -119,6 +122,7 @@ bool EventHandler::handleWheelEvent(QWheelEvent* const event)
 
     setActiveRenderTarget();
     setActiveViewport(event->pos());
+    setActiveCamera();
 
     for(const auto& idface : m_EventInterfaces)
         if(idface->handleWheelEvent(event))
@@ -167,4 +171,15 @@ void EventHandler::setActiveViewport(const QPoint& point)
 
     for(const auto& idface : m_EventInterfaces)
         idface->m_ActiveViewPort = m_ActiveViewPort;
+}
+
+void EventHandler::setActiveCamera()
+{
+    m_ActiveCamera = nullptr;
+
+    if(m_ActiveViewPort != nullptr)
+        m_ActiveCamera = m_ActiveViewPort->getCamera();
+
+    for(const auto& idface : m_EventInterfaces)
+        idface->m_ActiveCamera = m_ActiveCamera;
 }

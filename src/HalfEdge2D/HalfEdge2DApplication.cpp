@@ -2,7 +2,7 @@
 
 #include "HalfEdge2D/Events/EventHandler.h"
 
-#include "HalfEdge2D/Controlling/Controller.h"
+#include "HalfEdge2D/Controlling/ControllerBuildMesh.h"
 
 #include "HalfEdge2D/Navigation/Navigator.h"
 
@@ -103,7 +103,7 @@ void HalfEdge2DApplication::createRendering()
 
     // allocate event handler and add controller and navigator
     Navigator* navigator = new Navigator();
-    Controller* controller = new Controller();
+    ControllerBuildMesh* controller = new ControllerBuildMesh();
 
     controller->setScene(scene);
 
