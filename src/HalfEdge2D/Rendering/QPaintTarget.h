@@ -1,7 +1,7 @@
-#ifndef _SCENE_QPAINTTARGET_H_
-#define _SCENE_QPAINTTARGET_H_
+#ifndef _RENDERING_QPAINTTARGET_H_
+#define _RENDERING_QPAINTTARGET_H_
 
-#include "HalfEdge2D/Scene/RenderTarget.h"
+#include "HalfEdge2D/Rendering/RenderTarget.h"
 
 #include <QtWidgets/QWidget>
 
@@ -22,4 +22,4 @@ protected:
     virtual void render() final override;
 };
 
-#endif //_SCENE_QPAINTTARGET_H_
+#endif //_RENDERING_QPAINTTARGET_H_

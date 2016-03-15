@@ -1,9 +1,10 @@
 #include "HalfEdge2D/Navigation/Navigator.h"
 
+#include "HalfEdge2D/Rendering/RenderTarget.h"
+
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
-#include "HalfEdge2D/Scene/RenderTarget.h"
 
 #include <QtGui/QMouseEvent>
 

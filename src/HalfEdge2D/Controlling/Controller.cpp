@@ -3,8 +3,9 @@
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
+#include "HalfEdge2D/Rendering/RenderTarget.h"
+
 #include "HalfEdge2D/Scene/Scene.h"
-#include "HalfEdge2D/Scene/RenderTarget.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 #include "HalfEdge2D/Scene/Camera.h"
 

@@ -1,4 +1,4 @@
-#include "HalfEdge2D/Scene/QPaintTarget.h"
+#include "HalfEdge2D/Rendering/QPaintTarget.h"
 
 #include "HalfEdge2D/EVents/EventInterface.h"
 

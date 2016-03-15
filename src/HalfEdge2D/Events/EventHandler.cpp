@@ -1,8 +1,8 @@
 #include "HalfEdge2D/Events/EventHandler.h"
 
 #include "HalfEdge2D/Rendering/Renderer.h"
+#include "HalfEdge2D/Rendering/RenderTarget.h"
 
-#include "HalfEdge2D/Scene/RenderTarget.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 
 #include <QtGui/QResizeEvent>

@@ -1,5 +1,5 @@
-#ifndef _SCENE_RENDERTARGET_H_
-#define _SCENE_RENDERTARGET_H_
+#ifndef _RENDERING_RENDERTARGET_H_
+#define _RENDERING_RENDERTARGET_H_
 
 #include "HalfEdge2D/Base/Vector.h"
 
@@ -50,4 +50,4 @@ private:
     Mat3f m_InvDeviceMat;
 };
 
-#endif //_SCENE_RENDERTARGET_H_
+#endif //_RENDERING_RENDERTARGET_H_
