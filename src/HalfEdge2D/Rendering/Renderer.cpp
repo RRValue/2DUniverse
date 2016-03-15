@@ -8,6 +8,7 @@
 
 #include "HalfEdge2D/Mesh/Mesh.h"
 #include "HalfEdge2D/Mesh/Vertex.h"
+#include "HalfEdge2D/Mesh/Triangle.h"
 
 #include <QtGui/QPainter>
 
@@ -87,6 +88,7 @@ void Renderer::render(QPaintEvent* const event, QPaintTarget* const paintTarget)
         renderMesh(&painter, m_Scene->getMesh());
 
         // render coordiante system
+        painter.setPen(QPen(Qt::GlobalColor::red));
         painter.drawLine(trans(QPointF(-1.0f, 0.0f)), trans(QPointF(1.0f, 0.0f)));
         painter.drawLine(trans(QPointF(0.0f, -1.0f)), trans(QPointF(0.0f, 1.0f)));
 
@@ -113,9 +115,31 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
     QPointF tar = trans(QPointF(m_PointSize, 0.0f));
     float point_size_px = (tar - ref).manhattanLength();
 
-    painter->setPen(Qt::GlobalColor::black);
+    const std::vector<Vertex*>& vertices = mesh->getVertices();
+    const std::vector<Triangle*>& triangles = mesh->getTriangles();
 
-    for(const auto& p : mesh->getVertices())
+    // paint traingles
+    painter->setBrush(QBrush(Qt::GlobalColor::gray));
+
+    QPolygonF triangle_poly(3);
+
+    for(const auto& triangle : triangles)
+    {
+        Vec2f vp0 = vertices[triangle->data()[0]]->getPosition();
+        Vec2f vp1 = vertices[triangle->data()[1]]->getPosition();
+        Vec2f vp2 = vertices[triangle->data()[2]]->getPosition();
+
+        triangle_poly[0] = trans(QPointF(vp0.x(), vp0.y()));
+        triangle_poly[1] = trans(QPointF(vp1.x(), vp1.y()));
+        triangle_poly[2] = trans(QPointF(vp2.x(), vp2.y()));
+
+        painter->drawPolygon(triangle_poly);
+    }
+
+    // paint vertices
+    painter->setBrush(QBrush(Qt::GlobalColor::black));
+
+    for(const auto& p : vertices)
     {
         QPointF vert_pos(p->getPosition().x(), p->getPosition().y());
         
