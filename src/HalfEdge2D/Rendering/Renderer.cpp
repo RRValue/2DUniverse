@@ -102,8 +102,6 @@ void Renderer::render(QPaintEvent* const event, QPaintTarget* const paintTarget)
         QPointF p1 = transToDevice(QPointF(vp_size.right(), vp_size.bottom()));
         QPointF p2 = transToDevice(QPointF(vp_size.left(), vp_size.top()));
         QPointF p3 = transToDevice(QPointF(vp_size.right(), vp_size.top()));
-        /*QPointF p2 = transToDevice(QPointF(0.0f, 0.0f));
-        QPointF p3 = transToDevice(QPointF(0.0f, 0.0f));*/
 
         painter.drawLine(p0, p1);
         painter.drawLine(p0, p2);
