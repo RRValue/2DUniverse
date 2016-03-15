@@ -26,7 +26,7 @@
 
 HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplication(argc, argv)
 {
-    m_MultiView = true;
+    m_MultiView = false;
 }
 
 HalfEdge2DApplication::~HalfEdge2DApplication()
@@ -57,6 +57,9 @@ void HalfEdge2DApplication::createGui()
     m_MainWindowForm.setupUi(m_MainWidget);
 
     m_RenderTarget = m_MainWindowForm.m_RenderWidget;
+
+    // connect
+    connect(m_MainWindowForm.m_CbMultiView, &QCheckBox::stateChanged, this, &HalfEdge2DApplication::onMultiViewChanged);
 }
 
 void HalfEdge2DApplication::createViewPorts()
@@ -100,6 +103,16 @@ void HalfEdge2DApplication::createRendering()
     eventHandler->setRenderer(m_Renderer);
 
     m_RenderTarget->setEventHandler(eventHandler);
+}
+
+void HalfEdge2DApplication::onMultiViewChanged(int state)
+{
+    if((Qt::CheckState)state == Qt::Checked)
+        m_MultiView = true;
+    else
+        m_MultiView = false;
+
+    setUpMultiView();
 }
 
 void HalfEdge2DApplication::setUpMultiView()

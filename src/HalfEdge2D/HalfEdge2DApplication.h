@@ -22,6 +22,9 @@ public:
 public slots:
     void onRun();
 
+private slots:
+    void onMultiViewChanged(int state);
+
 private:
     void init();
 

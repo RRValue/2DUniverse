@@ -33,6 +33,13 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
+       <widget class="QCheckBox" name="m_CbMultiView">
+        <property name="text">
+         <string>MultiView</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QComboBox" name="comboBox"/>
       </item>
       <item>
