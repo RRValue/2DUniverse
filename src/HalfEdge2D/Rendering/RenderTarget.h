@@ -30,6 +30,7 @@ public:
     void setSize(const QSizeF& size);
     void addViewPort(ViewPort* const viewport);
     void removeViewPort(ViewPort* const viewport);
+    void clearViewPorts();
 
     // tooling
     void updateViewPortsTargetSize();

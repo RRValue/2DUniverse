@@ -88,6 +88,11 @@ void RenderTarget::removeViewPort(ViewPort* const viewport)
     }
 }
 
+void RenderTarget::clearViewPorts()
+{
+    m_ViewPorts.clear();
+}
+
 void RenderTarget::updateViewPortsTargetSize()
 {
     for(const auto& vp : m_ViewPorts)
