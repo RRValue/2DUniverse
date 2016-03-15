@@ -3,8 +3,7 @@
 
 #include "HalfEdge2D/Controlling/Controller.h"
 
-class Scene;
-class Camera;
+class HESMesh;
 
 class ControllerBuildMesh : public Controller
 {
@@ -12,7 +11,7 @@ public:
     ControllerBuildMesh();
     virtual ~ControllerBuildMesh();
 
-    void setScene(Scene* const scene);
+    void setMesh(HESMesh* const mesh);
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -22,12 +21,15 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    bool m_MovePoint;
+    int getPointAtPos(const QPointF& pos) const;
 
-    Scene* m_Scene;
+private:
+    bool m_MovePoint;
     
     int m_CurrentIdx;
     QPointF m_CurrentHitDistance;
+
+    HESMesh* m_Mesh;
 };
 
 #endif //_CONTROLLING_CONTROLLERBUILDMESH_H_

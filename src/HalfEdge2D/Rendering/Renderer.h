@@ -8,11 +8,13 @@
 #include <set>
 
 class QPaintEvent;
+class QPainter;
 
 class QPaintTarget;
 class Scene;
 class RenderTarget;
 class ViewPort;
+class Mesh;
 
 class Renderer
 {
@@ -33,6 +35,9 @@ private:
     QPointF transToDevice(const QPointF& point);
 
 private:
+    void renderMesh(QPainter* const painter, Mesh* const mesh);
+
+private:
     Scene* m_Scene;
 
     Mat3f m_DeviceMat;
@@ -41,6 +46,8 @@ private:
     Mat3f m_InvTransMat;
 
     std::set<QPaintTarget* const> m_PaintTargets;
+
+    const float m_PointSize;
 };
 
 #endif //_RENDERING_RENDERER_H_

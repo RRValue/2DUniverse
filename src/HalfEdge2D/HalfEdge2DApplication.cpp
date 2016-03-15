@@ -101,11 +101,13 @@ void HalfEdge2DApplication::createRendering()
 {
     Scene* scene = new Scene();
 
+    scene->setMesh(m_Mesh);
+
     // allocate event handler and add controller and navigator
     Navigator* navigator = new Navigator();
     ControllerBuildMesh* controller = new ControllerBuildMesh();
 
-    controller->setScene(scene);
+    controller->setMesh(m_Mesh);
 
     // create renderer
     m_Renderer = new Renderer();

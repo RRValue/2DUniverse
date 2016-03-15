@@ -4,7 +4,9 @@
 #include <QtCore/QVector>
 #include <QtCore/QPointF>
 
-class Camera;
+#include <vector>
+
+class Mesh;
 
 class Scene
 {
@@ -12,17 +14,14 @@ public:
     Scene();
     ~Scene();
 
-    bool hasPoints() const;
-    void setPointPos(const size_t& idx, const QPointF& pos);
-    void addPoint(const QPointF& pos);
-    const QPointF& getPoint(const size_t& idx) const;
-    const QVector<QPointF>& getPoints() const;
-    int getPointAtPos(const QPointF& pos) const;
-    const float& getPointSize() const;
+    Mesh* const getMesh() const;
+
+    void setMesh(Mesh* const mesh);
 
 private:
     float m_PointSize;
-    QVector<QPointF> m_Points;
+
+    Mesh* m_Mesh;
 };
 
 #endif //_SCENE_SCENE_H_

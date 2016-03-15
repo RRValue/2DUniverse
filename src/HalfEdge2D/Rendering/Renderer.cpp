@@ -6,11 +6,14 @@
 #include "HalfEdge2D/Scene/Camera.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 
+#include "HalfEdge2D/Mesh/Mesh.h"
+#include "HalfEdge2D/Mesh/Vertex.h"
+
 #include <QtGui/QPainter>
 
 #include <QtWidgets/QWidget>
 
-Renderer::Renderer()
+Renderer::Renderer() : m_PointSize(0.05f)
 {
 
 }
@@ -80,18 +83,10 @@ void Renderer::render(QPaintEvent* const event, QPaintTarget* const paintTarget)
 
         painter.fillRect(clip_region, Qt::GlobalColor::white);
 
-        painter.setPen(Qt::GlobalColor::black);
+        // render Mesh
+        renderMesh(&painter, m_Scene->getMesh());
 
-        for(const auto& p : m_Scene->getPoints())
-        {
-            QPointF ref = trans(QPointF(0.0f, 0.0f));
-            QPointF tar = trans(QPointF(m_Scene->getPointSize(), 0.0f));
-
-            float point_size_px = (tar - ref).manhattanLength();
-
-            painter.drawEllipse(trans(p), point_size_px, point_size_px);
-        }
-
+        // render coordiante system
         painter.drawLine(trans(QPointF(-1.0f, 0.0f)), trans(QPointF(1.0f, 0.0f)));
         painter.drawLine(trans(QPointF(0.0f, -1.0f)), trans(QPointF(0.0f, 1.0f)));
 
@@ -108,6 +103,23 @@ void Renderer::render(QPaintEvent* const event, QPaintTarget* const paintTarget)
 
         painter.drawLine(p1, p3);
         painter.drawLine(p2, p3);
+    }
+}
+
+void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
+{
+    // get point point size to paint
+    QPointF ref = trans(QPointF(0.0f, 0.0f));
+    QPointF tar = trans(QPointF(m_PointSize, 0.0f));
+    float point_size_px = (tar - ref).manhattanLength();
+
+    painter->setPen(Qt::GlobalColor::black);
+
+    for(const auto& p : mesh->getVertices())
+    {
+        QPointF vert_pos(p->getPosition().x(), p->getPosition().y());
+        
+        painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
     }
 }
 
