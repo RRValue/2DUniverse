@@ -149,6 +149,9 @@
        <widget class="QComboBox" name="m_CbMeshSelector"/>
       </item>
       <item>
+       <widget class="QComboBox" name="m_CbController"/>
+      </item>
+      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>

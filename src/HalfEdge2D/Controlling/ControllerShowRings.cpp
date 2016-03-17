@@ -4,6 +4,7 @@
 ControllerShowRings::ControllerShowRings()
 {
     m_Mesh = nullptr;
+    m_Name = "ControllerShowRings";
 }
 
 ControllerShowRings::~ControllerShowRings()

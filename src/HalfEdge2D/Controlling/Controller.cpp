@@ -12,11 +12,17 @@
 Controller::Controller()
 {
     m_ActiveCamera = nullptr;
+    m_Name = "";
 }
 
 Controller::~Controller()
 {
 
+}
+
+const std::string& Controller::getName() const
+{
+    return m_Name;
 }
 
 bool Controller::inViewPort(const QPoint& point) const

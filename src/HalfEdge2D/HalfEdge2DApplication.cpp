@@ -3,6 +3,7 @@
 #include "HalfEdge2D/Events/EventHandler.h"
 
 #include "HalfEdge2D/Controlling/ControllerBuildMesh.h"
+#include "HalfEdge2D/Controlling/ControllerShowRings.h"
 
 #include "HalfEdge2D/Navigation/Navigator.h"
 
@@ -51,7 +52,7 @@ void HalfEdge2DApplication::init()
     m_MainWidget->show();
 
     // set mesh to show
-    onMeshSelectorChanged(m_MainWindowForm.m_CbMeshSelector->currentIndex());
+    onMeshSelectionChanged(m_MainWindowForm.m_CbMeshSelector->currentIndex());
 }
 
 void HalfEdge2DApplication::createGui()
@@ -68,11 +69,14 @@ void HalfEdge2DApplication::createGui()
 
     m_MainWindowForm.m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Clear");
 
+    m_CbController = m_MainWindowForm.m_CbController;
+
     // connect
     connect(m_MainWindowForm.m_CbMultiView, &QCheckBox::stateChanged, this, &HalfEdge2DApplication::onMultiViewChanged);
     connect(m_SldHPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onHSliderChanged);
     connect(m_SldVPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onVSliderChanged);
-    connect(m_MainWindowForm.m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectorChanged(int)));
+    connect(m_MainWindowForm.m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
+    connect(m_CbController, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onControllerSelectionChanged(const QString&)));
 }
 
 void HalfEdge2DApplication::createViewPorts()
@@ -102,22 +106,31 @@ void HalfEdge2DApplication::createRendering()
     scene->setMesh(m_Mesh);
 
     // allocate event handler and add controller and navigator
-    Navigator* navigator = new Navigator();
-    ControllerBuildMesh* controller = new ControllerBuildMesh();
+    m_Navigator = new Navigator();
+    m_ControllerBuildMesh = new ControllerBuildMesh();
+    m_ControllerShowRings = new ControllerShowRings();
 
-    controller->setMesh(m_Mesh);
+    m_ControllerBuildMesh->setMesh(m_Mesh);
+    m_ControllerShowRings->setMesh(m_Mesh);
+
+    // add controller to combobox
+    m_CbController->addItem(m_ControllerBuildMesh->getName().c_str());
+    m_CbController->addItem(m_ControllerShowRings->getName().c_str());
+
+    m_Controller.insert(std::make_pair(m_ControllerBuildMesh->getName(), m_ControllerBuildMesh));
+    m_Controller.insert(std::make_pair(m_ControllerShowRings->getName(), m_ControllerShowRings));
 
     // create renderer
     m_Renderer = new Renderer();
     m_Renderer->setScene(scene);
 
     // create event handler
-    EventHandler* eventHandler = new EventHandler(m_RenderTarget);
-    eventHandler->setNavigator(navigator);
-    eventHandler->setController(controller);
-    eventHandler->setRenderer(m_Renderer);
+    m_EventHandler = new EventHandler(m_RenderTarget);
+    m_EventHandler->setNavigator(m_Navigator);
+    m_EventHandler->setController(m_ControllerBuildMesh);
+    m_EventHandler->setRenderer(m_Renderer);
 
-    m_RenderTarget->setEventHandler(eventHandler);
+    m_RenderTarget->setEventHandler(m_EventHandler);
 }
 
 void HalfEdge2DApplication::onMultiViewChanged(int state)
@@ -182,7 +195,7 @@ void HalfEdge2DApplication::onVSliderChanged(int value)
     m_Renderer->render();
 }
 
-void HalfEdge2DApplication::onMeshSelectorChanged(int value)
+void HalfEdge2DApplication::onMeshSelectionChanged(int value)
 {
     m_Mesh->clear();
 
@@ -224,4 +237,16 @@ void HalfEdge2DApplication::onMeshSelectorChanged(int value)
     builder.build();
 
     m_Renderer->render();
+}
+
+void HalfEdge2DApplication::onControllerSelectionChanged(const QString& text)
+{
+    std::string name = text.toStdString();
+
+    const auto& find_controller = m_Controller.find(name);
+
+    if(find_controller == m_Controller.end())
+        return;
+
+    m_EventHandler->setController(find_controller->second);
 }

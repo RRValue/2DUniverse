@@ -17,6 +17,7 @@ ControllerBuildMesh::ControllerBuildMesh()
 {
     m_Mesh = nullptr;
     m_MovePoint = false;
+    m_Name = "ControllerBuildMesh";
 }
 
 ControllerBuildMesh::~ControllerBuildMesh()

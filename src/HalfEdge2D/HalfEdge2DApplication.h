@@ -10,6 +10,12 @@ class ViewPort;
 class Camera;
 class Renderer;
 class HESMesh;
+class QComboBox;
+class Navigator;
+class Controller;
+class ControllerBuildMesh;
+class ControllerShowRings;
+class EventHandler;
 
 class HalfEdge2DApplication : public QApplication
 {
@@ -27,7 +33,8 @@ private slots:
     void onMultiViewChanged(int state);
     void onHSliderChanged(int value);
     void onVSliderChanged(int value);
-    void onMeshSelectorChanged(int value);
+    void onMeshSelectionChanged(int value);
+    void onControllerSelectionChanged(const QString& text);
 
 private:
     void init();
@@ -42,6 +49,7 @@ private:
 private:
     Ui_HalfEdgeAppMainWindow m_MainWindowForm;
     QWidget* m_MainWidget;
+    QComboBox* m_CbController;
     
     // rendering
     QPaintTarget* m_RenderTarget;
@@ -62,6 +70,14 @@ private:
     Camera* m_CamVp1;
     Camera* m_CamVp2;
     Camera* m_CamVp3;
+
+    EventHandler* m_EventHandler;
+
+    Navigator* m_Navigator;
+    ControllerBuildMesh* m_ControllerBuildMesh;
+    ControllerShowRings* m_ControllerShowRings;
+
+    std::map<std::string, Controller* const> m_Controller;
 
     float m_HPartition;
     float m_VPartition;

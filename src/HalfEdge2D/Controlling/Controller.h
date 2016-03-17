@@ -16,6 +16,8 @@ public:
     Controller();
     virtual ~Controller();
 
+    const std::string& getName() const;
+
 protected:
     bool inViewPort(const QPoint& point) const;
     QPoint keepInViewPort(const QPoint& point) const;
@@ -25,6 +27,8 @@ protected:
     QPointF invTrans(const QPointF& point);
 
 protected:
+    std::string m_Name;
+
     // scene matrices    
     Mat3f m_DeviceMat;
     Mat3f m_InvDeviceMat;
