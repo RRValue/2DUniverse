@@ -22,6 +22,28 @@ EventHandler::~EventHandler()
 
 }
 
+void EventHandler::setNavigator(EventInterface* const navigator)
+{
+    if(navigator == nullptr)
+        return;
+
+    if(navigator == m_Navigator)
+        return;
+
+    m_Navigator = navigator;
+}
+
+void EventHandler::setController(EventInterface* const controller)
+{
+    if(controller == nullptr)
+        return;
+
+    if(controller == m_Controller)
+        return;
+
+    m_Controller = controller;
+}
+
 void EventHandler::setRenderer(Renderer* const renderer)
 {
     if(renderer == nullptr)
@@ -30,20 +52,11 @@ void EventHandler::setRenderer(Renderer* const renderer)
     m_Renderer = renderer;
     m_Renderer->addPaintTarget(m_PaintTarget);
 
-    for(const auto& iface : m_EventInterfaces)
-        iface->m_Renderer = m_Renderer;
-}
+    if(m_Navigator != nullptr)
+        m_Navigator->m_Renderer = m_Renderer;
 
-void EventHandler::addEventInterface(EventInterface* const eventInterface)
-{
-    if(eventInterface == nullptr)
-        return;
-
-    for(const auto& iface : m_EventInterfaces)
-        if(iface == eventInterface)
-            return;
-
-    m_EventInterfaces.push_back(eventInterface);
+    if(m_Controller != nullptr)
+        m_Controller->m_Renderer = m_Renderer;
 }
 
 ViewPort* const EventHandler::getActiveViewPort()
@@ -60,8 +73,12 @@ bool EventHandler::handleMouseMoveEvent(QMouseEvent* const event)
     setActiveViewport(event->pos());
     setActiveCamera();
 
-    for(const auto& idface : m_EventInterfaces)
-        if(idface->handleMouseMoveEvent(event))
+    if(m_Navigator != nullptr)
+        if(m_Navigator->handleMouseMoveEvent(event))
+            return true;
+
+    if(m_Controller != nullptr)
+        if(m_Controller->handleMouseMoveEvent(event))
             return true;
 
     return true;
@@ -76,8 +93,12 @@ bool EventHandler::handleMousePressEvent(QMouseEvent* const event)
     setActiveViewport(event->pos());
     setActiveCamera();
 
-    for(const auto& idface : m_EventInterfaces)
-        if(idface->handleMousePressEvent(event))
+    if(m_Navigator != nullptr)
+        if(m_Navigator->handleMousePressEvent(event))
+            return true;
+
+    if(m_Controller != nullptr)
+        if(m_Controller->handleMousePressEvent(event))
             return true;
 
     return true;
@@ -92,8 +113,12 @@ bool EventHandler::handleMouseReleaseEvent(QMouseEvent* const event)
     setActiveViewport(event->pos());
     setActiveCamera();
 
-    for(const auto& idface : m_EventInterfaces)
-        if(idface->handleMouseReleaseEvent(event))
+    if(m_Navigator != nullptr)
+        if(m_Navigator->handleMouseReleaseEvent(event))
+            return true;
+
+    if(m_Controller != nullptr)
+        if(m_Controller->handleMouseReleaseEvent(event))
             return true;
 
     return true;
@@ -108,8 +133,12 @@ bool EventHandler::handleResizeEvent(QResizeEvent* const event)
 
     m_RenderTarget->setSize(QSizeF(event->size()));
 
-    for(const auto& idface : m_EventInterfaces)
-        if(idface->handleResizeEvent(event))
+    if(m_Navigator != nullptr)
+        if(m_Navigator->handleResizeEvent(event))
+            return true;
+
+    if(m_Controller != nullptr)
+        if(m_Controller->handleResizeEvent(event))
             return true;
 
     return true;
@@ -124,8 +153,12 @@ bool EventHandler::handleWheelEvent(QWheelEvent* const event)
     setActiveViewport(event->pos());
     setActiveCamera();
 
-    for(const auto& idface : m_EventInterfaces)
-        if(idface->handleWheelEvent(event))
+    if(m_Navigator != nullptr)
+        if(m_Navigator->handleWheelEvent(event))
+            return true;
+
+    if(m_Controller != nullptr)
+        if(m_Controller->handleWheelEvent(event))
             return true;
 
     return true;
@@ -144,8 +177,11 @@ void EventHandler::handlePaintEvent(QPaintEvent* const event)
 
 void EventHandler::setActiveRenderTarget()
 {
-    for(const auto& idface : m_EventInterfaces)
-        idface->m_RenderTarget = m_RenderTarget;
+    if(m_Navigator != nullptr)
+        m_Navigator->m_RenderTarget = m_RenderTarget;
+
+    if(m_Controller != nullptr)
+        m_Controller->m_RenderTarget = m_RenderTarget;
 }
 
 void EventHandler::setActiveViewport(const QPoint& point)
@@ -169,8 +205,11 @@ void EventHandler::setActiveViewport(const QPoint& point)
         }
     }
 
-    for(const auto& idface : m_EventInterfaces)
-        idface->m_ActiveViewPort = m_ActiveViewPort;
+    if(m_Navigator != nullptr)
+        m_Navigator->m_ActiveViewPort = m_ActiveViewPort;
+
+    if(m_Controller != nullptr)
+        m_Controller->m_ActiveViewPort = m_ActiveViewPort;
 }
 
 void EventHandler::setActiveCamera()
@@ -180,6 +219,9 @@ void EventHandler::setActiveCamera()
     if(m_ActiveViewPort != nullptr)
         m_ActiveCamera = m_ActiveViewPort->getCamera();
 
-    for(const auto& idface : m_EventInterfaces)
-        idface->m_ActiveCamera = m_ActiveCamera;
+    if(m_Navigator != nullptr)
+        m_Navigator->m_ActiveCamera = m_ActiveCamera;
+
+    if(m_Controller != nullptr)
+        m_Controller->m_ActiveCamera = m_ActiveCamera;
 }

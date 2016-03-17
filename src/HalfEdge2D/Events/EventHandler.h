@@ -20,7 +20,8 @@ public:
     EventHandler(QPaintTarget* const paintTarget);
     ~EventHandler();
 
-    void addEventInterface(EventInterface* const eventInterface);
+    void setNavigator(EventInterface* const navigator);
+    void setController(EventInterface* const controller);
     void setRenderer(Renderer* const renderer);
     ViewPort* const getActiveViewPort();
 
@@ -41,7 +42,8 @@ private:
 private:
     QPaintTarget* m_PaintTarget;
 
-    std::vector<EventInterface* const> m_EventInterfaces;
+    EventInterface* m_Navigator;
+    EventInterface* m_Controller;
 
     ViewPort* m_ActiveViewPort;
 };

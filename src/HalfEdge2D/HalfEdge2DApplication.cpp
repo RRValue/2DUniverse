@@ -113,8 +113,8 @@ void HalfEdge2DApplication::createRendering()
 
     // create event handler
     EventHandler* eventHandler = new EventHandler(m_RenderTarget);
-    eventHandler->addEventInterface(navigator);
-    eventHandler->addEventInterface(controller);
+    eventHandler->setNavigator(navigator);
+    eventHandler->setController(controller);
     eventHandler->setRenderer(m_Renderer);
 
     m_RenderTarget->setEventHandler(eventHandler);
