@@ -19,6 +19,7 @@ Renderer::Renderer() : m_PointSize(0.005f)
 {
     m_RenderVertices = true;
     m_RenderTriangles = true;
+    m_RenderTrianglesEdges = true;
     m_RenderCoordinateAxis = true;
     m_RenderViewport = true;
 }
@@ -46,6 +47,11 @@ void Renderer::setRenderVertices(const bool& render)
 void Renderer::setRenderTriangles(const bool& render)
 {
     m_RenderTriangles = render;
+}
+
+void Renderer::setRenderTrianglesEdges(const bool& render)
+{
+    m_RenderTrianglesEdges = render;
 }
 
 void Renderer::setScene(Scene* const scene)
@@ -209,22 +215,25 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
             painter->fillPath(path, QBrush(paint_color));
         }
 
-        // paint traingles edges
-        for(const auto& triangle : triangles)
+        if(m_RenderTrianglesEdges)
         {
-            Vec2f vp0 = vertices[triangle->getIdx0()]->getPosition();
-            Vec2f vp1 = vertices[triangle->getIdx1()]->getPosition();
-            Vec2f vp2 = vertices[triangle->getIdx2()]->getPosition();
+            // paint traingles edges
+            for(const auto& triangle : triangles)
+            {
+                Vec2f vp0 = vertices[triangle->getIdx0()]->getPosition();
+                Vec2f vp1 = vertices[triangle->getIdx1()]->getPosition();
+                Vec2f vp2 = vertices[triangle->getIdx2()]->getPosition();
 
-            QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
-            QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
-            QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
+                QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
+                QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
+                QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
 
-            painter->setPen(Qt::SolidLine);
-            painter->setPen(Qt::black);
-            painter->drawLine(p0, p1);
-            painter->drawLine(p1, p2);
-            painter->drawLine(p2, p0);
+                painter->setPen(Qt::SolidLine);
+                painter->setPen(Qt::black);
+                painter->drawLine(p0, p1);
+                painter->drawLine(p1, p2);
+                painter->drawLine(p2, p0);
+            }
         }
     }
 

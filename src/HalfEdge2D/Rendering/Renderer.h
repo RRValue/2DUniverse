@@ -38,6 +38,7 @@ public:
     void setRenderCoordianteAxis(const bool& render);
     void setRenderVertices(const bool& render);
     void setRenderTriangles(const bool& render);
+    void setRenderTrianglesEdges(const bool& render);
 
 private:
     void updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp);
@@ -55,6 +56,7 @@ private:
 private:
     bool m_RenderVertices;
     bool m_RenderTriangles;
+    bool m_RenderTrianglesEdges;
     bool m_RenderCoordinateAxis;
     bool m_RenderViewport;
 

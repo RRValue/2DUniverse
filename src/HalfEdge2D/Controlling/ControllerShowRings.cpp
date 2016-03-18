@@ -14,6 +14,7 @@
 #include <math.h>
 
 #include <QtGui/QMouseEvent>
+#include <QtGui/QImage>
 
 ControllerShowRings::ControllerShowRings()
 {
@@ -33,6 +34,7 @@ ControllerShowRings::ControllerShowRings()
     m_Renderer->setRenderCoordianteAxis(false);
     m_Renderer->setRenderVertices(false);
     m_Renderer->setRenderTriangles(true);
+    m_Renderer->setRenderTrianglesEdges(false);
 }
 
 ControllerShowRings::~ControllerShowRings()
@@ -87,11 +89,14 @@ void ControllerShowRings::updateIdTarget()
 
     m_ViewportContentChanges = false;
 
-    if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
+    if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr || m_RenderTarget == nullptr)
         return;
 
     m_ViewPort->setSize(m_ActiveViewPort->getSize());
     m_ViewPort->setCamera(m_ActiveCamera);
+
+    m_IdTarget->scaled((int)(m_RenderTarget->getSize().width() + 0.5f), (int)(m_RenderTarget->getSize().height() + 0.5f));
+    m_IdTarget->setSize(m_RenderTarget->getSize());
 
     // prepare mesh
     Mesh* mesh = m_Scene->getMesh();
@@ -103,7 +108,7 @@ void ControllerShowRings::updateIdTarget()
 
     Vec4f prev_triangle_color = m_Triangles[0]->getColor();
 
-    int color_step = 8;
+    int color_step = 3;
     int color_step_value = (int)std::pow(2.0, (float)color_step);
     float color_factor = 1.0f / (float)color_step_value;
     int r = 0;
@@ -130,4 +135,12 @@ void ControllerShowRings::updateIdTarget()
 
     for(size_t i = 0; i < m_Triangles.size(); i++)
         m_Triangles[i]->setColor(prev_triangle_color);
+
+    // save stuff
+    QString name = "image.png";
+    QFile file(name);
+    if(file.exists())
+        file.remove();
+    
+    m_IdTarget->save(name);
 }
