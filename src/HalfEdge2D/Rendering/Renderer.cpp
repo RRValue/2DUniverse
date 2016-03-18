@@ -1,6 +1,6 @@
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/RenderTarget.h"
-#include "HalfEdge2D/Rendering/QPaintTarget.h"
+#include "HalfEdge2D/Rendering/QWidgetTarget.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -32,7 +32,7 @@ void Renderer::setScene(Scene* const scene)
     m_Scene = scene;
 }
 
-void Renderer::addPaintTarget(QPaintTarget* const paintTarget)
+void Renderer::addPaintTarget(QWidgetTarget* const paintTarget)
 {
     if(paintTarget == nullptr)
         return;
@@ -43,7 +43,7 @@ void Renderer::addPaintTarget(QPaintTarget* const paintTarget)
     m_PaintTargets.insert(paintTarget);
 }
 
-void Renderer::removePaintTarget(QPaintTarget* const paintTarget)
+void Renderer::removePaintTarget(QWidgetTarget* const paintTarget)
 {
     if(paintTarget == nullptr)
         return;
@@ -60,17 +60,17 @@ void Renderer::render()
         pt->update();
 }
 
-void Renderer::render(QPaintTarget* const paintTarget)
+void Renderer::render(QWidgetTarget* const paintTarget)
 {
     paint(paintTarget);
 }
 
-void Renderer::render(QPaintEvent* const event, QPaintTarget* const paintTarget)
+void Renderer::render(QPaintEvent* const event, QWidgetTarget* const paintTarget)
 {
     paint(paintTarget);
 }
 
-void Renderer::paint(QPaintTarget* const paintTarget)
+void Renderer::paint(QWidgetTarget* const paintTarget)
 {
     QPainter painter(paintTarget);
 

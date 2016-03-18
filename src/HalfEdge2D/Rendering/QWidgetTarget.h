@@ -1,15 +1,15 @@
-#ifndef _RENDERING_QPAINTTARGET_H_
-#define _RENDERING_QPAINTTARGET_H_
+#ifndef _RENDERING_QWIDGETTARGET_H_
+#define _RENDERING_QWIDGETTARGET_H_
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 
 #include <QtWidgets/QWidget>
 
-class QPaintTarget : public QWidget, public RenderTarget
+class QWidgetTarget : public QWidget, public RenderTarget
 {
 public:
-    QPaintTarget(QWidget* parent = nullptr, Qt::WindowFlags f = 0);
-    ~QPaintTarget();
+    QWidgetTarget(QWidget* parent = nullptr, Qt::WindowFlags f = 0);
+    ~QWidgetTarget();
 
 protected:
     virtual void mouseMoveEvent(QMouseEvent* event) final override;
@@ -22,4 +22,4 @@ protected:
     virtual void render() final override;
 };
 
-#endif //_RENDERING_QPAINTTARGET_H_
+#endif //_RENDERING_QWIDGETTARGET_H_

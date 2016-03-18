@@ -5,7 +5,7 @@
 
 #include "HalfEdge2D/MainWindow_uic.h"
 
-class QPaintTarget;
+class QWidgetTarget;
 class ViewPort;
 class Camera;
 class Renderer;
@@ -53,7 +53,7 @@ private:
     QComboBox* m_CbController;
     
     // rendering
-    QPaintTarget* m_RenderTarget;
+    QWidgetTarget* m_RenderTarget;
 
     QSlider* m_SldHPart;
     QSlider* m_SldVPart;

@@ -1,18 +1,18 @@
-#include "HalfEdge2D/Rendering/QPaintTarget.h"
+#include "HalfEdge2D/Rendering/QWidgetTarget.h"
 
 #include "HalfEdge2D/EVents/EventInterface.h"
 
-QPaintTarget::QPaintTarget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
+QWidgetTarget::QWidgetTarget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
 
 }
 
-QPaintTarget::~QPaintTarget()
+QWidgetTarget::~QWidgetTarget()
 {
 
 }
 
-void QPaintTarget::mouseMoveEvent(QMouseEvent* event)
+void QWidgetTarget::mouseMoveEvent(QMouseEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -20,7 +20,7 @@ void QPaintTarget::mouseMoveEvent(QMouseEvent* event)
     m_EventInterface->handleMouseMoveEvent(event);
 }
 
-void QPaintTarget::mousePressEvent(QMouseEvent* event)
+void QWidgetTarget::mousePressEvent(QMouseEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -28,7 +28,7 @@ void QPaintTarget::mousePressEvent(QMouseEvent* event)
     m_EventInterface->handleMousePressEvent(event);
 }
 
-void QPaintTarget::mouseReleaseEvent(QMouseEvent* event)
+void QWidgetTarget::mouseReleaseEvent(QMouseEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -36,7 +36,7 @@ void QPaintTarget::mouseReleaseEvent(QMouseEvent* event)
     m_EventInterface->handleMouseReleaseEvent(event);
 }
 
-void QPaintTarget::resizeEvent(QResizeEvent* event)
+void QWidgetTarget::resizeEvent(QResizeEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -44,7 +44,7 @@ void QPaintTarget::resizeEvent(QResizeEvent* event)
     m_EventInterface->handleResizeEvent(event);
 }
 
-void QPaintTarget::wheelEvent(QWheelEvent* event)
+void QWidgetTarget::wheelEvent(QWheelEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -52,7 +52,7 @@ void QPaintTarget::wheelEvent(QWheelEvent* event)
     m_EventInterface->handleWheelEvent(event);
 }
 
-void QPaintTarget::paintEvent(QPaintEvent* event)
+void QWidgetTarget::paintEvent(QPaintEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -60,7 +60,7 @@ void QPaintTarget::paintEvent(QPaintEvent* event)
     m_EventInterface->handlePaintEvent(event);
 }
 
-void QPaintTarget::render()
+void QWidgetTarget::render()
 {
     update();
 }

@@ -4,7 +4,7 @@
 
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/RenderTarget.h"
-#include "HalfEdge2D/Rendering/QPaintTarget.h"
+#include "HalfEdge2D/Rendering/QWidgetTarget.h"
 
 #include "HalfEdge2D/Scene/ViewPort.h"
 
@@ -12,7 +12,7 @@
 
 #include <qdebug.h>
 
-EventHandler::EventHandler(QPaintTarget* const paintTarget) : m_PaintTarget(paintTarget)
+EventHandler::EventHandler(QWidgetTarget* const paintTarget) : m_PaintTarget(paintTarget)
 {
     m_RenderTarget = paintTarget;
     m_Renderer = nullptr;

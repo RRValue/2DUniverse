@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QPaintTarget" name="m_RenderWidget" native="true"/>
+    <widget class="QWidgetTarget" name="m_RenderWidget" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="widget_3" native="true">
@@ -171,9 +171,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QPaintTarget</class>
+   <class>QWidgetTarget</class>
    <extends>QWidget</extends>
-   <header>HalfEdge2D/Rendering/QPaintTarget.h</header>
+   <header>HalfEdge2D/Rendering/QWidgetTarget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

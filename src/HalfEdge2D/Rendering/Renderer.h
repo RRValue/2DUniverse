@@ -10,7 +10,7 @@
 class QPaintEvent;
 class QPainter;
 
-class QPaintTarget;
+class QWidgetTarget;
 class Scene;
 class RenderTarget;
 class ViewPort;
@@ -23,19 +23,19 @@ public:
     ~Renderer();
 
     void render();
-    void render(QPaintEvent* const event, QPaintTarget* const paintTarget);
-    void render(QPaintTarget* const paintTarget);
+    void render(QPaintEvent* const event, QWidgetTarget* const paintTarget);
+    void render(QWidgetTarget* const paintTarget);
 
     void setScene(Scene* const scene);
-    void addPaintTarget(QPaintTarget* const paintTarget);
-    void removePaintTarget(QPaintTarget* const paintTarget);
+    void addPaintTarget(QWidgetTarget* const paintTarget);
+    void removePaintTarget(QWidgetTarget* const paintTarget);
 
 private:
     void updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp);
     QPointF trans(const QPointF& point);
     QPointF transToDevice(const QPointF& point);
 
-    void paint(QPaintTarget* const paintTarget);
+    void paint(QWidgetTarget* const paintTarget);
 
 private:
     void renderMesh(QPainter* const painter, Mesh* const mesh);
@@ -48,7 +48,7 @@ private:
     Mat3f m_TransMat;
     Mat3f m_InvTransMat;
 
-    std::set<QPaintTarget* const> m_PaintTargets;
+    std::set<QWidgetTarget* const> m_PaintTargets;
 
     const float m_PointSize;
 };
