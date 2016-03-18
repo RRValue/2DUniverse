@@ -15,8 +15,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <qdebug.h>
-
 Renderer::Renderer() : m_PointSize(0.005f)
 {
     m_RenderVertices = true;

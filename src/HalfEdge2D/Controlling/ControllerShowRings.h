@@ -3,11 +3,14 @@
 
 #include "HalfEdge2D/Controlling/Controller.h"
 
+#include <vector>
+
 class HESMesh;
 class Scene;
 class Renderer;
 class ViewPort;
 class QPaintTarget;
+class Triangle;
 
 class ControllerShowRings : public Controller
 {
@@ -25,12 +28,17 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
+    void updateIdTarget();
+
+private:
     Scene* m_Scene;
     HESMesh* m_Mesh;
 
     QPaintTarget* m_IdTarget;
     Renderer* m_Renderer;
     ViewPort* m_ViewPort;
+
+    std::vector<Triangle*> m_Triangles;
 };
 
 #endif //_CONTROLLING_CONTROLLERSHOWRINGS_H_

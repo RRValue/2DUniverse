@@ -8,9 +8,12 @@
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 
-#include <QtGui/QMouseEvent>
+#include "HalfEdge2D/Mesh/Vertex.h"
+#include "HalfEdge2D/Mesh/Triangle.h"
 
-#include <qdebug.h>
+#include <math.h>
+
+#include <QtGui/QMouseEvent>
 
 ControllerShowRings::ControllerShowRings()
 {
@@ -52,18 +55,7 @@ void ControllerShowRings::setMesh(HESMesh* const mesh)
 
 bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 {
-    if(!m_ViewportContentChanges)
-        return false;
-
-    m_ViewportContentChanges = false;
-
-    if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
-        return false;
-    
-    m_ViewPort->setSize(m_ActiveViewPort->getSize());
-    m_ViewPort->setCamera(m_ActiveCamera);
-
-    m_Renderer->render(m_IdTarget);
+    updateIdTarget();
 
     return false;
 }
@@ -86,4 +78,56 @@ bool ControllerShowRings::handleResizeEvent(QResizeEvent* const event)
 bool ControllerShowRings::handleWheelEvent(QWheelEvent* const event)
 {
     return false;
+}
+
+void ControllerShowRings::updateIdTarget()
+{
+    if(!m_ViewportContentChanges)
+        return;
+
+    m_ViewportContentChanges = false;
+
+    if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
+        return;
+
+    m_ViewPort->setSize(m_ActiveViewPort->getSize());
+    m_ViewPort->setCamera(m_ActiveCamera);
+
+    // prepare mesh
+    Mesh* mesh = m_Scene->getMesh();
+
+    m_Triangles = mesh->getTriangles();
+
+    if(m_Triangles.empty())
+        return;
+
+    Vec4f prev_triangle_color = m_Triangles[0]->getColor();
+
+    int color_step = 8;
+    int color_step_value = (int)std::pow(2.0, (float)color_step);
+    float color_factor = 1.0f / (float)color_step_value;
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    Vec4f current_color;
+
+    for(size_t i = 0; i < m_Triangles.size(); i++)
+    {
+        r = (i >> 0 * color_step) % color_step_value;
+        g = (i >> 1 * color_step) % color_step_value;
+        b = (i >> 2 * color_step) % color_step_value;
+
+        current_color = Vec4f(
+            color_factor * (float)r,
+            color_factor * (float)g,
+            color_factor * (float)b,
+            1.0f);
+
+        m_Triangles[i]->setColor(current_color);
+    }
+
+    m_Renderer->render(m_IdTarget);
+
+    for(size_t i = 0; i < m_Triangles.size(); i++)
+        m_Triangles[i]->setColor(prev_triangle_color);
 }

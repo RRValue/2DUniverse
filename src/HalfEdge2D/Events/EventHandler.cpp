@@ -10,8 +10,6 @@
 
 #include <QtGui/QResizeEvent>
 
-#include <qdebug.h>
-
 EventHandler::EventHandler(QWidgetTarget* const widgetTarget) : m_WidgetTarget(widgetTarget)
 {
     m_RenderTarget = widgetTarget;
