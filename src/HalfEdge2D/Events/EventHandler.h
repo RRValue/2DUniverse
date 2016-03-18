@@ -5,12 +5,11 @@
 
 #include <QtCore/QPoint>
 
-#include <vector>
+#include <set>
 
 class Navigator;
 class Controller;
 class Renderer;
-class ViewPort;
 class QPaintTarget;
 
 class EventHandler : public EventInterface
@@ -21,8 +20,10 @@ public:
     ~EventHandler();
 
     void setNavigator(EventInterface* const navigator);
-    void setController(EventInterface* const controller);
+    void addController(Controller* const controller);
+    void removeController(Controller* const controller);
     void setRenderer(Renderer* const renderer);
+    void setActiveController(Controller* const controller);
     ViewPort* const getActiveViewPort();
 
 protected:
@@ -43,9 +44,8 @@ private:
     QPaintTarget* m_PaintTarget;
 
     EventInterface* m_Navigator;
-    EventInterface* m_Controller;
-
-    ViewPort* m_ActiveViewPort;
+    std::set<Controller* const> m_Controller;
+    Controller* m_ActiveController;
 };
 
 #endif //_EVENTS_EVENTHANDLER_H_

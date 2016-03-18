@@ -127,8 +127,10 @@ void HalfEdge2DApplication::createRendering()
     // create event handler
     m_EventHandler = new EventHandler(m_RenderTarget);
     m_EventHandler->setNavigator(m_Navigator);
-    m_EventHandler->setController(m_ControllerBuildMesh);
+    m_EventHandler->addController(m_ControllerBuildMesh);
+    m_EventHandler->addController(m_ControllerShowRings);
     m_EventHandler->setRenderer(m_Renderer);
+    m_EventHandler->setActiveController(m_ControllerBuildMesh);
 
     m_RenderTarget->setEventHandler(m_EventHandler);
 }
@@ -248,5 +250,5 @@ void HalfEdge2DApplication::onControllerSelectionChanged(const QString& text)
     if(find_controller == m_Controller.end())
         return;
 
-    m_EventHandler->setController(find_controller->second);
+    m_EventHandler->setActiveController(find_controller->second);
 }

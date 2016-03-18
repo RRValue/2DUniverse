@@ -13,11 +13,17 @@ Controller::Controller()
 {
     m_ActiveCamera = nullptr;
     m_Name = "";
+    m_Active = false;
 }
 
 Controller::~Controller()
 {
 
+}
+
+const bool& Controller::isActive() const
+{
+    return m_Active;
 }
 
 const std::string& Controller::getName() const

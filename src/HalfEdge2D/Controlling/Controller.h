@@ -9,13 +9,17 @@
 
 class Scene;
 class Camera;
+class EventHandler;
 
 class Controller : public EventInterface
 {
+    friend class EventHandler;
+
 public:
     Controller();
     virtual ~Controller();
 
+    const bool& isActive() const;
     const std::string& getName() const;
 
 protected:
@@ -27,6 +31,7 @@ protected:
     QPointF invTrans(const QPointF& point);
 
 protected:
+    bool m_Active;
     std::string m_Name;
 
     // scene matrices    
