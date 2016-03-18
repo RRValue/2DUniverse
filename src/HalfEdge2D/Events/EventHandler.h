@@ -16,7 +16,7 @@ class EventHandler : public EventInterface
 {
 public:
     EventHandler() = delete;
-    EventHandler(QWidgetTarget* const paintTarget);
+    EventHandler(QWidgetTarget* const widgetTarget);
     ~EventHandler();
 
     void setNavigator(EventInterface* const navigator);
@@ -43,7 +43,7 @@ private:
     void viewportContentChanged();
 
 private:
-    QWidgetTarget* m_PaintTarget;
+    QWidgetTarget* m_WidgetTarget;
 
     EventInterface* m_Navigator;
     std::set<Controller* const> m_Controller;

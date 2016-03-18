@@ -32,57 +32,57 @@ void Renderer::setScene(Scene* const scene)
     m_Scene = scene;
 }
 
-void Renderer::addPaintTarget(QWidgetTarget* const paintTarget)
+void Renderer::addWidgetTarget(QWidgetTarget* const widgetTarget)
 {
-    if(paintTarget == nullptr)
+    if(widgetTarget == nullptr)
         return;
 
-    if(m_PaintTargets.find(paintTarget) != m_PaintTargets.end())
+    if(m_WidgetTargets.find(widgetTarget) != m_WidgetTargets.end())
         return;
 
-    m_PaintTargets.insert(paintTarget);
+    m_WidgetTargets.insert(widgetTarget);
 }
 
-void Renderer::removePaintTarget(QWidgetTarget* const paintTarget)
+void Renderer::removeWidgetTarget(QWidgetTarget* const widgetTarget)
 {
-    if(paintTarget == nullptr)
+    if(widgetTarget == nullptr)
         return;
 
-    if(m_PaintTargets.find(paintTarget) == m_PaintTargets.end())
+    if(m_WidgetTargets.find(widgetTarget) == m_WidgetTargets.end())
         return;
 
-    m_PaintTargets.erase(m_PaintTargets.find(paintTarget));
+    m_WidgetTargets.erase(m_WidgetTargets.find(widgetTarget));
 }
 
 void Renderer::render()
 {
-    for(const auto& pt : m_PaintTargets)
+    for(const auto& pt : m_WidgetTargets)
         pt->update();
 }
 
-void Renderer::render(QWidgetTarget* const paintTarget)
+void Renderer::render(QWidgetTarget* const widgetTarget)
 {
-    paint(paintTarget);
+    paint(widgetTarget);
 }
 
-void Renderer::render(QPaintEvent* const event, QWidgetTarget* const paintTarget)
+void Renderer::render(QPaintEvent* const event, QWidgetTarget* const widgetTarget)
 {
-    paint(paintTarget);
+    paint(widgetTarget);
 }
 
-void Renderer::paint(QWidgetTarget* const paintTarget)
+void Renderer::paint(QWidgetTarget* const widgetTarget)
 {
-    QPainter painter(paintTarget);
+    QPainter painter(widgetTarget);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    for(const auto& vp : paintTarget->getViewPorts())
+    for(const auto& vp : widgetTarget->getViewPorts())
     {
-        updateMatrices(paintTarget, vp);
+        updateMatrices(widgetTarget, vp);
 
         // add clipping
         const QRectF& vp_size = vp->getSize();
-        const QSizeF& rt_size = paintTarget->getSize();
+        const QSizeF& rt_size = widgetTarget->getSize();
 
         QPointF bl = transToDevice(vp_size.bottomLeft());
         QPointF tr = transToDevice(vp_size.topRight());

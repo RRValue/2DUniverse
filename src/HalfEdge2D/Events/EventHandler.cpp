@@ -12,9 +12,9 @@
 
 #include <qdebug.h>
 
-EventHandler::EventHandler(QWidgetTarget* const paintTarget) : m_PaintTarget(paintTarget)
+EventHandler::EventHandler(QWidgetTarget* const widgetTarget) : m_WidgetTarget(widgetTarget)
 {
-    m_RenderTarget = paintTarget;
+    m_RenderTarget = widgetTarget;
     m_Renderer = nullptr;
     m_ActiveViewPort = nullptr;
     m_ActiveController = nullptr;
@@ -90,7 +90,7 @@ void EventHandler::setRenderer(Renderer* const renderer)
         return;
 
     m_Renderer = renderer;
-    m_Renderer->addPaintTarget(m_PaintTarget);
+    m_Renderer->addWidgetTarget(m_WidgetTarget);
 
     if(m_Navigator != nullptr)
         m_Navigator->m_Renderer = m_Renderer;
@@ -232,7 +232,7 @@ void EventHandler::handlePaintEvent(QPaintEvent* const event)
     setActiveRenderTarget();
 
     m_RenderTarget->updateViewPortsTargetSize();
-    m_Renderer->render(event, m_PaintTarget);
+    m_Renderer->render(event, m_WidgetTarget);
 }
 
 void EventHandler::setActiveRenderTarget()
