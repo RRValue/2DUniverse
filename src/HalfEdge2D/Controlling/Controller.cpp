@@ -14,6 +14,7 @@ Controller::Controller()
     m_ActiveCamera = nullptr;
     m_Name = "";
     m_Active = false;
+    m_ViewportContentChanges = true;
 }
 
 Controller::~Controller()

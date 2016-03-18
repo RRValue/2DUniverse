@@ -40,6 +40,8 @@ private:
     void setActiveViewport(const QPoint& point);
     void setActiveCamera();
 
+    void viewportContentChanged();
+
 private:
     QPaintTarget* m_PaintTarget;
 

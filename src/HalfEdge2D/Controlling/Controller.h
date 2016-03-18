@@ -33,6 +33,7 @@ protected:
 protected:
     bool m_Active;
     std::string m_Name;
+    bool m_ViewportContentChanges;
 
     // scene matrices    
     Mat3f m_DeviceMat;

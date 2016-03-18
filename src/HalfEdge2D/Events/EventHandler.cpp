@@ -115,7 +115,11 @@ bool EventHandler::handleMouseMoveEvent(QMouseEvent* const event)
 
     if(m_Navigator != nullptr)
         if(m_Navigator->handleMouseMoveEvent(event))
+        {
+            viewportContentChanged();
+
             return true;
+        }
 
     if(m_ActiveController != nullptr)
         if(m_ActiveController->handleMouseMoveEvent(event))
@@ -135,7 +139,11 @@ bool EventHandler::handleMousePressEvent(QMouseEvent* const event)
 
     if(m_Navigator != nullptr)
         if(m_Navigator->handleMousePressEvent(event))
+        {
+            viewportContentChanged();
+
             return true;
+        }
 
     if(m_ActiveController != nullptr)
         if(m_ActiveController->handleMousePressEvent(event))
@@ -155,7 +163,11 @@ bool EventHandler::handleMouseReleaseEvent(QMouseEvent* const event)
 
     if(m_Navigator != nullptr)
         if(m_Navigator->handleMouseReleaseEvent(event))
+        {
+            viewportContentChanged();
+
             return true;
+        }
 
     if(m_ActiveController != nullptr)
         if(m_ActiveController->handleMouseReleaseEvent(event))
@@ -175,7 +187,11 @@ bool EventHandler::handleResizeEvent(QResizeEvent* const event)
 
     if(m_Navigator != nullptr)
         if(m_Navigator->handleResizeEvent(event))
+        {
+            viewportContentChanged();
+
             return true;
+        }
 
     if(m_ActiveController != nullptr)
         if(m_ActiveController->handleResizeEvent(event))
@@ -195,7 +211,11 @@ bool EventHandler::handleWheelEvent(QWheelEvent* const event)
 
     if(m_Navigator != nullptr)
         if(m_Navigator->handleWheelEvent(event))
+        {
+            viewportContentChanged();
+
             return true;
+        }
 
     if(m_ActiveController != nullptr)
         if(m_ActiveController->handleWheelEvent(event))
@@ -249,7 +269,10 @@ void EventHandler::setActiveViewport(const QPoint& point)
         m_Navigator->m_ActiveViewPort = m_ActiveViewPort;
 
     for(const auto& controller : m_Controller)
+    {
         controller->m_ActiveViewPort = m_ActiveViewPort;
+        controller->m_ViewportContentChanges = true;
+    }
 }
 
 void EventHandler::setActiveCamera()
@@ -263,5 +286,14 @@ void EventHandler::setActiveCamera()
         m_Navigator->m_ActiveCamera = m_ActiveCamera;
 
     for(const auto& controller : m_Controller)
+    {
         controller->m_ActiveCamera = m_ActiveCamera;
+        controller->m_ViewportContentChanges = true;
+    }
+}
+
+void EventHandler::viewportContentChanged()
+{
+    for(const auto& contoller : m_Controller)
+        contoller->m_ViewportContentChanges = true;
 }
