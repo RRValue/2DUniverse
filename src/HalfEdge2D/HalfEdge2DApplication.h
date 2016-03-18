@@ -16,6 +16,7 @@ class Controller;
 class ControllerBuildMesh;
 class ControllerShowRings;
 class EventHandler;
+class Scene;
 
 class HalfEdge2DApplication : public QApplication
 {
@@ -60,6 +61,8 @@ private:
     Renderer* m_Renderer;
 
     bool m_MultiView;
+
+    Scene* m_Scene;
 
     ViewPort* m_ViewPort0;
     ViewPort* m_ViewPort1;

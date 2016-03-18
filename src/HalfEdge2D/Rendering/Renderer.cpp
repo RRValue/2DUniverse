@@ -60,7 +60,17 @@ void Renderer::render()
         pt->update();
 }
 
+void Renderer::render(QPaintTarget* const paintTarget)
+{
+    paint(paintTarget);
+}
+
 void Renderer::render(QPaintEvent* const event, QPaintTarget* const paintTarget)
+{
+    paint(paintTarget);
+}
+
+void Renderer::paint(QPaintTarget* const paintTarget)
 {
     QPainter painter(paintTarget);
 

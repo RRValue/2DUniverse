@@ -101,9 +101,9 @@ void HalfEdge2DApplication::createViewPorts()
 
 void HalfEdge2DApplication::createRendering()
 {
-    Scene* scene = new Scene();
+    m_Scene = new Scene();
 
-    scene->setMesh(m_Mesh);
+    m_Scene->setMesh(m_Mesh);
 
     // allocate event handler and add controller and navigator
     m_Navigator = new Navigator();
@@ -122,7 +122,7 @@ void HalfEdge2DApplication::createRendering()
 
     // create renderer
     m_Renderer = new Renderer();
-    m_Renderer->setScene(scene);
+    m_Renderer->setScene(m_Scene);
 
     // create event handler
     m_EventHandler = new EventHandler(m_RenderTarget);

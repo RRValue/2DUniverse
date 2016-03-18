@@ -24,6 +24,7 @@ public:
 
     void render();
     void render(QPaintEvent* const event, QPaintTarget* const paintTarget);
+    void render(QPaintTarget* const paintTarget);
 
     void setScene(Scene* const scene);
     void addPaintTarget(QPaintTarget* const paintTarget);
@@ -33,6 +34,8 @@ private:
     void updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp);
     QPointF trans(const QPointF& point);
     QPointF transToDevice(const QPointF& point);
+
+    void paint(QPaintTarget* const paintTarget);
 
 private:
     void renderMesh(QPainter* const painter, Mesh* const mesh);
