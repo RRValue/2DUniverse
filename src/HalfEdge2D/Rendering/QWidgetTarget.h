@@ -5,21 +5,32 @@
 
 #include <QtWidgets/QWidget>
 
-class QWidgetTarget : public QWidget, public RenderTarget
+class RenderWidget;
+
+class QWidgetTarget : public QObject, public RenderTarget
 {
+    Q_OBJECT
+
 public:
-    QWidgetTarget(QWidget* parent = nullptr, Qt::WindowFlags f = 0);
+    QWidgetTarget() = delete;
+    QWidgetTarget(RenderWidget* renderWidget);
     ~QWidgetTarget();
 
-protected:
-    virtual void mouseMoveEvent(QMouseEvent* event) final override;
-    virtual void mousePressEvent(QMouseEvent* event) final override;
-    virtual void mouseReleaseEvent(QMouseEvent* event) final override;
-    virtual void resizeEvent(QResizeEvent* event) final override;
-    virtual void paintEvent(QPaintEvent* event) final override;
-    virtual void wheelEvent(QWheelEvent* event) final override;
+    RenderWidget* const getWidget() const;
 
+protected:
     virtual void render() final override;
+
+private slots:
+    void handleMouseMoveEvent(QMouseEvent* event);
+    void handleMousePressEvent(QMouseEvent* event);
+    void handleMouseReleaseEvent(QMouseEvent* event);
+    void handleResizeEvent(QResizeEvent* event);
+    void handlePaintEvent(QPaintEvent* event);
+    void handleWheelEvent(QWheelEvent* event);
+
+private:
+    RenderWidget* const m_RenderWidget;
 };
 
 #endif //_RENDERING_QWIDGETTARGET_H_

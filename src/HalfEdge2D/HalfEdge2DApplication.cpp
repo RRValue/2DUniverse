@@ -60,7 +60,7 @@ void HalfEdge2DApplication::createGui()
     m_MainWidget = new QWidget();
     m_MainWindowForm.setupUi(m_MainWidget);
 
-    m_RenderTarget = m_MainWindowForm.m_RenderWidget;
+    m_RenderTarget = new QWidgetTarget(m_MainWindowForm.m_RenderWidget);
     m_SldHPart = m_MainWindowForm.m_SldHPart;
     m_SldVPart = m_MainWindowForm.m_SldVPart;
 

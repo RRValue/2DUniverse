@@ -2,6 +2,7 @@
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/QWidgetTarget.h"
 #include "HalfEdge2D/Rendering/QPaintTarget.h"
+#include "HalfEdge2D/Rendering/RenderWidget.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -87,12 +88,12 @@ void Renderer::removeWidgetTarget(QWidgetTarget* const widgetTarget)
 void Renderer::render()
 {
     for(const auto& pt : m_WidgetTargets)
-        pt->update();
+        pt->getWidget()->update();
 }
 
 void Renderer::render(QWidgetTarget* const widgetTarget)
 {
-    paint(widgetTarget, widgetTarget);
+    paint(widgetTarget->getWidget(), widgetTarget);
 }
 
 void Renderer::render(QPaintTarget* const paintTarget)
@@ -102,7 +103,7 @@ void Renderer::render(QPaintTarget* const paintTarget)
 
 void Renderer::render(QPaintEvent* const event, QWidgetTarget* const widgetTarget)
 {
-    paint(widgetTarget, widgetTarget);
+    paint(widgetTarget->getWidget(), widgetTarget);
 }
 
 void Renderer::paint(QPaintDevice* const paintDevice, RenderTarget* const renderTarget)

@@ -1,10 +1,19 @@
 #include "HalfEdge2D/Rendering/QWidgetTarget.h"
 
+#include "HalfEdge2D/Rendering/RenderWidget.h"
+
 #include "HalfEdge2D/EVents/EventInterface.h"
 
-QWidgetTarget::QWidgetTarget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
+#include <QtGui/QMouseEvent>
+
+QWidgetTarget::QWidgetTarget(RenderWidget* renderWidget) : m_RenderWidget(renderWidget)
 {
-    setMouseTracking(true);
+    connect(m_RenderWidget, &RenderWidget::onMouseMoveEvent, this, &QWidgetTarget::handleMouseMoveEvent);
+    connect(m_RenderWidget, &RenderWidget::onMousePressEvent, this, &QWidgetTarget::handleMousePressEvent);
+    connect(m_RenderWidget, &RenderWidget::onMouseReleaseEvent, this, &QWidgetTarget::handleMouseReleaseEvent);
+    connect(m_RenderWidget, &RenderWidget::onResizeEvent, this, &QWidgetTarget::handleResizeEvent);
+    connect(m_RenderWidget, &RenderWidget::onPaintEvent, this, &QWidgetTarget::handlePaintEvent);
+    connect(m_RenderWidget, &RenderWidget::onWheelEvent, this, &QWidgetTarget::handleWheelEvent);
 }
 
 QWidgetTarget::~QWidgetTarget()
@@ -12,7 +21,12 @@ QWidgetTarget::~QWidgetTarget()
 
 }
 
-void QWidgetTarget::mouseMoveEvent(QMouseEvent* event)
+RenderWidget* const QWidgetTarget::getWidget() const
+{
+    return m_RenderWidget;
+}
+
+void QWidgetTarget::handleMouseMoveEvent(QMouseEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -20,7 +34,7 @@ void QWidgetTarget::mouseMoveEvent(QMouseEvent* event)
     m_EventInterface->handleMouseMoveEvent(event);
 }
 
-void QWidgetTarget::mousePressEvent(QMouseEvent* event)
+void QWidgetTarget::handleMousePressEvent(QMouseEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -28,7 +42,7 @@ void QWidgetTarget::mousePressEvent(QMouseEvent* event)
     m_EventInterface->handleMousePressEvent(event);
 }
 
-void QWidgetTarget::mouseReleaseEvent(QMouseEvent* event)
+void QWidgetTarget::handleMouseReleaseEvent(QMouseEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -36,7 +50,7 @@ void QWidgetTarget::mouseReleaseEvent(QMouseEvent* event)
     m_EventInterface->handleMouseReleaseEvent(event);
 }
 
-void QWidgetTarget::resizeEvent(QResizeEvent* event)
+void QWidgetTarget::handleResizeEvent(QResizeEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -44,7 +58,7 @@ void QWidgetTarget::resizeEvent(QResizeEvent* event)
     m_EventInterface->handleResizeEvent(event);
 }
 
-void QWidgetTarget::wheelEvent(QWheelEvent* event)
+void QWidgetTarget::handleWheelEvent(QWheelEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -52,7 +66,7 @@ void QWidgetTarget::wheelEvent(QWheelEvent* event)
     m_EventInterface->handleWheelEvent(event);
 }
 
-void QWidgetTarget::paintEvent(QPaintEvent* event)
+void QWidgetTarget::handlePaintEvent(QPaintEvent* event)
 {
     if(m_EventInterface == nullptr || event == nullptr)
         return;
@@ -62,5 +76,5 @@ void QWidgetTarget::paintEvent(QPaintEvent* event)
 
 void QWidgetTarget::render()
 {
-    update();
+    m_RenderWidget->update();
 }
