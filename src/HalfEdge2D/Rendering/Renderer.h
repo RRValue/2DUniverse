@@ -9,8 +9,10 @@
 
 class QPaintEvent;
 class QPainter;
+class QPaintDevice;
 
 class QWidgetTarget;
+class QPaintTarget;
 class Scene;
 class RenderTarget;
 class ViewPort;
@@ -25,6 +27,7 @@ public:
     void render();
     void render(QPaintEvent* const event, QWidgetTarget* const widgetTarget);
     void render(QWidgetTarget* const widgetTarget);
+    void render(QPaintTarget* const paintTarget);
 
     void setScene(Scene* const scene);
     void addWidgetTarget(QWidgetTarget* const widgetTarget);
@@ -35,9 +38,10 @@ private:
     QPointF trans(const QPointF& point);
     QPointF transToDevice(const QPointF& point);
 
-    void paint(QWidgetTarget* const widgetTarget);
+    void paint(QPaintDevice* const paintDevice, RenderTarget* const renderTarget);
 
 private:
+    void renderScene(QPainter* const painter, Scene* const scene);
     void renderMesh(QPainter* const painter, Mesh* const mesh);
 
 private:

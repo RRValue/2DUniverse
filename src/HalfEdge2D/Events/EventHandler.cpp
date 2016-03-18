@@ -82,6 +82,10 @@ void EventHandler::setActiveController(Controller* const controller)
 
     m_ActiveController = *find_iter;
     m_ActiveController->m_Active = true;
+    m_ActiveController->m_RenderTarget = m_RenderTarget;
+    m_ActiveController->m_ActiveCamera = m_ActiveCamera;
+    m_ActiveController->m_ActiveViewPort = m_ActiveViewPort;
+    m_ActiveController->m_Renderer = m_Renderer;
 }
 
 void EventHandler::setRenderer(Renderer* const renderer)
@@ -249,7 +253,7 @@ void EventHandler::setActiveViewport(const QPoint& point)
     Mat3f inv_device_matrix = m_RenderTarget->getInvDeviceMatrix();
     Vec3f dev_coord = inv_device_matrix * Vec3f((float)point.x(), (float)point.y(), 1.0f);
 
-    m_ActiveViewPort = nullptr;
+    ViewPort* new_viewport = nullptr;
 
     for(const auto& vp : m_RenderTarget->getViewPorts())
     {
@@ -259,11 +263,16 @@ void EventHandler::setActiveViewport(const QPoint& point)
             dev_coord(0) >= vp_size.left() && dev_coord(0) < vp_size.right() &&
             dev_coord(1) >= vp_size.top() && dev_coord(1) < vp_size.bottom())
         {
-            m_ActiveViewPort = vp;
+            new_viewport = vp;
 
             break;
         }
     }
+
+    if(new_viewport == m_ActiveViewPort)
+        return;
+
+    m_ActiveViewPort = new_viewport;
 
     if(m_Navigator != nullptr)
         m_Navigator->m_ActiveViewPort = m_ActiveViewPort;
@@ -277,10 +286,15 @@ void EventHandler::setActiveViewport(const QPoint& point)
 
 void EventHandler::setActiveCamera()
 {
-    m_ActiveCamera = nullptr;
+    Camera* new_camera = nullptr;
 
     if(m_ActiveViewPort != nullptr)
-        m_ActiveCamera = m_ActiveViewPort->getCamera();
+        new_camera = m_ActiveViewPort->getCamera();
+
+    if(new_camera == m_ActiveCamera)
+        return;
+
+    m_ActiveCamera = new_camera;
 
     if(m_Navigator != nullptr)
         m_Navigator->m_ActiveCamera = m_ActiveCamera;

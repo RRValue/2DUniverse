@@ -1,6 +1,7 @@
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/QWidgetTarget.h"
+#include "HalfEdge2D/Rendering/QPaintTarget.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/Camera.h"
@@ -62,27 +63,32 @@ void Renderer::render()
 
 void Renderer::render(QWidgetTarget* const widgetTarget)
 {
-    paint(widgetTarget);
+    paint(widgetTarget, widgetTarget);
+}
+
+void Renderer::render(QPaintTarget* const paintTarget)
+{
+    paint(paintTarget, paintTarget);
 }
 
 void Renderer::render(QPaintEvent* const event, QWidgetTarget* const widgetTarget)
 {
-    paint(widgetTarget);
+    paint(widgetTarget, widgetTarget);
 }
 
-void Renderer::paint(QWidgetTarget* const widgetTarget)
+void Renderer::paint(QPaintDevice* const paintDevice, RenderTarget* const renderTarget)
 {
-    QPainter painter(widgetTarget);
+    QPainter painter(paintDevice);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    for(const auto& vp : widgetTarget->getViewPorts())
+    for(const auto& vp : renderTarget->getViewPorts())
     {
-        updateMatrices(widgetTarget, vp);
+        updateMatrices(renderTarget, vp);
 
         // add clipping
         const QRectF& vp_size = vp->getSize();
-        const QSizeF& rt_size = widgetTarget->getSize();
+        const QSizeF& rt_size = renderTarget->getSize();
 
         QPointF bl = transToDevice(vp_size.bottomLeft());
         QPointF tr = transToDevice(vp_size.topRight());
@@ -94,8 +100,9 @@ void Renderer::paint(QWidgetTarget* const widgetTarget)
 
         painter.fillRect(clip_region, Qt::GlobalColor::white);
 
-        // render Mesh
-        renderMesh(&painter, m_Scene->getMesh());
+        // render scene
+        if(m_Scene != nullptr)
+            renderScene(&painter, m_Scene);
 
         // render coordiante system
         painter.setPen(QPen(Qt::GlobalColor::red));
@@ -116,6 +123,12 @@ void Renderer::paint(QWidgetTarget* const widgetTarget)
         painter.drawLine(p1, p3);
         painter.drawLine(p2, p3);
     }
+}
+
+void Renderer::renderScene(QPainter* const painter, Scene* const scene)
+{
+    if(scene->getMesh() != nullptr)
+        renderMesh(painter, m_Scene->getMesh());
 }
 
 void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)

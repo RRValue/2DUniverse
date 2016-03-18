@@ -4,7 +4,7 @@
 
 QWidgetTarget::QWidgetTarget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
-
+    setMouseTracking(true);
 }
 
 QWidgetTarget::~QWidgetTarget()

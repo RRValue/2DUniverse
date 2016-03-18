@@ -4,6 +4,10 @@
 #include "HalfEdge2D/Controlling/Controller.h"
 
 class HESMesh;
+class Scene;
+class Renderer;
+class ViewPort;
+class QPaintTarget;
 
 class ControllerShowRings : public Controller
 {
@@ -21,7 +25,12 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
+    Scene* m_Scene;
     HESMesh* m_Mesh;
+
+    QPaintTarget* m_IdTarget;
+    Renderer* m_Renderer;
+    ViewPort* m_ViewPort;
 };
 
 #endif //_CONTROLLING_CONTROLLERSHOWRINGS_H_
