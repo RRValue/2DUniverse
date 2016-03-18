@@ -26,9 +26,9 @@ bool HESBuilder::build()
     // iterate over all Triangles and build basis triangles
     for(const auto& tris : m_Mesh->getTriangles())
     {
-        HESVertex* const v0 = m_Mesh->getHESVertex(tris->data()[0]);
-        HESVertex* const v1 = m_Mesh->getHESVertex(tris->data()[1]);
-        HESVertex* const v2 = m_Mesh->getHESVertex(tris->data()[2]);
+        HESVertex* const v0 = m_Mesh->getHESVertex(tris->getIdx0());
+        HESVertex* const v1 = m_Mesh->getHESVertex(tris->getIdx1());
+        HESVertex* const v2 = m_Mesh->getHESVertex(tris->getIdx2());
 
         HESFace* f = new HESFace();
 

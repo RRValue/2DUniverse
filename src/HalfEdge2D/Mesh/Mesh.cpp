@@ -92,9 +92,7 @@ void Mesh::removeVertex(const size_t& idx)
 void Mesh::addTriangle(const size_t& idx0, const size_t& idx1, const size_t& idx2)
 {
     Triangle* new_tris = new Triangle();
-    new_tris->data()[0] = idx0;
-    new_tris->data()[1] = idx1;
-    new_tris->data()[2] = idx2;
+    new_tris->setIdx({idx0, idx1, idx2});
 
     m_Triangles.push_back(new_tris);
 }

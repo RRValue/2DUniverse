@@ -26,6 +26,10 @@ ControllerShowRings::ControllerShowRings()
 
     m_IdTarget->addViewPort(m_ViewPort);
     m_Renderer->setScene(m_Scene);
+    m_Renderer->setRenderViewport(false);
+    m_Renderer->setRenderCoordianteAxis(false);
+    m_Renderer->setRenderVertices(false);
+    m_Renderer->setRenderTriangles(true);
 }
 
 ControllerShowRings::~ControllerShowRings()

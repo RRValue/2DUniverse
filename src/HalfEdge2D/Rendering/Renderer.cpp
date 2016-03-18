@@ -15,14 +15,39 @@
 
 #include <QtWidgets/QWidget>
 
+#include <qdebug.h>
+
 Renderer::Renderer() : m_PointSize(0.005f)
 {
-
+    m_RenderVertices = true;
+    m_RenderTriangles = true;
+    m_RenderCoordinateAxis = true;
+    m_RenderViewport = true;
 }
 
 Renderer::~Renderer()
 {
 
+}
+
+void Renderer::setRenderViewport(const bool& render)
+{
+    m_RenderViewport = render;
+}
+
+void Renderer::setRenderCoordianteAxis(const bool& render)
+{
+    m_RenderCoordinateAxis = render;
+}
+
+void Renderer::setRenderVertices(const bool& render)
+{
+    m_RenderVertices = render;
+}
+
+void Renderer::setRenderTriangles(const bool& render)
+{
+    m_RenderTriangles = render;
 }
 
 void Renderer::setScene(Scene* const scene)
@@ -104,25 +129,40 @@ void Renderer::paint(QPaintDevice* const paintDevice, RenderTarget* const render
         if(m_Scene != nullptr)
             renderScene(&painter, m_Scene);
 
-        // render coordiante system
-        painter.setPen(QPen(Qt::GlobalColor::red));
-        painter.drawLine(trans(QPointF(-1.0f, 0.0f)), trans(QPointF(1.0f, 0.0f)));
-        painter.drawLine(trans(QPointF(0.0f, -1.0f)), trans(QPointF(0.0f, 1.0f)));
-
-        // render Viewport
-        painter.setPen(QPen(Qt::GlobalColor::black));
-
-        QPointF p0 = transToDevice(QPointF(vp_size.left(), vp_size.bottom()));
-        QPointF p1 = transToDevice(QPointF(vp_size.right(), vp_size.bottom()));
-        QPointF p2 = transToDevice(QPointF(vp_size.left(), vp_size.top()));
-        QPointF p3 = transToDevice(QPointF(vp_size.right(), vp_size.top()));
-
-        painter.drawLine(p0, p1);
-        painter.drawLine(p0, p2);
-
-        painter.drawLine(p1, p3);
-        painter.drawLine(p2, p3);
+        renderCoordinateCross(&painter);
+        renderViewport(&painter, vp_size);
     }
+}
+
+void Renderer::renderViewport(QPainter* const painter, const QRectF& vp)
+{
+    if(!m_RenderViewport)
+        return;
+
+    QPointF p0 = transToDevice(QPointF(vp.left(), vp.bottom()));
+    QPointF p1 = transToDevice(QPointF(vp.right(), vp.bottom()));
+    QPointF p2 = transToDevice(QPointF(vp.left(), vp.top()));
+    QPointF p3 = transToDevice(QPointF(vp.right(), vp.top()));
+
+    painter->setPen(Qt::SolidLine);
+    painter->setPen(QPen(Qt::GlobalColor::black));
+
+    painter->drawLine(p0, p1);
+    painter->drawLine(p0, p2);
+
+    painter->drawLine(p1, p3);
+    painter->drawLine(p2, p3);
+}
+
+void Renderer::renderCoordinateCross(QPainter* const painter)
+{
+    if(!m_RenderCoordinateAxis)
+        return;
+
+    painter->setPen(Qt::SolidLine);
+    painter->setPen(QPen(Qt::GlobalColor::black));
+    painter->drawLine(trans(QPointF(-1.0f, 0.0f)), trans(QPointF(1.0f, 0.0f)));
+    painter->drawLine(trans(QPointF(0.0f, -1.0f)), trans(QPointF(0.0f, 1.0f)));
 }
 
 void Renderer::renderScene(QPainter* const painter, Scene* const scene)
@@ -141,32 +181,69 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
     const std::vector<Vertex*>& vertices = mesh->getVertices();
     const std::vector<Triangle*>& triangles = mesh->getTriangles();
 
-    // paint traingles
-    painter->setBrush(QBrush(Qt::GlobalColor::gray));
+    QColor paint_color;
 
-    QPolygonF triangle_poly(3);
-
-    for(const auto& triangle : triangles)
+    if(m_RenderTriangles)
     {
-        Vec2f vp0 = vertices[triangle->data()[0]]->getPosition();
-        Vec2f vp1 = vertices[triangle->data()[1]]->getPosition();
-        Vec2f vp2 = vertices[triangle->data()[2]]->getPosition();
+        // paint traingles
+        for(const auto& triangle : triangles)
+        {
+            Vec2f vp0 = vertices[triangle->getIdx0()]->getPosition();
+            Vec2f vp1 = vertices[triangle->getIdx1()]->getPosition();
+            Vec2f vp2 = vertices[triangle->getIdx2()]->getPosition();
 
-        triangle_poly[0] = trans(QPointF(vp0.x(), vp0.y()));
-        triangle_poly[1] = trans(QPointF(vp1.x(), vp1.y()));
-        triangle_poly[2] = trans(QPointF(vp2.x(), vp2.y()));
+            QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
+            QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
+            QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
 
-        painter->drawPolygon(triangle_poly);
+            // fill triangle
+            const Vec4f& tris_color = triangle->getColor();
+            paint_color = QColor::fromRgbF(tris_color[0], tris_color[1], tris_color[2], tris_color[3]);
+
+            QPainterPath path;
+
+            path.moveTo(p0);
+            path.lineTo(p1);
+            path.lineTo(p2);
+            path.lineTo(p0);
+
+            painter->setPen(Qt::NoPen);
+            painter->fillPath(path, QBrush(paint_color));
+        }
+
+        // paint traingles edges
+        for(const auto& triangle : triangles)
+        {
+            Vec2f vp0 = vertices[triangle->getIdx0()]->getPosition();
+            Vec2f vp1 = vertices[triangle->getIdx1()]->getPosition();
+            Vec2f vp2 = vertices[triangle->getIdx2()]->getPosition();
+
+            QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
+            QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
+            QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
+
+            painter->setPen(Qt::SolidLine);
+            painter->setPen(Qt::black);
+            painter->drawLine(p0, p1);
+            painter->drawLine(p1, p2);
+            painter->drawLine(p2, p0);
+        }
     }
 
-    // paint vertices
-    painter->setBrush(QBrush(Qt::GlobalColor::black));
-
-    for(const auto& p : vertices)
+    if(m_RenderVertices)
     {
-        QPointF vert_pos(p->getPosition().x(), p->getPosition().y());
-        
-        painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
+        // paint vertices
+        for(const auto& vert : vertices)
+        {
+            QPointF vert_pos(vert->getPosition().x(), vert->getPosition().y());
+
+            const Vec4f& vert_color = vert->getColor();
+            paint_color = QColor::fromRgbF(vert_color[0], vert_color[1], vert_color[2], vert_color[3]);
+
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(QBrush(paint_color));
+            painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
+        }
     }
 }
 

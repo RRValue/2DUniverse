@@ -4,6 +4,7 @@
 #include "HalfEdge2D/Base/Vector.h"
 
 #include <QtCore/QPointF>
+#include <QtCore/QRectF>
 
 #include <set>
 
@@ -33,6 +34,11 @@ public:
     void addWidgetTarget(QWidgetTarget* const widgetTarget);
     void removeWidgetTarget(QWidgetTarget* const widgetTarget);
 
+    void setRenderViewport(const bool& render);
+    void setRenderCoordianteAxis(const bool& render);
+    void setRenderVertices(const bool& render);
+    void setRenderTriangles(const bool& render);
+
 private:
     void updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp);
     QPointF trans(const QPointF& point);
@@ -43,8 +49,15 @@ private:
 private:
     void renderScene(QPainter* const painter, Scene* const scene);
     void renderMesh(QPainter* const painter, Mesh* const mesh);
+    void renderViewport(QPainter* const painter, const QRectF& vp);
+    void renderCoordinateCross(QPainter* const painter);
 
 private:
+    bool m_RenderVertices;
+    bool m_RenderTriangles;
+    bool m_RenderCoordinateAxis;
+    bool m_RenderViewport;
+
     Scene* m_Scene;
 
     Mat3f m_DeviceMat;
