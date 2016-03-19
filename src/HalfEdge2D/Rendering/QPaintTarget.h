@@ -3,17 +3,24 @@
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 
-#include <QtGui/QPixmap>
+class QPixmap;
+class QPaintDevice;
 
-class QPaintTarget : public QPixmap, public RenderTarget
+class QPaintTarget : public RenderTarget
 {
 public:
     QPaintTarget() = delete;
     QPaintTarget(int width, int height);
     ~QPaintTarget();
 
-protected:
+    QPaintDevice* const getPaintDevice() const;
     virtual void render() final override;
+
+    void resize(const int& width, const int& height);
+    void save(const QString& fileName);
+
+private:
+    QPixmap* m_Image;
 };
 
 #endif //_RENDERING_QPAINTTARGET_H_

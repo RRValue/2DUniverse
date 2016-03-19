@@ -39,6 +39,7 @@ public:
     void setRenderVertices(const bool& render);
     void setRenderTriangles(const bool& render);
     void setRenderTrianglesEdges(const bool& render);
+    void setSmoothRendering(const bool& smooth);
 
 private:
     void updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp);
@@ -59,6 +60,7 @@ private:
     bool m_RenderTrianglesEdges;
     bool m_RenderCoordinateAxis;
     bool m_RenderViewport;
+    bool m_SmoothRendering;
 
     Scene* m_Scene;
 

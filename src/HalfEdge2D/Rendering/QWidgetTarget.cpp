@@ -21,7 +21,7 @@ QWidgetTarget::~QWidgetTarget()
 
 }
 
-RenderWidget* const QWidgetTarget::getWidget() const
+QPaintDevice* const QWidgetTarget::getPaintDevice() const
 {
     return m_RenderWidget;
 }

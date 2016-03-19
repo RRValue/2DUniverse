@@ -16,9 +16,8 @@ public:
     QWidgetTarget(RenderWidget* renderWidget);
     ~QWidgetTarget();
 
-    RenderWidget* const getWidget() const;
-
-protected:
+    QPaintDevice* const getPaintDevice() const;
+    
     virtual void render() final override;
 
 private slots:

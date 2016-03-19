@@ -35,6 +35,7 @@ ControllerShowRings::ControllerShowRings()
     m_Renderer->setRenderVertices(false);
     m_Renderer->setRenderTriangles(true);
     m_Renderer->setRenderTrianglesEdges(false);
+    m_Renderer->setSmoothRendering(false);
 }
 
 ControllerShowRings::~ControllerShowRings()
@@ -95,9 +96,8 @@ void ControllerShowRings::updateIdTarget()
     m_ViewPort->setSize(m_ActiveViewPort->getSize());
     m_ViewPort->setCamera(m_ActiveCamera);
 
-    m_IdTarget->scaled((int)(m_RenderTarget->getSize().width() + 0.5f), (int)(m_RenderTarget->getSize().height() + 0.5f));
-    m_IdTarget->setSize(m_RenderTarget->getSize());
-
+    m_IdTarget->resize((int)(m_RenderTarget->getSize().width() + 0.5f), (int)(m_RenderTarget->getSize().height() + 0.5f));
+    
     // prepare mesh
     Mesh* mesh = m_Scene->getMesh();
 
@@ -136,11 +136,5 @@ void ControllerShowRings::updateIdTarget()
     for(size_t i = 0; i < m_Triangles.size(); i++)
         m_Triangles[i]->setColor(prev_triangle_color);
 
-    // save stuff
-    QString name = "image.png";
-    QFile file(name);
-    if(file.exists())
-        file.remove();
-    
-    m_IdTarget->save(name);
+    m_IdTarget->save("image.png");
 }

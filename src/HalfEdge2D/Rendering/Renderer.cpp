@@ -23,6 +23,7 @@ Renderer::Renderer() : m_PointSize(0.005f)
     m_RenderTrianglesEdges = true;
     m_RenderCoordinateAxis = true;
     m_RenderViewport = true;
+    m_SmoothRendering = true;
 }
 
 Renderer::~Renderer()
@@ -53,6 +54,11 @@ void Renderer::setRenderTriangles(const bool& render)
 void Renderer::setRenderTrianglesEdges(const bool& render)
 {
     m_RenderTrianglesEdges = render;
+}
+
+void Renderer::setSmoothRendering(const bool& smooth)
+{
+    m_SmoothRendering = smooth;
 }
 
 void Renderer::setScene(Scene* const scene)
@@ -88,29 +94,32 @@ void Renderer::removeWidgetTarget(QWidgetTarget* const widgetTarget)
 void Renderer::render()
 {
     for(const auto& pt : m_WidgetTargets)
-        pt->getWidget()->update();
+        pt->render();
 }
 
 void Renderer::render(QWidgetTarget* const widgetTarget)
 {
-    paint(widgetTarget->getWidget(), widgetTarget);
+    paint(widgetTarget->getPaintDevice(), widgetTarget);
 }
 
 void Renderer::render(QPaintTarget* const paintTarget)
 {
-    paint(paintTarget, paintTarget);
+    paint(paintTarget->getPaintDevice(), paintTarget);
 }
 
 void Renderer::render(QPaintEvent* const event, QWidgetTarget* const widgetTarget)
 {
-    paint(widgetTarget->getWidget(), widgetTarget);
+    paint(widgetTarget->getPaintDevice(), widgetTarget);
 }
 
 void Renderer::paint(QPaintDevice* const paintDevice, RenderTarget* const renderTarget)
 {
     QPainter painter(paintDevice);
 
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    if(m_SmoothRendering)
+        painter.setRenderHint(QPainter::Antialiasing, true);
+    else
+        painter.setRenderHint(QPainter::Antialiasing, false);
 
     for(const auto& vp : renderTarget->getViewPorts())
     {
