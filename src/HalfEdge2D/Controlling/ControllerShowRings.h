@@ -30,6 +30,9 @@ protected:
 private:
     void updateIdTarget();
 
+    Vec4f idToColour(const unsigned int& id);
+    unsigned int colourToId(const Vec4f& colour);
+
 private:
     Scene* m_Scene;
     HESMesh* m_Mesh;
@@ -40,6 +43,10 @@ private:
     ViewPort* m_ViewPort;
 
     std::vector<Triangle*> m_Triangles;
+
+    const unsigned int m_ChannelBitRange;
+    const unsigned int m_ChannelRange;
+    const float m_ChannelFFactor;
 };
 
 #endif //_CONTROLLING_CONTROLLERSHOWRINGS_H_

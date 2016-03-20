@@ -31,8 +31,8 @@ Vec4f QPaintTarget::getColourAtPos(const unsigned int& x, const unsigned int& y)
 
     colour[0] = pixel.redF();
     colour[1] = pixel.greenF();
-    colour[2] = pixel.blackF();
-    colour[2] = 1.0f;
+    colour[2] = pixel.blueF();
+    colour[3] = 1.0f;
 
     return colour;
 }

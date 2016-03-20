@@ -16,7 +16,10 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QImage>
 
-ControllerShowRings::ControllerShowRings()
+ControllerShowRings::ControllerShowRings() :
+m_ChannelBitRange(8),
+m_ChannelRange(1 << m_ChannelBitRange),
+m_ChannelFFactor(1.0f / (float)m_ChannelRange)
 {
     m_Name = "ControllerShowRings";
 
@@ -71,6 +74,8 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
     // get colur id_target
     Vec4f hit_colour = m_IdTarget->getColourAtPos((int)(hit_px_pos[0] + 0.5), (int)(hit_px_pos[1] + 0.5));
 
+    unsigned int id = colourToId(hit_colour);
+
     return false;
 }
 
@@ -122,28 +127,8 @@ void ControllerShowRings::updateIdTarget()
 
     Vec4f prev_triangle_color = m_Triangles[0]->getColor();
 
-    int color_step = 8;
-    int color_step_value = (int)std::pow(2.0, (float)color_step);
-    float color_factor = 1.0f / (float)color_step_value;
-    int r = 0;
-    int g = 0;
-    int b = 0;
-    Vec4f current_color;
-
     for(size_t i = 0; i < m_Triangles.size(); i++)
-    {
-        r = (i >> 0 * color_step) % color_step_value;
-        g = (i >> 1 * color_step) % color_step_value;
-        b = (i >> 2 * color_step) % color_step_value;
-
-        current_color = Vec4f(
-            color_factor * (float)r,
-            color_factor * (float)g,
-            color_factor * (float)b,
-            1.0f);
-
-        m_Triangles[i]->setColor(current_color);
-    }
+        m_Triangles[i]->setColor(idToColour(i));
 
     m_Renderer->render(m_IdTarget);
 
@@ -151,4 +136,21 @@ void ControllerShowRings::updateIdTarget()
         m_Triangles[i]->setColor(prev_triangle_color);
 
     m_IdTarget->save("image.png");
+}
+
+Vec4f ControllerShowRings::idToColour(const unsigned int& id)
+{
+    return Vec4f(
+        m_ChannelFFactor * (float)((id >> 0 * m_ChannelBitRange) % m_ChannelRange),
+        m_ChannelFFactor * (float)((id >> 1 * m_ChannelBitRange) % m_ChannelRange),
+        m_ChannelFFactor * (float)((id >> 2 * m_ChannelBitRange) % m_ChannelRange),
+        1.0f);
+}
+
+unsigned int ControllerShowRings::colourToId(const Vec4f& colour)
+{
+    return
+        (((unsigned int)((colour[0] / m_ChannelFFactor) + 0.5f)) << (0 * m_ChannelBitRange)) +
+        (((unsigned int)((colour[1] / m_ChannelFFactor) + 0.5f)) << (1 * m_ChannelBitRange)) +
+        (((unsigned int)((colour[2] / m_ChannelFFactor) + 0.5f)) << (2 * m_ChannelBitRange));
 }
