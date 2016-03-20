@@ -24,6 +24,7 @@ Renderer::Renderer() : m_PointSize(0.005f)
     m_RenderCoordinateAxis = true;
     m_RenderViewport = true;
     m_SmoothRendering = true;
+    m_ClearColor = Vec4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 Renderer::~Renderer()
@@ -137,7 +138,7 @@ void Renderer::paint(QPaintDevice* const paintDevice, RenderTarget* const render
         painter.setClipRegion(clip_region);
         painter.setClipping(true);
 
-        painter.fillRect(clip_region, Qt::GlobalColor::white);
+        painter.fillRect(clip_region, QColor::fromRgbF(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]));
 
         // render scene
         if(m_Scene != nullptr)

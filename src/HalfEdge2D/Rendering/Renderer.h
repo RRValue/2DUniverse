@@ -24,6 +24,7 @@ class Renderer
 public:
     Renderer();
     ~Renderer();
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     void render();
     void render(QPaintEvent* const event, QWidgetTarget* const widgetTarget);
@@ -68,6 +69,8 @@ private:
     Mat3f m_InvDeviceMat;
     Mat3f m_TransMat;
     Mat3f m_InvTransMat;
+
+    Vec4f m_ClearColor;
 
     std::set<QWidgetTarget* const> m_WidgetTargets;
 

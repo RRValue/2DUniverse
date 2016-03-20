@@ -19,26 +19,29 @@
 ControllerShowRings::ControllerShowRings() :
 m_ChannelBitRange(8),
 m_ChannelRange(1 << m_ChannelBitRange),
-m_ChannelFFactor(1.0f / (float)m_ChannelRange)
+m_ChannelFFactor(1.0f / (float)m_ChannelRange),
+m_TrisHitColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f))
 {
     m_Name = "ControllerShowRings";
 
     m_Scene = new Scene();
     m_Mesh = nullptr;
 
-    m_Renderer = new Renderer();
+    m_IdRenderer = new Renderer();
     m_IdTarget = new QPaintTarget(100, 100);
 
     m_ViewPort = new ViewPort();
 
     m_IdTarget->addViewPort(m_ViewPort);
-    m_Renderer->setScene(m_Scene);
-    m_Renderer->setRenderViewport(false);
-    m_Renderer->setRenderCoordianteAxis(false);
-    m_Renderer->setRenderVertices(false);
-    m_Renderer->setRenderTriangles(true);
-    m_Renderer->setRenderTrianglesEdges(false);
-    m_Renderer->setSmoothRendering(false);
+    m_IdRenderer->setScene(m_Scene);
+    m_IdRenderer->setRenderViewport(false);
+    m_IdRenderer->setRenderCoordianteAxis(false);
+    m_IdRenderer->setRenderVertices(false);
+    m_IdRenderer->setRenderTriangles(true);
+    m_IdRenderer->setRenderTrianglesEdges(false);
+    m_IdRenderer->setSmoothRendering(false);
+
+    m_LastHitId = -1;
 }
 
 ControllerShowRings::~ControllerShowRings()
@@ -74,9 +77,28 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
     // get colur id_target
     Vec4f hit_colour = m_IdTarget->getColourAtPos((int)(hit_px_pos[0] + 0.5), (int)(hit_px_pos[1] + 0.5));
 
-    unsigned int id = colourToId(hit_colour);
+    int current_hit_id = -1;
 
-    return false;
+    if(!(hit_colour[0] == 1.0f, hit_colour[1] == 1.0f, hit_colour[2] == 1.0f))
+        current_hit_id = colourToId(hit_colour);
+
+    if(m_LastHitId == current_hit_id)
+        return true;
+
+    if(m_LastHitId != -1)
+        m_Triangles[m_LastHitId]->setColor(m_LastTrisColour);
+
+    if(current_hit_id != -1)
+    {
+        m_LastTrisColour = m_Triangles[current_hit_id]->getColor();
+        m_Triangles[current_hit_id]->setColor(m_TrisHitColour);
+    }
+
+    m_LastHitId = current_hit_id;
+
+    m_Renderer->render();
+
+    return true;
 }
 
 bool ControllerShowRings::handleMousePressEvent(QMouseEvent* const event)
@@ -130,12 +152,10 @@ void ControllerShowRings::updateIdTarget()
     for(size_t i = 0; i < m_Triangles.size(); i++)
         m_Triangles[i]->setColor(idToColour(i));
 
-    m_Renderer->render(m_IdTarget);
+    m_IdRenderer->render(m_IdTarget);
 
     for(size_t i = 0; i < m_Triangles.size(); i++)
         m_Triangles[i]->setColor(prev_triangle_color);
-
-    m_IdTarget->save("image.png");
 }
 
 Vec4f ControllerShowRings::idToColour(const unsigned int& id)
