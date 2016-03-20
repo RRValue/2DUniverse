@@ -35,6 +35,7 @@ private:
     HESMesh* m_Mesh;
 
     QPaintTarget* m_IdTarget;
+    
     Renderer* m_Renderer;
     ViewPort* m_ViewPort;
 

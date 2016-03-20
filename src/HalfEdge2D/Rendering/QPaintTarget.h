@@ -3,7 +3,7 @@
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 
-class QPixmap;
+class QImage;
 class QPaintDevice;
 
 class QPaintTarget : public RenderTarget
@@ -13,6 +13,8 @@ public:
     QPaintTarget(int width, int height);
     ~QPaintTarget();
 
+    Vec4f getColourAtPos(const unsigned int& x, const unsigned int& y);
+
     QPaintDevice* const getPaintDevice() const;
     virtual void render() final override;
 
@@ -20,7 +22,7 @@ public:
     void save(const QString& fileName);
 
 private:
-    QPixmap* m_Image;
+    QImage* m_Image;
 };
 
 #endif //_RENDERING_QPAINTTARGET_H_

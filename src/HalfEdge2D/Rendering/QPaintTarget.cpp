@@ -4,16 +4,37 @@
 
 #include <QtCore/QFile>
 
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
+#include <QtGui/QColor>
 
 QPaintTarget::QPaintTarget(int width, int height)
 {
-    m_Image = new QPixmap(width, height);
+    m_Image = new QImage(width, height, QImage::Format_RGB32);
 }
 
 QPaintTarget::~QPaintTarget()
 {
     delete m_Image;
+}
+
+Vec4f QPaintTarget::getColourAtPos(const unsigned int& x, const unsigned int& y)
+{
+    Vec4f colour;
+
+    if(m_Image == nullptr)
+        return colour;
+
+    if(x >= m_Size.width() || y >= m_Size.height())
+        return colour;
+
+    QColor pixel = m_Image->pixel(x, y);
+
+    colour[0] = pixel.redF();
+    colour[1] = pixel.greenF();
+    colour[2] = pixel.blackF();
+    colour[2] = 1.0f;
+
+    return colour;
 }
 
 QPaintDevice* const QPaintTarget::getPaintDevice() const
@@ -38,7 +59,7 @@ void QPaintTarget::resize(const int& width, const int& height)
 
     QSize new_size(width, height);
 
-    m_Image = new QPixmap(new_size);
+    m_Image = new QImage(new_size, QImage::Format_RGB32);
 
     setSize(QSize(width, height));
 

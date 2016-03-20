@@ -60,6 +60,17 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 {
     updateIdTarget();
 
+    if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr || m_RenderTarget == nullptr)
+        return false;
+
+    Mat3f target_dev_matrix = m_RenderTarget->getDeviceMatrix();
+    Mat3f id_dev_matrix = m_IdTarget->getInvDeviceMatrix();
+
+    Vec3f hit_px_pos = id_dev_matrix * target_dev_matrix * Vec3f((float)event->x(), (float)event->y(), 1.0f);
+
+    // get colur id_target
+    Vec4f hit_colour = m_IdTarget->getColourAtPos((int)(hit_px_pos[0] + 0.5), (int)(hit_px_pos[1] + 0.5));
+
     return false;
 }
 
