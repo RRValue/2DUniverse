@@ -38,12 +38,13 @@ public:
 protected:
     EventInterface* m_EventInterface;
 
+    std::vector<ViewPort* const> m_ViewPorts;
+
 private:
     void updateDeviceMatrices();
 
 private:
     QSizeF m_Size;
-    std::vector<ViewPort* const> m_ViewPorts;
 
     bool m_DeviceDirty;
 

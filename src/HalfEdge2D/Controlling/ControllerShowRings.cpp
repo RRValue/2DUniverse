@@ -93,10 +93,13 @@ void ControllerShowRings::updateIdTarget()
     if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr || m_RenderTarget == nullptr)
         return;
 
-    m_ViewPort->setSize(m_ActiveViewPort->getSize());
     m_ViewPort->setCamera(m_ActiveCamera);
 
-    m_IdTarget->resize((int)(m_RenderTarget->getSize().width() + 0.5f), (int)(m_RenderTarget->getSize().height() + 0.5f));
+    QSizeF render_target_size = m_RenderTarget->getSize();
+    QRectF viewport_size = m_ActiveViewPort->getSize();
+    QSizeF id_target_size(render_target_size.width() * viewport_size.width(), render_target_size.height() * viewport_size.height());
+
+    m_IdTarget->resize((int)(id_target_size.width() + 0.5f), (int)(id_target_size.height() + 0.5f));
     
     // prepare mesh
     Mesh* mesh = m_Scene->getMesh();
@@ -108,7 +111,7 @@ void ControllerShowRings::updateIdTarget()
 
     Vec4f prev_triangle_color = m_Triangles[0]->getColor();
 
-    int color_step = 3;
+    int color_step = 8;
     int color_step_value = (int)std::pow(2.0, (float)color_step);
     float color_factor = 1.0f / (float)color_step_value;
     int r = 0;
