@@ -52,6 +52,8 @@ private:
     int m_LastHitId;
     Vec4f m_LastTrisColour;
     const Vec4f m_TrisHitColour;
+
+    Mat3f m_MousePosToTargetMat;
 };
 
 #endif //_CONTROLLING_CONTROLLERSHOWRINGS_H_

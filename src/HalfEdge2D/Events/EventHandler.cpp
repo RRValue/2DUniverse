@@ -187,13 +187,11 @@ bool EventHandler::handleResizeEvent(QResizeEvent* const event)
 
     m_RenderTarget->setSize(QSizeF(event->size()));
 
+    viewportContentChanged();
+
     if(m_Navigator != nullptr)
         if(m_Navigator->handleResizeEvent(event))
-        {
-            viewportContentChanged();
-
             return true;
-        }
 
     if(m_ActiveController != nullptr)
         if(m_ActiveController->handleResizeEvent(event))

@@ -16,6 +16,8 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QImage>
 
+#include <qdebug.h>
+
 ControllerShowRings::ControllerShowRings() :
 m_ChannelBitRange(8),
 m_ChannelRange(1 << m_ChannelBitRange),
@@ -69,10 +71,7 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
     if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr || m_RenderTarget == nullptr)
         return false;
 
-    Mat3f target_dev_matrix = m_RenderTarget->getDeviceMatrix();
-    Mat3f id_dev_matrix = m_IdTarget->getInvDeviceMatrix();
-
-    Vec3f hit_px_pos = id_dev_matrix * target_dev_matrix * Vec3f((float)event->x(), (float)event->y(), 1.0f);
+    Vec3f hit_px_pos = m_MousePosToTargetMat * Vec3f((float)event->x(), (float)event->y(), 1.0f);
 
     // get colur id_target
     Vec4f hit_colour = m_IdTarget->getColourAtPos((int)(hit_px_pos[0] + 0.5), (int)(hit_px_pos[1] + 0.5));
@@ -113,6 +112,8 @@ bool ControllerShowRings::handleMouseReleaseEvent(QMouseEvent* const event)
 
 bool ControllerShowRings::handleResizeEvent(QResizeEvent* const event)
 {
+    m_ViewportContentChanges = true;
+
     return false;
 }
 
@@ -138,7 +139,20 @@ void ControllerShowRings::updateIdTarget()
     QSizeF id_target_size(render_target_size.width() * viewport_size.width(), render_target_size.height() * viewport_size.height());
 
     m_IdTarget->resize((int)(id_target_size.width() + 0.5f), (int)(id_target_size.height() + 0.5f));
-    
+
+    // update mouse to target matrix
+    Mat3f targetVp_to_idVp_mat;
+
+    float ivpw = 1.0f / viewport_size.width();
+    float ivph = 1.0f / viewport_size.height();
+
+    targetVp_to_idVp_mat <<
+        ivpw, 0.0f, -viewport_size.x() * ivpw,
+        0.0f, ivph, -viewport_size.y() * ivph,
+        0.0f, 0.0f, 1.0f;
+  
+    m_MousePosToTargetMat = m_IdTarget->getDeviceMatrix() * targetVp_to_idVp_mat * m_RenderTarget->getInvDeviceMatrix();
+
     // prepare mesh
     Mesh* mesh = m_Scene->getMesh();
 
