@@ -84,12 +84,13 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
     if(m_LastHitId == current_hit_id)
         return true;
 
-    if(m_LastHitId != -1)
+    if(m_LastHitId != -1 && m_LastHitId < m_Triangles.size())
         m_Triangles[m_LastHitId]->setColor(m_LastTrisColour);
 
-    if(current_hit_id != -1)
+    if(current_hit_id != -1 && current_hit_id < m_Triangles.size())
     {
         m_LastTrisColour = m_Triangles[current_hit_id]->getColor();
+
         m_Triangles[current_hit_id]->setColor(m_TrisHitColour);
     }
 
