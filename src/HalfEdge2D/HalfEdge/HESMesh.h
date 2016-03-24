@@ -17,6 +17,7 @@ public:
 
     // getter
     HESVertex* getHESVertex(const size_t& idx) const;
+    HESFace* getHESFace(const size_t& idx) const;
     const bool& hasChanged() const;
 
     // setter

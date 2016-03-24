@@ -30,6 +30,11 @@ HESVertex* HESMesh::getHESVertex(const size_t& idx) const
     return dynamic_cast<HESVertex*>(getVertex(idx));
 }
 
+HESFace* HESMesh::getHESFace(const size_t& idx) const
+{
+    return dynamic_cast<HESFace*>(getFace(idx));
+}
+
 const bool& HESMesh::hasChanged() const
 {
     return m_Changed;
