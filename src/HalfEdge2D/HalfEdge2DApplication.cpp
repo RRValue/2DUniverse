@@ -238,6 +238,7 @@ void HalfEdge2DApplication::onMeshSelectionChanged(int value)
     HESBuilder builder(m_Mesh);
     builder.build();
 
+    m_ControllerShowRings->setMesh(m_Mesh);
     m_Renderer->render();
 }
 

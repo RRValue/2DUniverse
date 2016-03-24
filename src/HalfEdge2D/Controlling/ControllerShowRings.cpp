@@ -6,6 +6,7 @@
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
+#include "HalfEdge2D/HalfEdge/HESVertex.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
@@ -24,7 +25,8 @@ ControllerShowRings::ControllerShowRings() :
 m_ChannelBitRange(8),
 m_ChannelRange(1 << m_ChannelBitRange),
 m_ChannelFFactor(1.0f / (float)m_ChannelRange),
-m_TrisHitColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f))
+m_FaceHitColour(Vec4f(0.5f, 0.0f, 0.0f, 1.0f)),
+m_FaceRingColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f))
 {
     m_Name = "ControllerShowRings";
 
@@ -71,7 +73,7 @@ void ControllerShowRings::setMesh(HESMesh* const mesh)
 
 bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 {
-    /*updateIdTarget();
+    updateIdTarget();
 
     if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr || m_RenderTarget == nullptr)
         return false;
@@ -86,34 +88,25 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
     if(!(hit_colour[0] == 1.0f, hit_colour[1] == 1.0f, hit_colour[2] == 1.0f))
         current_hit_id = colourToId(hit_colour);
 
-    if(m_LastHitId == -1 || current_hit_id >= m_Triangles.size())
+    if(current_hit_id == -1 || (size_t)current_hit_id >= m_Faces.size())
         return true;
 
-    unsetLastTris();
+    HESFace* center_face = dynamic_cast<HESFace*>(m_Faces[current_hit_id]);
 
-    if(m_LastHitId == current_hit_id)
+    if(center_face == nullptr)
         return true;
 
-    if(m_LastHitId != -1 && m_LastHitId < m_Triangles.size())
-        m_Triangles[m_LastHitId]->setColor(m_LastTrisColour);
+    unsetLastFaces();
+    setNeigbourFaces(center_face, findRing(center_face));
 
-    if(current_hit_id != -1 && current_hit_id < m_Triangles.size())
-    {
-        m_LastTrisColour = m_Triangles[current_hit_id]->getColor();
-
-        m_Triangles[current_hit_id]->setColor(m_TrisHitColour);
-    }
-
-    m_LastHitId = current_hit_id;
-
-    m_Renderer->render();*/
+    m_Renderer->render();
 
     return true;
 }
 
-void ControllerShowRings::unsetLastTris()
+void ControllerShowRings::unsetLastFaces()
 {
-    /*for(const auto& face : m_LastFaces)
+    for(const auto& face : m_LastFaces)
     {
         const auto& find_color = m_LastFacesColours.find(face);
 
@@ -121,35 +114,58 @@ void ControllerShowRings::unsetLastTris()
             continue;
 
         find_color->first->setColor(find_color->second);
-    }*/
+    }
 }
 
-std::set<int> ControllerShowRings::findRing(HESFace* const face)
+void ControllerShowRings::setNeigbourFaces(HESFace* const centerface, const std::set<HESFace* const>& ringFaces)
 {
-    return std::set<int>();
+    m_LastFacesColours.clear();
+    m_LastFaces.clear();
 
-    /*if(face == nullptr)
-        return std::set<int>();
+    // colour center face
+    m_LastFacesColours.insert(std::make_pair(centerface, centerface->getColor()));
+    m_LastFaces.insert(centerface);
 
-    HESFace* const face = m_Mesh->getHESFace(face);
+    centerface->setColor(m_FaceHitColour);
 
-    std::set<int> neigbour_tris;
-
-    for(const auto& edges : face->getEdges())
+    // colour ring faces
+    for(auto face : ringFaces)
     {
-        HESEdge* const op = edges->opposite();
+        m_LastFacesColours.insert(std::make_pair(face, face->getColor()));
+        m_LastFaces.insert(face);
 
-        if(op == nullptr)
-            continue;
-
-        HESFace* const op_face = op->face();
-
-        if(op_face == nullptr)
-            continue;
-
-        neigbour_tris.insert(op_face);
+        face->setColor(m_FaceRingColour);
     }
-    */
+}
+
+std::set<HESFace* const> ControllerShowRings::findRing(HESFace* const face)
+{
+    std::set<HESFace* const> neigbour_tris;
+
+    if(face == nullptr)
+        return neigbour_tris;
+
+    std::set<HESFace* const> visited;
+    visited.insert(face);
+
+    for(const auto& face_edge : face->getEdges())
+    {
+        for(const auto& edge : face_edge->from()->getEdges())
+        {
+            HESFace* const face = edge->face();
+
+            if(face == nullptr)
+                continue;
+
+            if(visited.find(face) != visited.end())
+                continue;
+
+            visited.insert(face);
+            neigbour_tris.insert(face);
+        }
+    }
+
+    return neigbour_tris;
 }
 
 bool ControllerShowRings::handleMousePressEvent(QMouseEvent* const event)
