@@ -1,7 +1,7 @@
 #include "HalfEdge2D/Mesh/Mesh.h"
 
 #include "HalfEdge2D/Mesh/Vertex.h"
-#include "HalfEdge2D/Mesh/Triangle.h"
+#include "HalfEdge2D/Mesh/Face.h"
 
 #include <cassert>
 
@@ -20,11 +20,11 @@ void Mesh::clear()
     for(const auto& vertex : m_Vertices)
         delete vertex;
 
-    for(const auto& triangle : m_Triangles)
-        delete triangle;
+    for(const auto& face : m_Faces)
+        delete face;
 
     m_Vertices.clear();
-    m_Triangles.clear();
+    m_Faces.clear();
 }
 
 const std::vector<Vertex*>& Mesh::getVertices() const
@@ -32,9 +32,9 @@ const std::vector<Vertex*>& Mesh::getVertices() const
     return m_Vertices;
 }
 
-const std::vector<Triangle*>& Mesh::getTriangles() const
+const std::vector<Face*>& Mesh::getFaces() const
 {
-    return m_Triangles;
+    return m_Faces;
 }
 
 Vertex* const Mesh::getVertex(const size_t& idx) const
@@ -44,16 +44,21 @@ Vertex* const Mesh::getVertex(const size_t& idx) const
     return m_Vertices[idx];
 }
 
-Triangle* const Mesh::getTriangle(const size_t& idx) const
+Face* const Mesh::getFace(const size_t& idx) const
 {
-    assert(idx >= 0 && idx < m_Triangles.size());
+    assert(idx >= 0 && idx < m_Faces.size());
 
-    return m_Triangles[idx];
+    return m_Faces[idx];
 }
 
 Vertex* Mesh::allocateVertex()
 {
     return new Vertex();
+}
+
+Face* Mesh::allocateFace()
+{
+    return new Face();
 }
 
 void Mesh::addVertex()
@@ -89,21 +94,29 @@ void Mesh::removeVertex(const size_t& idx)
     m_Vertices.erase(iter);
 }
 
-void Mesh::addTriangle(const size_t& idx0, const size_t& idx1, const size_t& idx2)
+void Mesh::addFace(const size_t& idx0, const size_t& idx1, const size_t& idx2)
 {
-    Triangle* new_tris = new Triangle();
-    new_tris->setIdx({idx0, idx1, idx2});
+    Face* new_face = allocateFace();
+    new_face->addVertIdx({idx0, idx1, idx2});
 
-    m_Triangles.push_back(new_tris);
+    m_Faces.push_back(new_face);
 }
 
-void Mesh::removeTriangle(const size_t& idx)
+void Mesh::addFace(const std::initializer_list<size_t>& idxs)
 {
-    assert(idx >= 0 && idx < m_Triangles.size());
+    Face* new_face = allocateFace();
+    new_face->addVertIdx(idxs);
 
-    std::vector<Triangle*>::iterator iter = m_Triangles.begin() + idx;
+    m_Faces.push_back(new_face);
+}
+
+void Mesh::removeFace(const size_t& idx)
+{
+    assert(idx >= 0 && idx < m_Faces.size());
+
+    std::vector<Face*>::iterator iter = m_Faces.begin() + idx;
 
     delete *iter;
 
-    m_Triangles.erase(iter);
+    m_Faces.erase(iter);
 }

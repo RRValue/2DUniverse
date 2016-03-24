@@ -4,13 +4,16 @@
 #include "HalfEdge2D/Controlling/Controller.h"
 
 #include <vector>
+#include <map>
+#include <set>
 
 class HESMesh;
+class HESFace;
 class Scene;
 class Renderer;
 class ViewPort;
 class QPaintTarget;
-class Triangle;
+class Face;
 
 class ControllerShowRings : public Controller
 {
@@ -34,6 +37,18 @@ private:
     Vec4f idToColour(const unsigned int& id);
     unsigned int colourToId(const Vec4f& colour);
 
+    void clear();
+
+    void unsetLastTris();
+    std::set<int> findRing(HESFace* const face);
+
+private:
+    const unsigned int m_ChannelBitRange;
+    const unsigned int m_ChannelRange;
+    const float m_ChannelFFactor;
+
+    const Vec4f m_TrisHitColour;
+
 private:
     Scene* m_Scene;
     HESMesh* m_Mesh;
@@ -43,17 +58,12 @@ private:
     Renderer* m_IdRenderer;
     ViewPort* m_ViewPort;
 
-    std::vector<Triangle*> m_Triangles;
-
-    const unsigned int m_ChannelBitRange;
-    const unsigned int m_ChannelRange;
-    const float m_ChannelFFactor;
-
-    int m_LastHitId;
-    Vec4f m_LastTrisColour;
-    const Vec4f m_TrisHitColour;
+    std::vector<Face*> m_Faces;
 
     Mat3f m_MousePosToTargetMat;
+
+    std::map<HESFace* const, Vec3f> m_LastFacesColours;
+    std::set<HESFace* const> m_LastFaces;
 };
 
 #endif //_CONTROLLING_CONTROLLERSHOWRINGS_H_

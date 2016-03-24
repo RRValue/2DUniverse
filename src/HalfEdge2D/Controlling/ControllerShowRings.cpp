@@ -4,12 +4,14 @@
 #include "HalfEdge2D/Rendering/QPaintTarget.h"
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
+#include "HalfEdge2D/HalfEdge/HESFace.h"
+#include "HalfEdge2D/HalfEdge/HESEdge.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 
 #include "HalfEdge2D/Mesh/Vertex.h"
-#include "HalfEdge2D/Mesh/Triangle.h"
+#include "HalfEdge2D/Mesh/Face.h"
 
 #include <math.h>
 
@@ -42,8 +44,6 @@ m_TrisHitColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f))
     m_IdRenderer->setRenderTriangles(true);
     m_IdRenderer->setRenderTrianglesEdges(false);
     m_IdRenderer->setSmoothRendering(false);
-
-    m_LastHitId = -1;
 }
 
 ControllerShowRings::~ControllerShowRings()
@@ -51,13 +51,18 @@ ControllerShowRings::~ControllerShowRings()
 
 }
 
+void ControllerShowRings::clear()
+{
+    m_LastFacesColours.clear();
+    m_LastFaces.clear();
+}
+
 void ControllerShowRings::setMesh(HESMesh* const mesh)
 {
     if(mesh == nullptr)
         return;
 
-    if(mesh == m_Mesh)
-        return;
+    clear();
 
     m_Mesh = mesh;
 
@@ -66,7 +71,7 @@ void ControllerShowRings::setMesh(HESMesh* const mesh)
 
 bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 {
-    updateIdTarget();
+    /*updateIdTarget();
 
     if(m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr || m_RenderTarget == nullptr)
         return false;
@@ -80,6 +85,11 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 
     if(!(hit_colour[0] == 1.0f, hit_colour[1] == 1.0f, hit_colour[2] == 1.0f))
         current_hit_id = colourToId(hit_colour);
+
+    if(m_LastHitId == -1 || current_hit_id >= m_Triangles.size())
+        return true;
+
+    unsetLastTris();
 
     if(m_LastHitId == current_hit_id)
         return true;
@@ -96,9 +106,50 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 
     m_LastHitId = current_hit_id;
 
-    m_Renderer->render();
+    m_Renderer->render();*/
 
     return true;
+}
+
+void ControllerShowRings::unsetLastTris()
+{
+    /*for(const auto& face : m_LastFaces)
+    {
+        const auto& find_color = m_LastFacesColours.find(face);
+
+        if(find_color == m_LastFacesColours.end())
+            continue;
+
+        find_color->first->setColor(find_color->second);
+    }*/
+}
+
+std::set<int> ControllerShowRings::findRing(HESFace* const face)
+{
+    return std::set<int>();
+
+    /*if(face == nullptr)
+        return std::set<int>();
+
+    HESFace* const face = m_Mesh->getHESFace(face);
+
+    std::set<int> neigbour_tris;
+
+    for(const auto& edges : face->getEdges())
+    {
+        HESEdge* const op = edges->opposite();
+
+        if(op == nullptr)
+            continue;
+
+        HESFace* const op_face = op->face();
+
+        if(op_face == nullptr)
+            continue;
+
+        neigbour_tris.insert(op_face);
+    }
+    */
 }
 
 bool ControllerShowRings::handleMousePressEvent(QMouseEvent* const event)
@@ -157,20 +208,20 @@ void ControllerShowRings::updateIdTarget()
     // prepare mesh
     Mesh* mesh = m_Scene->getMesh();
 
-    m_Triangles = mesh->getTriangles();
+    m_Faces = mesh->getFaces();
 
-    if(m_Triangles.empty())
+    if(m_Faces.empty())
         return;
 
-    Vec4f prev_triangle_color = m_Triangles[0]->getColor();
+    Vec4f prev_triangle_color = m_Faces[0]->getColor();
 
-    for(size_t i = 0; i < m_Triangles.size(); i++)
-        m_Triangles[i]->setColor(idToColour(i));
+    for(size_t i = 0; i < m_Faces.size(); i++)
+        m_Faces[i]->setColor(idToColour(i));
 
     m_IdRenderer->render(m_IdTarget);
 
-    for(size_t i = 0; i < m_Triangles.size(); i++)
-        m_Triangles[i]->setColor(prev_triangle_color);
+    for(size_t i = 0; i < m_Faces.size(); i++)
+        m_Faces[i]->setColor(prev_triangle_color);
 }
 
 Vec4f ControllerShowRings::idToColour(const unsigned int& id)

@@ -17,13 +17,9 @@ HESMesh::~HESMesh()
 
 void HESMesh::clear()
 {
-    for(const auto& face : m_Faces)
-        delete face;
-
     for(const auto& edge : m_Edges)
         delete edge;
 
-    m_Faces.clear();
     m_Edges.clear();
 
     Mesh::clear();
@@ -39,11 +35,6 @@ const bool& HESMesh::hasChanged() const
     return m_Changed;
 }
 
-void HESMesh::addFace(HESFace* const face)
-{
-    m_Faces.push_back(face);
-}
-
 void HESMesh::addEdge(HESEdge* const edge)
 {
     m_Edges.push_back(edge);
@@ -52,4 +43,9 @@ void HESMesh::addEdge(HESEdge* const edge)
 Vertex* HESMesh::allocateVertex()
 {
     return new HESVertex();
+}
+
+Face* HESMesh::allocateFace()
+{
+    return new HESFace();
 }

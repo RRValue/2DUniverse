@@ -20,16 +20,15 @@ public:
     const bool& hasChanged() const;
 
     // setter
-    void addFace(HESFace* const face);
     void addEdge(HESEdge* const edge);
 
 protected:
     virtual Vertex* allocateVertex();
+    virtual Face* allocateFace();
 
 private:
     bool m_Changed;
 
-    std::vector<HESFace*> m_Faces;
     std::vector<HESEdge*> m_Edges;
 };
 

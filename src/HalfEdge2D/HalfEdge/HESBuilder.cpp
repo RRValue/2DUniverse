@@ -1,6 +1,6 @@
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
-#include "HalfEdge2D/Mesh/Triangle.h"
+#include "HalfEdge2D/Mesh/Face.h"
 
 #include "HalfEdge2D/HalfEdge/HESVertex.h"
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
@@ -24,25 +24,21 @@ bool HESBuilder::build()
         return false;
 
     // iterate over all Triangles and build basis triangles
-    for(const auto& tris : m_Mesh->getTriangles())
+    for(const auto& f : m_Mesh->getFaces())
     {
-        HESVertex* const v0 = m_Mesh->getHESVertex(tris->getIdx0());
-        HESVertex* const v1 = m_Mesh->getHESVertex(tris->getIdx1());
-        HESVertex* const v2 = m_Mesh->getHESVertex(tris->getIdx2());
-
-        HESFace* f = new HESFace();
+        HESVertex* const v0 = m_Mesh->getHESVertex(f->getVertIdx(0));
+        HESVertex* const v1 = m_Mesh->getHESVertex(f->getVertIdx(1));
+        HESVertex* const v2 = m_Mesh->getHESVertex(f->getVertIdx(2));
 
         HESEdge* e0 = new HESEdge();
         HESEdge* e1 = new HESEdge();
         HESEdge* e2 = new HESEdge();
-
-        m_Mesh->addFace(f);
         
         m_Mesh->addEdge(e0);
         m_Mesh->addEdge(e1);
         m_Mesh->addEdge(e2);
 
-        buildFace({v0, v1, v2}, {e0, e1, e2}, f);
+        buildFace({v0, v1, v2}, {e0, e1, e2}, dynamic_cast<HESFace*>(f));
         connectEdges({e0, e1, e2});
     }
 

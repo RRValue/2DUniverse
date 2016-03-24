@@ -6,7 +6,7 @@
 #include <vector>
 
 class Vertex;
-class Triangle;
+class Face;
 
 class Mesh
 {
@@ -18,10 +18,10 @@ public:
 
     // getter
     const std::vector<Vertex*>& getVertices() const;
-    const std::vector<Triangle*>& getTriangles() const;
+    const std::vector<Face*>& getFaces() const;
 
     Vertex* const getVertex(const size_t& idx) const;
-    Triangle* const getTriangle(const size_t& idx) const;
+    Face* const getFace(const size_t& idx) const;
 
     // vertices
     void addVertex();
@@ -30,15 +30,17 @@ public:
     void removeVertex(const size_t& idx);
 
     // triangles
-    void addTriangle(const size_t& idx0, const size_t& idx1, const size_t& idx2);
-    void removeTriangle(const size_t& idx);
+    void addFace(const size_t& idx0, const size_t& idx1, const size_t& idx2);
+    void addFace(const std::initializer_list<size_t>& idxs);
+    void removeFace(const size_t& idx);
 
 protected:
     virtual Vertex* allocateVertex();
+    virtual Face* allocateFace();
 
 protected:
     std::vector<Vertex*> m_Vertices;
-    std::vector<Triangle*> m_Triangles;
+    std::vector<Face*> m_Faces;
 };
 
 #endif //_MESH_MESH_H_

@@ -1119,7 +1119,7 @@ std::vector<float> testVertices03 = {0.998026728428f, 0.0627905195293f,
 0.775887725737f, 0.432550178393f
 };
 
-std::vector<int> testTriangles03 = {787, 125, 462,
+std::vector<size_t> testTriangles03 = {787, 125, 462,
 386, 787, 462,
 785, 123, 463,
 786, 464, 124,

@@ -209,7 +209,7 @@ void HalfEdge2DApplication::onMeshSelectionChanged(int value)
     }
 
     std::vector<float> float_array;
-    std::vector<int> idx_array;
+    std::vector<size_t> idx_array;
 
     if(value == 0)
     {
@@ -233,7 +233,7 @@ void HalfEdge2DApplication::onMeshSelectionChanged(int value)
         m_Mesh->addVertex(Vec2f(float_array[i], float_array[i + 1]));
 
     for(size_t i = 0; i < idx_array.size(); i += 3)
-        m_Mesh->addTriangle(idx_array[i], idx_array[i + 1], idx_array[i + 2]);
+        m_Mesh->addFace({idx_array[i], idx_array[i + 1], idx_array[i + 2]});
 
     HESBuilder builder(m_Mesh);
     builder.build();

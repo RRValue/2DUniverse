@@ -10,7 +10,7 @@
 
 #include "HalfEdge2D/Mesh/Mesh.h"
 #include "HalfEdge2D/Mesh/Vertex.h"
-#include "HalfEdge2D/Mesh/Triangle.h"
+#include "HalfEdge2D/Mesh/Face.h"
 
 #include <QtGui/QPainter>
 
@@ -194,25 +194,25 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
     float point_size_px = (tar - ref).manhattanLength();
 
     const std::vector<Vertex*>& vertices = mesh->getVertices();
-    const std::vector<Triangle*>& triangles = mesh->getTriangles();
+    const std::vector<Face*>& faces = mesh->getFaces();
 
     QColor paint_color;
 
     if(m_RenderTriangles)
     {
         // paint traingles
-        for(const auto& triangle : triangles)
+        for(const auto& face : faces)
         {
-            Vec2f vp0 = vertices[triangle->getIdx0()]->getPosition();
-            Vec2f vp1 = vertices[triangle->getIdx1()]->getPosition();
-            Vec2f vp2 = vertices[triangle->getIdx2()]->getPosition();
+            Vec2f vp0 = vertices[face->getVertIdx(0)]->getPosition();
+            Vec2f vp1 = vertices[face->getVertIdx(1)]->getPosition();
+            Vec2f vp2 = vertices[face->getVertIdx(2)]->getPosition();
 
             QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
             QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
             QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
 
             // fill triangle
-            const Vec4f& tris_color = triangle->getColor();
+            const Vec4f& tris_color = face->getColor();
             paint_color = QColor::fromRgbF(tris_color[0], tris_color[1], tris_color[2], tris_color[3]);
 
             QPainterPath path;
@@ -229,11 +229,11 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
         if(m_RenderTrianglesEdges)
         {
             // paint traingles edges
-            for(const auto& triangle : triangles)
+            for(const auto& face : faces)
             {
-                Vec2f vp0 = vertices[triangle->getIdx0()]->getPosition();
-                Vec2f vp1 = vertices[triangle->getIdx1()]->getPosition();
-                Vec2f vp2 = vertices[triangle->getIdx2()]->getPosition();
+                Vec2f vp0 = vertices[face->getVertIdx(0)]->getPosition();
+                Vec2f vp1 = vertices[face->getVertIdx(1)]->getPosition();
+                Vec2f vp2 = vertices[face->getVertIdx(2)]->getPosition();
 
                 QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
                 QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
