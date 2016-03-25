@@ -69,6 +69,9 @@ void ControllerShowRings::setMesh(HESMesh* const mesh)
     m_Mesh = mesh;
 
     m_Scene->setMesh(m_Mesh);
+    m_Faces = mesh->getFaces();
+
+    m_ViewportContentChanges = true;
 }
 
 bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
@@ -221,11 +224,7 @@ void ControllerShowRings::updateIdTarget()
   
     m_MousePosToTargetMat = m_IdTarget->getDeviceMatrix() * targetVp_to_idVp_mat * m_RenderTarget->getInvDeviceMatrix();
 
-    // prepare mesh
-    Mesh* mesh = m_Scene->getMesh();
-
-    m_Faces = mesh->getFaces();
-
+    // draw id mesh
     if(m_Faces.empty())
         return;
 
