@@ -150,13 +150,12 @@ void ControllerShowRings::setNeigbourFaces(HESFace* const centerface, const std:
 
 std::set<HESFace* const> ControllerShowRings::findRing(HESFace* const face)
 {
-    std::set<HESFace* const> neigbour_tris;
+    std::set<HESFace* const> neigbour_faces;
 
     if(face == nullptr)
-        return neigbour_tris;
+        return neigbour_faces;
 
-    std::set<HESFace* const> visited;
-    visited.insert(face);
+    face->setVisited(true);
 
     for(const auto& face_edge : face->getEdges())
     {
@@ -167,15 +166,21 @@ std::set<HESFace* const> ControllerShowRings::findRing(HESFace* const face)
             if(face == nullptr)
                 continue;
 
-            if(visited.find(face) != visited.end())
+            if(face->visited())
                 continue;
+            
+            neigbour_faces.insert(face);
 
-            visited.insert(face);
-            neigbour_tris.insert(face);
+            face->setVisited(true);
         }
     }
 
-    return neigbour_tris;
+    face->setVisited(false);
+
+    for(const auto& face : neigbour_faces)
+        face->setVisited(false);
+
+    return neigbour_faces;
 }
 
 bool ControllerShowRings::handleMousePressEvent(QMouseEvent* const event)
