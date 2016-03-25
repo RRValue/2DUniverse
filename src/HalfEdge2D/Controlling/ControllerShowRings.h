@@ -15,6 +15,20 @@ class ViewPort;
 class QPaintTarget;
 class Face;
 
+typedef std::vector<HESFace* const> FaceVector;
+typedef std::vector<FaceVector> RingFacesVector;
+
+class LastFaceColour
+{
+public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
+    HESFace* m_Face;
+    Vec4f m_Colour;
+};
+
+typedef std::vector<LastFaceColour, Eigen::aligned_allocator<LastFaceColour>> LastColourVector;
+
 class ControllerShowRings : public Controller
 {
 public:
@@ -40,17 +54,15 @@ private:
     void clear();
 
     void unsetLastFaces();
-    std::set<HESFace* const> findRing(HESFace* const face);
-    void setNeigbourFaces(HESFace* const centerface, const std::set<HESFace* const>& ringFaces);
+    RingFacesVector findRingOrder(HESFace* const face, const size_t& order);
+    void colourRingFaces(const RingFacesVector& ringFaces);
 
 private:
     const size_t m_ChannelBitRange;
     const size_t m_ChannelRange;
     const size_t m_MaxId;
     const float m_ChannelFFactor;
-
-    const Vec4f m_FaceHitColour;
-    const Vec4f m_FaceRingColour;
+    const size_t m_NumRings;
 
 private:
     Scene* m_Scene;
@@ -66,8 +78,7 @@ private:
     Mat3f m_MousePosToTargetMat;
 
     size_t m_LastHitId;
-    std::map<HESFace* const, Vec4f, std::less<HESFace* const>, Eigen::aligned_allocator<std::pair<HESFace* const, Vec4f>>> m_LastFacesColours;
-    std::set<HESFace* const> m_LastFaces;
+    LastColourVector m_LastColourVector;
 };
 
 #endif //_CONTROLLING_CONTROLLERSHOWRINGS_H_

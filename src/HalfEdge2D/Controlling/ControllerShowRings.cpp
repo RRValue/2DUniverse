@@ -26,8 +26,7 @@ m_ChannelBitRange(6),
 m_ChannelRange(1 << m_ChannelBitRange),
 m_ChannelFFactor(1.0f / (float)m_ChannelRange),
 m_MaxId(m_ChannelBitRange * m_ChannelBitRange * m_ChannelBitRange),
-m_FaceHitColour(Vec4f(0.5f, 0.0f, 0.0f, 1.0f)),
-m_FaceRingColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f))
+m_NumRings(4)
 {
     m_Name = "ControllerShowRings";
 
@@ -56,8 +55,7 @@ ControllerShowRings::~ControllerShowRings()
 
 void ControllerShowRings::clear()
 {
-    m_LastFacesColours.clear();
-    m_LastFaces.clear();
+    m_LastColourVector.clear();
 }
 
 void ControllerShowRings::setMesh(HESMesh* const mesh)
@@ -107,7 +105,7 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
     m_LastHitId = current_hit_id;
 
     unsetLastFaces();
-    setNeigbourFaces(center_face, findRing(center_face));
+    colourRingFaces(findRingOrder(center_face, m_NumRings));
 
     m_Renderer->render();
 
@@ -116,71 +114,108 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 
 void ControllerShowRings::unsetLastFaces()
 {
-    for(const auto& face : m_LastFaces)
-    {
-        const auto& find_color = m_LastFacesColours.find(face);
-
-        if(find_color == m_LastFacesColours.end())
-            continue;
-
-        find_color->first->setColor(find_color->second);
-    }
+    for(const auto& last_colour : m_LastColourVector)
+        last_colour.m_Face->setColor(last_colour.m_Colour);
 }
 
-void ControllerShowRings::setNeigbourFaces(HESFace* const centerface, const std::set<HESFace* const>& ringFaces)
+void ControllerShowRings::colourRingFaces(const RingFacesVector& rings)
 {
-    m_LastFacesColours.clear();
-    m_LastFaces.clear();
+    m_LastColourVector.clear();
 
-    // colour center face
-    m_LastFacesColours.insert(std::make_pair(centerface, centerface->getColor()));
-    m_LastFaces.insert(centerface);
+    if(rings.empty())
+        return;
 
-    centerface->setColor(m_FaceHitColour);
+    std::vector<float> r_value;
+    std::vector<float> b_value;
 
+    float r_step = 1.0f / ((float)rings.size() - 1);
+    float b_step = 1.0f / ((float)rings.size() - 1);
+    
+    for(size_t i = 0; i < rings.size(); i++)
+    {
+        r_value.push_back(r_step * (float)i);
+        b_value.push_back(b_step * (float)i);
+    }
+    
     // colour ring faces
-    for(auto face : ringFaces)
+    size_t idx = 0;
+    float r, g, b;
+    for(auto ring : rings)
     {
-        m_LastFacesColours.insert(std::make_pair(face, face->getColor()));
-        m_LastFaces.insert(face);
+        for(const auto& face : ring)
+        {
+            m_LastColourVector.push_back({face, face->getColor()});
+            
+            r = 1.0f - b_value[idx];
+            g = r_value[idx] + (1.0f - b_value[idx]);
+            b = r_value[idx];
 
-        face->setColor(m_FaceRingColour);
+            face->setColor(Vec4f(r, g, b, 1.0f));
+        }
+
+        idx++;
     }
 }
 
-std::set<HESFace* const> ControllerShowRings::findRing(HESFace* const face)
+RingFacesVector ControllerShowRings::findRingOrder(HESFace* const face, const size_t& order)
 {
-    std::set<HESFace* const> neigbour_faces;
+    RingFacesVector ring_faces;
 
     if(face == nullptr)
-        return neigbour_faces;
+        return ring_faces;
 
+    size_t current_order = 0;
+
+    // add order 0
+    ring_faces.push_back(FaceVector());
+    ring_faces[current_order].push_back(face);
+    
     face->setVisited(true);
 
-    for(const auto& face_edge : face->getEdges())
+    current_order++;
+
+    // add order 1 .. n
+    while(current_order <= order)
     {
-        for(const auto& edge : face_edge->from()->getEdges())
+        ring_faces.push_back(FaceVector());
+
+        for(const auto& last_face : ring_faces[current_order - 1])
         {
-            HESFace* const face = edge->face();
+            for(const auto& face_edge : last_face->getEdges())
+            {
+                for(const auto& edge : face_edge->from()->getEdges())
+                {
+                    HESFace* const face = edge->face();
 
-            if(face == nullptr)
-                continue;
+                    if(face == nullptr)
+                        continue;
 
-            if(face->visited())
-                continue;
-            
-            neigbour_faces.insert(face);
+                    if(face->visited())
+                        continue;
 
-            face->setVisited(true);
+                    ring_faces[current_order].push_back(face);
+
+                    face->setVisited(true);
+                }
+            }
         }
+
+        if(ring_faces[current_order].empty())
+        {
+            ring_faces.erase(ring_faces.begin() + ring_faces.size() - 1);
+
+            break;
+        }
+
+        current_order++;
     }
 
-    face->setVisited(false);
+    // set all unvisited
+    for(const auto& ring : ring_faces)
+        for(const auto& face : ring)
+            face->setVisited(false);
 
-    for(const auto& face : neigbour_faces)
-        face->setVisited(false);
-
-    return neigbour_faces;
+    return ring_faces;
 }
 
 bool ControllerShowRings::handleMousePressEvent(QMouseEvent* const event)
