@@ -26,7 +26,7 @@ m_ChannelBitRange(6),
 m_ChannelRange(1 << m_ChannelBitRange),
 m_ChannelFFactor(1.0f / (float)m_ChannelRange),
 m_MaxId(m_ChannelBitRange * m_ChannelBitRange * m_ChannelBitRange),
-m_NumRings(4)
+m_NumRings(1)
 {
     m_Name = "ControllerShowRings";
 
