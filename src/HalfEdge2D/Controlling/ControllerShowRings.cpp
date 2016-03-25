@@ -25,6 +25,7 @@ ControllerShowRings::ControllerShowRings() :
 m_ChannelBitRange(8),
 m_ChannelRange(1 << m_ChannelBitRange),
 m_ChannelFFactor(1.0f / (float)m_ChannelRange),
+m_MaxId(m_ChannelBitRange * m_ChannelBitRange * m_ChannelBitRange),
 m_FaceHitColour(Vec4f(0.5f, 0.0f, 0.0f, 1.0f)),
 m_FaceRingColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f))
 {
@@ -72,6 +73,7 @@ void ControllerShowRings::setMesh(HESMesh* const mesh)
     m_Faces = mesh->getFaces();
 
     m_ViewportContentChanges = true;
+    m_LastHitId = m_MaxId;
 }
 
 bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
@@ -86,18 +88,23 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
     // get colur id_target
     Vec4f hit_colour = m_IdTarget->getColourAtPos((int)(hit_px_pos[0] + 0.5), (int)(hit_px_pos[1] + 0.5));
 
-    int current_hit_id = -1;
+    size_t current_hit_id = m_MaxId;
 
     if(!(hit_colour[0] == 1.0f, hit_colour[1] == 1.0f, hit_colour[2] == 1.0f))
         current_hit_id = colourToId(hit_colour);
 
-    if(current_hit_id == -1 || (size_t)current_hit_id >= m_Faces.size())
+    if(current_hit_id == m_MaxId || current_hit_id >= m_Faces.size())
+        return true;
+
+    if(m_LastHitId == current_hit_id)
         return true;
 
     HESFace* center_face = dynamic_cast<HESFace*>(m_Faces[current_hit_id]);
 
     if(center_face == nullptr)
         return true;
+
+    m_LastHitId = current_hit_id;
 
     unsetLastFaces();
     setNeigbourFaces(center_face, findRing(center_face));

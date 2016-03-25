@@ -44,8 +44,9 @@ private:
     void setNeigbourFaces(HESFace* const centerface, const std::set<HESFace* const>& ringFaces);
 
 private:
-    const unsigned int m_ChannelBitRange;
-    const unsigned int m_ChannelRange;
+    const size_t m_ChannelBitRange;
+    const size_t m_ChannelRange;
+    const size_t m_MaxId;
     const float m_ChannelFFactor;
 
     const Vec4f m_FaceHitColour;
@@ -64,6 +65,7 @@ private:
 
     Mat3f m_MousePosToTargetMat;
 
+    size_t m_LastHitId;
     std::map<HESFace* const, Vec4f, std::less<HESFace* const>, Eigen::aligned_allocator<std::pair<HESFace* const, Vec4f>>> m_LastFacesColours;
     std::set<HESFace* const> m_LastFaces;
 };
