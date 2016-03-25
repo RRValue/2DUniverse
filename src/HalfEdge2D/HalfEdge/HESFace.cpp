@@ -2,7 +2,7 @@
 
 HESFace::HESFace()
 {
-
+    m_Visited = false;
 }
 
 HESFace::~HESFace()
@@ -13,6 +13,16 @@ HESFace::~HESFace()
 const std::set<HESEdge*>& HESFace::getEdges() const
 {
     return m_Edges;
+}
+
+const bool& HESFace::visited() const
+{
+    return m_Visited;
+}
+
+void HESFace::setVisited(const bool& visited)
+{
+    m_Visited = visited;
 }
 
 void HESFace::addEdge(HESEdge* const edge)

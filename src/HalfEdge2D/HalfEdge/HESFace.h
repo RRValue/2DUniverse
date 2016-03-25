@@ -15,6 +15,10 @@ public:
 
     // getter
     const std::set<HESEdge*>& getEdges() const;
+    const bool& visited() const;
+
+    // setter
+    void setVisited(const bool& visited);
 
     // edges
     void addEdge(HESEdge* const edge);
@@ -25,6 +29,8 @@ private:
 
 private:
     std::set<HESEdge*> m_Edges;
+
+    bool m_Visited;
 };
 
 #endif //_HALFEDGESTRUCTURE_FACE_H_

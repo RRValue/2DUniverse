@@ -8,6 +8,8 @@ HESEdge::HESEdge()
     m_Opposite = nullptr;
     m_Prev = nullptr;
     m_Next = nullptr;
+
+    m_Visited = false;
 }
 
 HESEdge::~HESEdge()
@@ -43,6 +45,11 @@ HESEdge* const HESEdge::prev() const
 HESEdge* const HESEdge::next() const
 {
     return m_Next;
+}
+
+const bool& HESEdge::visited() const
+{
+    return m_Visited;
 }
 
 void HESEdge::setFrom(HESVertex* const vertex)
@@ -91,4 +98,9 @@ void HESEdge::setNext(HESEdge* const nextEdge)
         return;
 
     m_Next = nextEdge;
+}
+
+void HESEdge::setVisited(const bool& visited)
+{
+    m_Visited = visited;
 }

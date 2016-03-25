@@ -17,6 +17,7 @@ public:
     HESEdge* const opposite() const;
     HESEdge* const prev() const;
     HESEdge* const next() const;
+    const bool& visited() const;
 
     // setter
     void setFrom(HESVertex* const vertex);
@@ -25,6 +26,7 @@ public:
     void setOpposite(HESEdge* const oppositeEdge);
     void setPrev(HESEdge* const prevEdge);
     void setNext(HESEdge* const nextEdge);
+    void setVisited(const bool& visited);
 
 private:
     HESVertex* m_From;
@@ -35,6 +37,8 @@ private:
     HESEdge* m_Opposite;
     HESEdge* m_Prev;
     HESEdge* m_Next;
+
+    bool m_Visited;
 };
 
 #endif //_HALFEDGESTRUCTURE_EDGE_H_

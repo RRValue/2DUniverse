@@ -2,7 +2,7 @@
 
 HESVertex::HESVertex()
 {
-
+    m_Visited = false;
 }
 
 HESVertex::~HESVertex()
@@ -13,6 +13,16 @@ HESVertex::~HESVertex()
 const std::set<HESEdge*>& HESVertex::getEdges() const
 {
     return m_Edges;
+}
+
+const bool& HESVertex::visited() const
+{
+    return m_Visited;
+}
+
+void HESVertex::setVisited(const bool& visited)
+{
+    m_Visited = visited;
 }
 
 void HESVertex::addEdge(HESEdge* const edge)
