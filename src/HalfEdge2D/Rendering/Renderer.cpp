@@ -13,6 +13,8 @@
 #include "HalfEdge2D/Mesh/Face.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
+#include "HalfEdge2D/Renderables/Circle.h"
+#include "HalfEdge2D/Renderables/Line.h"
 
 #include <QtGui/QPainter>
 
@@ -188,11 +190,12 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
         renderMesh(painter, m_Scene->getMesh());
 
     renderPoints(painter, scene->getPoints());
+    renderCircles(painter, scene->getCircles());
+    renderLines(painter, scene->getLines());
 }
 
 void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const>& points)
 {
-    // paint vertices
     for(const auto& p : points)
     {
         QPointF ref = trans(QPointF(0.0f, 0.0f));
@@ -210,6 +213,32 @@ void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const
         painter->setBrush(QBrush(paint_color));
         painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
     }
+}
+
+void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* const>& circles)
+{
+    for(const auto& c : circles)
+    {
+        QPointF ref = trans(QPointF(0.0f, 0.0f));
+        QPointF tar = trans(QPointF(c->getRadius(), 0.0f));
+        float radius_px = (tar - ref).manhattanLength();
+
+        const Vec2f& pos = c->getPosition();
+        const Vec4f& col = c->getColour();
+
+        QPointF circle_pos(pos[0], pos[1]);
+
+        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+        painter->setPen(QPen(paint_color));
+        painter->setBrush(Qt::BrushStyle::NoBrush);
+        painter->drawEllipse(trans(circle_pos), radius_px, radius_px);
+    }
+}
+
+void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>& lines)
+{
+
 }
 
 void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)

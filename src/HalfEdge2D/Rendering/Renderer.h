@@ -17,6 +17,8 @@ class QWidgetTarget;
 class QPaintTarget;
 class Scene;
 class Point;
+class Circle;
+class Line;
 class RenderTarget;
 class ViewPort;
 class Mesh;
@@ -54,6 +56,8 @@ private:
 private:
     void renderScene(QPainter* const painter, Scene* const scene);
     void renderPoints(QPainter* const painter, const std::set<Point* const>& points);
+    void renderCircles(QPainter* const painter, const std::set<Circle* const>& circles);
+    void renderLines(QPainter* const painter, const std::set<Line* const>& lines);
     void renderMesh(QPainter* const painter, Mesh* const mesh);
     void renderViewport(QPainter* const painter, const QRectF& vp);
     void renderCoordinateCross(QPainter* const painter);
