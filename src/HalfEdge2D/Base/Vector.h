@@ -9,6 +9,7 @@
 
 typedef Eigen::Matrix<float, 2, 1>  Vec2f;
 typedef Eigen::Matrix<int, 2, 1>  Vec2i;
+typedef Eigen::Matrix<double, 2, 1>  Vec2d;
 typedef Eigen::Matrix<float, 3, 1>  Vec3f;
 typedef Eigen::Matrix<float, 4, 1>  Vec4f;
 typedef Eigen::Matrix<float, 3, 3>  Mat3f;
