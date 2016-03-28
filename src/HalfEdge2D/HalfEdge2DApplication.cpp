@@ -103,13 +103,9 @@ void HalfEdge2DApplication::createViewPorts()
 
 void HalfEdge2DApplication::createRendering()
 {
-    m_Scene01 = new Scene();
-    m_Scene02 = new Scene();
-    m_Scene03 = new Scene();
+    m_Scene = new Scene();
 
-    m_Scene01->setMesh(m_Mesh);
-    m_Scene02->setMesh(m_Mesh);
-    m_Scene03->setMesh(m_Mesh);
+    m_Scene->setMesh(m_Mesh);
 
     // allocate event handler and add controller and navigator
     m_Navigator = new Navigator();
@@ -117,9 +113,9 @@ void HalfEdge2DApplication::createRendering()
     m_ControllerShowRings = new ControllerShowRings();
     m_ControllerDelaunay = new ControllerDelaunay();
 
-    m_ControllerBuildMesh->setScene(m_Scene01);
-    m_ControllerShowRings->setScene(m_Scene02);
-    m_ControllerDelaunay->setScene(m_Scene03);
+    m_ControllerBuildMesh->setScene(m_Scene);
+    m_ControllerShowRings->setScene(m_Scene);
+    m_ControllerDelaunay->setScene(m_Scene);
 
     // add controller to combobox
     m_CbController->addItem(m_ControllerBuildMesh->getName().c_str());
@@ -132,7 +128,7 @@ void HalfEdge2DApplication::createRendering()
 
     // create renderer
     m_Renderer = new Renderer();
-    m_Renderer->setScene(m_Scene01);
+    m_Renderer->setScene(m_Scene);
 
     // create event handler
     m_EventHandler = new EventHandler(m_RenderTarget);
@@ -249,9 +245,7 @@ void HalfEdge2DApplication::onMeshSelectionChanged(int value)
     HESBuilder builder(m_Mesh);
     builder.build();
 
-    m_Scene01->setMesh(m_Mesh);
-    m_Scene02->setMesh(m_Mesh);
-    m_Scene03->setMesh(m_Mesh);
+    m_Scene->setMesh(m_Mesh);
 
     m_ActiveController->setChanged();
 

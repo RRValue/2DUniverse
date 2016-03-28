@@ -7,6 +7,9 @@
 #include <QtCore/QRectF>
 
 #include <set>
+#include <vector>
+
+typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> PointVector;
 
 class QPaintEvent;
 class QPainter;
@@ -51,6 +54,7 @@ private:
 
 private:
     void renderScene(QPainter* const painter, Scene* const scene);
+    void renderPoints(QPainter* const painter, const PointVector& points);
     void renderMesh(QPainter* const painter, Mesh* const mesh);
     void renderViewport(QPainter* const painter, const QRectF& vp);
     void renderCoordinateCross(QPainter* const painter);

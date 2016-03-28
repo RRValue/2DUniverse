@@ -63,9 +63,7 @@ private:
 
     bool m_MultiView;
 
-    Scene* m_Scene01;
-    Scene* m_Scene02;
-    Scene* m_Scene03;
+    Scene* m_Scene;
 
     ViewPort* m_ViewPort0;
     ViewPort* m_ViewPort1;

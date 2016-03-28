@@ -41,7 +41,9 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
     Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
     Vec2f new_pos = invTrans(pos);
 
-    m_Scene->getMesh()->getVertices()[m_CurrentIdx]->setPosition(new_pos);
+    m_Points[m_CurrentIdx] = new_pos;
+
+    m_Scene->setPoints(m_Points);
 
     m_Renderer->render();
 
@@ -80,17 +82,19 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     // if hit nothing and point size < 4 -> add
     if(result == -1)
     {
-        m_Scene->getMesh()->addVertex(invTrans(p_f));
-
+        m_Points.push_back(invTrans(p_f));
+        
         m_MovePoint = false;
 
+        m_Scene->setPoints(m_Points);
+        
         m_Renderer->render();
     }
     else
     {
         m_CurrentIdx = result;
 
-        m_CurrentHitDistance = trans(m_Scene->getMesh()->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
+        m_CurrentHitDistance = trans(m_Points[m_CurrentIdx]) - p_f;
     }
 
     return true;
@@ -124,14 +128,12 @@ bool ControllerDelaunay::handleWheelEvent(QWheelEvent* const event)
 
 int ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
 {
-    const std::vector<Vertex*>& vertices = m_Scene->getMesh()->getVertices();
-
-    if(vertices.empty())
+    if(m_Points.empty())
         return -1;
 
     // TODO point size from renderable point
-    for(size_t i = 0; i < vertices.size(); i++)
-        if((vertices[i]->getPosition() - pos).norm() < 0.05f)
+    for(size_t i = 0; i < m_Points.size(); i++)
+        if((m_Points[i] - pos).norm() < 0.05f)
             return i;
 
     return -1;

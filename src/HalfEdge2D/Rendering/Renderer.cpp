@@ -184,6 +184,27 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
 {
     if(scene->getMesh() != nullptr)
         renderMesh(painter, m_Scene->getMesh());
+
+    renderPoints(painter, scene->getPoints());
+}
+
+void Renderer::renderPoints(QPainter* const painter, const PointVector& points)
+{
+    QPointF ref = trans(QPointF(0.0f, 0.0f));
+    QPointF tar = trans(QPointF(m_PointSize, 0.0f));
+    float point_size_px = (tar - ref).manhattanLength();
+
+    // paint vertices
+    for(const auto& p : points)
+    {
+        QPointF vert_pos(p[0], p[1]);
+
+        QColor paint_color = QColor::fromRgbF(0.0f, 0.0f, 0.0f, 1.0f);
+
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(QBrush(paint_color));
+        painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
+    }
 }
 
 void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
