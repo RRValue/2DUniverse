@@ -38,6 +38,9 @@ void ControllerBuildMesh::setMesh(HESMesh* const mesh)
 
 bool ControllerBuildMesh::handleMouseMoveEvent(QMouseEvent* const event)
 {
+    if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
+        return false;
+
     if(m_Mesh == nullptr)
         return false;
 

@@ -38,6 +38,9 @@ void ControllerDelaunay::setMesh(HESMesh* const mesh)
 
 bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
 {
+    if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
+        return false;
+
     if(m_Mesh == nullptr)
         return false;
 
