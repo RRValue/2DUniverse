@@ -9,8 +9,6 @@
 #include <set>
 #include <vector>
 
-typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> PointVector;
-
 class QPaintEvent;
 class QPainter;
 class QPaintDevice;
@@ -18,6 +16,7 @@ class QPaintDevice;
 class QWidgetTarget;
 class QPaintTarget;
 class Scene;
+class Point;
 class RenderTarget;
 class ViewPort;
 class Mesh;
@@ -54,7 +53,7 @@ private:
 
 private:
     void renderScene(QPainter* const painter, Scene* const scene);
-    void renderPoints(QPainter* const painter, const PointVector& points);
+    void renderPoints(QPainter* const painter, const std::set<Point* const>& points);
     void renderMesh(QPainter* const painter, Mesh* const mesh);
     void renderViewport(QPainter* const painter, const QRectF& vp);
     void renderCoordinateCross(QPainter* const painter);

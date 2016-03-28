@@ -12,6 +12,8 @@
 #include "HalfEdge2D/Mesh/Vertex.h"
 #include "HalfEdge2D/Mesh/Face.h"
 
+#include "HalfEdge2D/Renderables/Point.h"
+
 #include <QtGui/QPainter>
 
 #include <QtWidgets/QWidget>
@@ -188,18 +190,21 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
     renderPoints(painter, scene->getPoints());
 }
 
-void Renderer::renderPoints(QPainter* const painter, const PointVector& points)
+void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const>& points)
 {
-    QPointF ref = trans(QPointF(0.0f, 0.0f));
-    QPointF tar = trans(QPointF(m_PointSize, 0.0f));
-    float point_size_px = (tar - ref).manhattanLength();
-
     // paint vertices
     for(const auto& p : points)
     {
-        QPointF vert_pos(p[0], p[1]);
+        QPointF ref = trans(QPointF(0.0f, 0.0f));
+        QPointF tar = trans(QPointF(p->getSize(), 0.0f));
+        float point_size_px = (tar - ref).manhattanLength();
 
-        QColor paint_color = QColor::fromRgbF(0.0f, 0.0f, 0.0f, 1.0f);
+        const Vec2f& pos = p->getPosition();
+        const Vec4f& col = p->getColour();
+
+        QPointF vert_pos(pos[0], pos[1]);
+
+        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
         painter->setPen(Qt::NoPen);
         painter->setBrush(QBrush(paint_color));

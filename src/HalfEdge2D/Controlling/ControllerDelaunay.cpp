@@ -7,6 +7,8 @@
 #include "HalfEdge2D/Scene/ViewPort.h"
 #include "HalfEdge2D/Scene/Camera.h"
 
+#include "HalfEdge2D/Renderables/Point.h"
+
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 
 #include "HalfEdge2D/Mesh/Vertex.h"
@@ -18,6 +20,7 @@ ControllerDelaunay::ControllerDelaunay()
     m_Scene = nullptr;
     m_MovePoint = false;
     m_Name = "ControllerDelaunay";
+    m_CurrentPoint = nullptr;
 }
 
 ControllerDelaunay::~ControllerDelaunay()
@@ -41,8 +44,8 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
     Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
     Vec2f new_pos = invTrans(pos);
 
-    m_Points[m_CurrentIdx] = new_pos;
-
+    m_CurrentPoint->setPosition(new_pos);
+    
     m_Scene->setPoints(m_Points);
 
     m_Renderer->render();
@@ -77,25 +80,24 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     Vec2i p = keepInViewPort(pos_global);
     Vec2f p_f(p[0], p[1]);
 
-    int result = getPointAtPos(invTrans(p_f));
+    m_CurrentPoint = getPointAtPos(invTrans(p_f));
 
     // if hit nothing and point size < 4 -> add
-    if(result == -1)
+    if(m_CurrentPoint == nullptr)
     {
-        m_Points.push_back(invTrans(p_f));
+        m_CurrentPoint = new Point();
+        m_CurrentPoint->setPosition(invTrans(p_f));
         
         m_MovePoint = false;
 
-        m_Scene->setPoints(m_Points);
+        m_Points.insert(m_CurrentPoint);
+        m_Scene->addPoint(m_CurrentPoint);
         
         m_Renderer->render();
     }
-    else
-    {
-        m_CurrentIdx = result;
-
-        m_CurrentHitDistance = trans(m_Points[m_CurrentIdx]) - p_f;
-    }
+    
+    m_MovePoint = true;
+    m_CurrentHitDistance = trans(m_CurrentPoint->getPosition()) - p_f;
 
     return true;
 }
@@ -126,15 +128,15 @@ bool ControllerDelaunay::handleWheelEvent(QWheelEvent* const event)
     return false;
 }
 
-int ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
+Point* const ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
 {
     if(m_Points.empty())
-        return -1;
+        return nullptr;
 
     // TODO point size from renderable point
-    for(size_t i = 0; i < m_Points.size(); i++)
-        if((m_Points[i] - pos).norm() < 0.05f)
-            return i;
+    for(const auto& p : m_Points)
+        if((p->getPosition() - pos).norm() < p->getSize())
+            return p;
 
-    return -1;
+    return nullptr;
 }

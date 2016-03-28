@@ -206,10 +206,12 @@ void HalfEdge2DApplication::onVSliderChanged(int value)
 
 void HalfEdge2DApplication::onMeshSelectionChanged(int value)
 {
-    m_Mesh->clear();
+    m_Scene->clear();
 
     if(value < 0 || value >= 3)
     {
+        m_ActiveController->setChanged();
+
         m_Renderer->render();
 
         return;

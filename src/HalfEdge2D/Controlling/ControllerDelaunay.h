@@ -5,9 +5,9 @@
 
 #include <HalfEdge2D/Base/Vector.h>
 
-#include <vector>
+#include <set>
 
-typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> PointVector;
+class Point;
 
 class ControllerDelaunay : public Controller
 {
@@ -23,15 +23,15 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    int getPointAtPos(const Vec2f& pos) const;
+    Point* const getPointAtPos(const Vec2f& pos) const;
 
 private:
     bool m_MovePoint;
     
-    int m_CurrentIdx;
+    Point* m_CurrentPoint;
     Vec2f m_CurrentHitDistance;
 
-    PointVector m_Points;
+    std::set<Point* const> m_Points;
 };
 
 #endif //_CONTROLLING_CONTROLLERDELAUNAY_H_

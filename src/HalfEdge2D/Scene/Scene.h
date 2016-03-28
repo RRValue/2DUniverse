@@ -3,11 +3,10 @@
 
 #include "HalfEdge2D/Base/Vector.h"
 
-#include <vector>
-
-typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> PointVector;
+#include <set>
 
 class Mesh;
+class Point;
 
 class Scene
 {
@@ -15,17 +14,22 @@ public:
     Scene();
     ~Scene();
 
+    void clear();
+
     Mesh* const getMesh() const;
-    const PointVector& getPoints() const;
+    const std::set<Point* const>& getPoints() const;
 
     void setMesh(Mesh* const mesh);
-    void setPoints(const PointVector& points);
+    void setPoints(const std::set<Point* const>& points);
+
+    void addPoint(Point* const point);
+    void removePoint(Point* const point);
 
 private:
     float m_PointSize;
 
     Mesh* m_Mesh;
-    PointVector m_Points;
+    std::set<Point* const> m_Points;
 };
 
 #endif //_SCENE_SCENE_H_
