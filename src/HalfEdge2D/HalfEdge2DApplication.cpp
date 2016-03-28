@@ -4,6 +4,7 @@
 
 #include "HalfEdge2D/Controlling/ControllerBuildMesh.h"
 #include "HalfEdge2D/Controlling/ControllerShowRings.h"
+#include "HalfEdge2D/Controlling/ControllerDelaunay.h"
 
 #include "HalfEdge2D/Navigation/Navigator.h"
 
@@ -109,16 +110,20 @@ void HalfEdge2DApplication::createRendering()
     m_Navigator = new Navigator();
     m_ControllerBuildMesh = new ControllerBuildMesh();
     m_ControllerShowRings = new ControllerShowRings();
+    m_ControllerDelaunay = new ControllerDelaunay();
 
     m_ControllerBuildMesh->setMesh(m_Mesh);
     m_ControllerShowRings->setMesh(m_Mesh);
+    m_ControllerDelaunay->setMesh(m_Mesh);
 
     // add controller to combobox
     m_CbController->addItem(m_ControllerBuildMesh->getName().c_str());
     m_CbController->addItem(m_ControllerShowRings->getName().c_str());
+    m_CbController->addItem(m_ControllerDelaunay->getName().c_str());
 
     m_Controller.insert(std::make_pair(m_ControllerBuildMesh->getName(), m_ControllerBuildMesh));
     m_Controller.insert(std::make_pair(m_ControllerShowRings->getName(), m_ControllerShowRings));
+    m_Controller.insert(std::make_pair(m_ControllerDelaunay->getName(), m_ControllerDelaunay));
 
     // create renderer
     m_Renderer = new Renderer();
@@ -129,6 +134,7 @@ void HalfEdge2DApplication::createRendering()
     m_EventHandler->setNavigator(m_Navigator);
     m_EventHandler->addController(m_ControllerBuildMesh);
     m_EventHandler->addController(m_ControllerShowRings);
+    m_EventHandler->addController(m_ControllerDelaunay);
     m_EventHandler->setRenderer(m_Renderer);
     m_EventHandler->setActiveController(m_ControllerBuildMesh);
 

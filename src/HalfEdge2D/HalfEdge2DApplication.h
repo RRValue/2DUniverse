@@ -15,6 +15,7 @@ class Navigator;
 class Controller;
 class ControllerBuildMesh;
 class ControllerShowRings;
+class ControllerDelaunay;
 class EventHandler;
 class Scene;
 
@@ -79,6 +80,7 @@ private:
     Navigator* m_Navigator;
     ControllerBuildMesh* m_ControllerBuildMesh;
     ControllerShowRings* m_ControllerShowRings;
+    ControllerDelaunay* m_ControllerDelaunay;
 
     std::map<std::string, Controller* const> m_Controller;
 
