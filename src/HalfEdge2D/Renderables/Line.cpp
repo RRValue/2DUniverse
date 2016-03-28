@@ -6,6 +6,7 @@ Line::Line()
     m_PositionStart = Vec2f(-1.0f, 0.0f);
     m_PositionEnd = Vec2f(1.0f, 0.0f);
     m_Colour= Vec4f(0.0f, 0.0f, 0.0f, 1.0f);
+    m_Visible = true;
 }
 
 Line::~Line()
@@ -33,6 +34,11 @@ const Vec4f& Line::getColour() const
     return m_Colour;
 }
 
+const bool& Line::isVisible() const
+{
+    return m_Visible;
+}
+
 void Line::setThickness(const float& thickness)
 {
     m_Thickness = thickness;
@@ -51,4 +57,9 @@ void Line::setPositionEnd(const Vec2f& pos)
 void Line::setColour(const Vec4f& colour)
 {
     m_Colour = colour;
+}
+
+void Line::setVisible(const bool& visible)
+{
+    m_Visible = visible;
 }

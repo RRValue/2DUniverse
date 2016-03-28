@@ -10,6 +10,7 @@
 
 class Point;
 class Circle;
+class Line;
 
 class ControllerDelaunay : public Controller
 {
@@ -29,6 +30,7 @@ private:
     void updateCircumCircles();
     void updateCircumCircle(Circle* const circle, const std::array<Point* const, 3>& points);
     void triangulate();
+    void updateLines();
 
 private:
     bool m_MovePoint;
@@ -38,6 +40,7 @@ private:
 
     std::vector<Point* const> m_Points;
     std::vector<Circle* const> m_CircumCircles;
+    std::vector<Line* const> m_Lines;
 };
 
 #endif //_CONTROLLING_CONTROLLERDELAUNAY_H_

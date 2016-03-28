@@ -243,6 +243,9 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
 {
     for(const auto& l : lines)
     {
+        if(!l->isVisible())
+            continue;
+
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(l->getThickness(), 0.0f));
         float thickness_px = (tar - ref).manhattanLength();

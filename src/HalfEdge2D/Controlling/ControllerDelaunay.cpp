@@ -50,6 +50,7 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
 
     m_CurrentPoint->setPosition(new_pos);
 
+    updateLines();
     updateCircumCircles();
     triangulate();
 
@@ -104,6 +105,7 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
         m_Scene->addPoint(m_CurrentPoint);
     }
 
+    updateLines();
     updateCircumCircles();
     triangulate();
 
@@ -113,6 +115,50 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     m_CurrentHitDistance = trans(m_CurrentPoint->getPosition()) - p_f;
 
     return true;
+}
+
+void ControllerDelaunay::updateLines()
+{
+    if(m_Lines.empty())
+    {
+        m_Lines.push_back(new Line());
+        m_Lines.push_back(new Line());
+        m_Lines.push_back(new Line());
+        m_Lines.push_back(new Line());
+        m_Lines.push_back(new Line());
+
+        for(const auto& l : m_Lines)
+        {
+            l->setVisible(false);
+            
+            m_Scene->addLine(l);
+        }
+    }
+
+    if(m_Points.size() >= 2)
+    {
+        m_Lines[0]->setPositionStart(m_Points[0]->getPosition());
+        m_Lines[0]->setPositionEnd(m_Points[1]->getPosition());
+        m_Lines[0]->setVisible(true);
+    }
+
+    if(m_Points.size() >= 3)
+    {
+        m_Lines[1]->setPositionStart(m_Points[1]->getPosition());
+        m_Lines[1]->setPositionEnd(m_Points[2]->getPosition());
+        m_Lines[1]->setVisible(true);
+    }
+
+    if(m_Points.size() >= 4)
+    {
+        m_Lines[2]->setPositionStart(m_Points[2]->getPosition());
+        m_Lines[2]->setPositionEnd(m_Points[3]->getPosition());
+        m_Lines[2]->setVisible(true);
+
+        m_Lines[3]->setPositionStart(m_Points[3]->getPosition());
+        m_Lines[3]->setPositionEnd(m_Points[0]->getPosition());
+        m_Lines[3]->setVisible(true);
+    }
 }
 
 bool ControllerDelaunay::handleMouseReleaseEvent(QMouseEvent* const event)
