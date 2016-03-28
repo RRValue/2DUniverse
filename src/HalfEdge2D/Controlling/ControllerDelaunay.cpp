@@ -25,7 +25,6 @@ ControllerDelaunay::ControllerDelaunay()
     m_MovePoint = false;
     m_Name = "ControllerDelaunay";
     m_CurrentPoint = nullptr;
-    m_CircumCircle = nullptr;
 }
 
 ControllerDelaunay::~ControllerDelaunay()
@@ -51,7 +50,8 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
 
     m_CurrentPoint->setPosition(new_pos);
 
-    updateCircumCircle();
+    updateCircumCircles();
+    triangulate();
 
     m_Renderer->render();
 
@@ -90,30 +90,22 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     // if hit nothing and point size < 4 -> add
     if(m_CurrentPoint == nullptr)
     {
-        if(m_Points.size() >= 3)
+        if(m_Points.size() >= 4)
+        {
+            m_MovePoint = false;
+
             return true;
+        }
 
         m_CurrentPoint = new Point();
         m_CurrentPoint->setPosition(invTrans(p_f));
-        
-        m_MovePoint = false;
 
-        m_Points.insert(m_CurrentPoint);
+        m_Points.push_back(m_CurrentPoint);
         m_Scene->addPoint(m_CurrentPoint);
     }
 
-    if(m_Points.size() == 3 && m_CircumCircle == nullptr)
-    {
-        // add circumcircle
-        m_CircumCircle = new Circle();
-        m_CircumCircle->setPosition(Vec2f(0.0f, 0.0f));
-        m_CircumCircle->setColour(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
-        m_CircumCircle->setRadius(0.5f);
-
-        m_Scene->addCircle(m_CircumCircle);
-
-        updateCircumCircle();
-    }
+    updateCircumCircles();
+    triangulate();
 
     m_Renderer->render();
     
@@ -162,30 +154,76 @@ Point* const ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
     return nullptr;
 }
 
-void ControllerDelaunay::updateCircumCircle()
+#include <qdebug.h>
+
+void ControllerDelaunay::triangulate()
 {
-    if(m_Points.size() != 3 || m_CircumCircle == nullptr)
+    if(m_Points.size() != 4)
         return;
 
-    auto pos_iter = m_Points.begin();
+    const Vec2f& p0 = m_Points[0]->getPosition();
+    const Vec2f& p1 = m_Points[1]->getPosition();
+    const Vec2f& p2 = m_Points[2]->getPosition();
+    const Vec2f& p3 = m_Points[3]->getPosition();
 
-    Vec2f pos0 = (*(pos_iter++))->getPosition();
-    Vec2f pos1 = (*(pos_iter++))->getPosition();
-    Vec2f pos2 = (*(pos_iter++))->getPosition();
-        
+    Vec2f p02(p0[0] * p0[0], p0[1] * p0[1]);
+    Vec2f p12(p1[0] * p1[0], p1[1] * p1[1]);
+    Vec2f p22(p2[0] * p2[0], p2[1] * p2[1]);
+    Vec2f p32(p3[0] * p3[0], p3[1] * p3[1]);
+
+    Mat3f m;
+    m <<
+        p0[0] - p3[0], p0[1] - p3[1], p02[0] - p32[0] + p02[1] - p32[1],
+        p1[0] - p3[0], p1[1] - p3[1], p12[0] - p32[0] + p12[1] - p32[1],
+        p2[0] - p3[0], p2[1] - p3[1], p22[0] - p32[0] + p22[1] - p32[1];
+
+    bool inside = m.determinant() > 0.0f;
+
+    if(inside)
+        qDebug() << "inside";
+    else
+        qDebug() << "not inside";
+}
+
+void ControllerDelaunay::updateCircumCircles()
+{
+    if(m_Points.size() < 3)
+        return;
+
+    if(m_CircumCircles.empty())
+    {
+        m_CircumCircles.push_back(new Circle());
+        m_CircumCircles.push_back(new Circle());
+
+        m_CircumCircles[0]->setVisible(false);
+        m_CircumCircles[1]->setVisible(false);
+
+        m_Scene->addCircle(m_CircumCircles[0]);
+        m_Scene->addCircle(m_CircumCircles[1]);
+    }
+
+    if(m_Points.size() >= 3)
+        updateCircumCircle(m_CircumCircles[0], {m_Points[0], m_Points[1], m_Points[2]});
+
+    if(m_Points.size() >= 4)
+        updateCircumCircle(m_CircumCircles[1], {m_Points[1], m_Points[2], m_Points[3]});
+}
+
+void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::array<Point* const, 3>& points)
+{
     LineSegment l01;
     LineSegment l12;
 
-    l01.setStart(pos0);
-    l01.setEnd(pos1);
-    l12.setStart(pos1);
-    l12.setEnd(pos2);
+    l01.setStart(points[0]->getPosition());
+    l01.setEnd(points[1]->getPosition());
+    l12.setStart(points[1]->getPosition());
+    l12.setEnd(points[2]->getPosition());
 
     float length = 1000.0f * (l01.getLength() + l12.getLength());
 
     Vec2f bn0(l01.getNormal()[1], -l01.getNormal()[0]);
     Vec2f bn1(l12.getNormal()[1], -l12.getNormal()[0]);
-    
+
     Vec2f sp0 = l01.getRelativePoint(0.5f);
     Vec2f sp1 = l12.getRelativePoint(0.5f);
 
@@ -205,11 +243,10 @@ void ControllerDelaunay::updateCircumCircle()
     bool intersects = false;
     Vec2f center = bisect0.intersect(bisect1, &intersects);
 
-    if(!intersects)
-        return;
+    circle->setVisible(intersects);
 
-    float radius = (pos0 - center).norm();
+    float radius = (points[0]->getPosition() - center).norm();
 
-    m_CircumCircle->setPosition(center);
-    m_CircumCircle->setRadius(radius);
+    circle->setPosition(center);
+    circle->setRadius(radius);
 }

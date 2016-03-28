@@ -219,6 +219,9 @@ void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* con
 {
     for(const auto& c : circles)
     {
+        if(!c->isVisible())
+            continue;
+
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(c->getRadius(), 0.0f));
         float radius_px = (tar - ref).manhattanLength();

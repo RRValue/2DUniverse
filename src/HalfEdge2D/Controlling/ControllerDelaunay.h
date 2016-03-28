@@ -5,7 +5,8 @@
 
 #include <HalfEdge2D/Base/Vector.h>
 
-#include <set>
+#include <vector>
+#include <array>
 
 class Point;
 class Circle;
@@ -25,7 +26,9 @@ protected:
 
 private:
     Point* const getPointAtPos(const Vec2f& pos) const;
-    void updateCircumCircle();
+    void updateCircumCircles();
+    void updateCircumCircle(Circle* const circle, const std::array<Point* const, 3>& points);
+    void triangulate();
 
 private:
     bool m_MovePoint;
@@ -33,9 +36,8 @@ private:
     Point* m_CurrentPoint;
     Vec2f m_CurrentHitDistance;
 
-    std::set<Point* const> m_Points;
-
-    Circle* m_CircumCircle;
+    std::vector<Point* const> m_Points;
+    std::vector<Circle* const> m_CircumCircles;
 };
 
 #endif //_CONTROLLING_CONTROLLERDELAUNAY_H_
