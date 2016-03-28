@@ -52,7 +52,6 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
 
     updateLines();
     updateCircumCircles();
-    triangulate();
 
     m_Renderer->render();
 
@@ -107,7 +106,6 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
 
     updateLines();
     updateCircumCircles();
-    triangulate();
 
     m_Renderer->render();
     
@@ -158,6 +156,20 @@ void ControllerDelaunay::updateLines()
         m_Lines[3]->setPositionStart(m_Points[3]->getPosition());
         m_Lines[3]->setPositionEnd(m_Points[0]->getPosition());
         m_Lines[3]->setVisible(true);
+
+        if(isPointInCircle({m_Points[0], m_Points[1], m_Points[2]}, m_Points[3]))
+        {
+            m_Lines[4]->setPositionStart(m_Points[0]->getPosition());
+            m_Lines[4]->setPositionEnd(m_Points[2]->getPosition());
+        }
+        else
+        {
+            m_Lines[4]->setPositionStart(m_Points[1]->getPosition());
+            m_Lines[4]->setPositionEnd(m_Points[3]->getPosition());
+        }
+
+        m_Lines[4]->setVisible(true);
+        m_Lines[4]->setColour(Vec4f(0.0f, 0.0f, 0.0f, 1.0f));
     }
 }
 
@@ -200,17 +212,12 @@ Point* const ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
     return nullptr;
 }
 
-#include <qdebug.h>
-
-void ControllerDelaunay::triangulate()
+bool ControllerDelaunay::isPointInCircle(const std::array<Point* const, 3>& points, Point* const point)
 {
-    if(m_Points.size() != 4)
-        return;
-
     const Vec2f& p0 = m_Points[0]->getPosition();
     const Vec2f& p1 = m_Points[1]->getPosition();
     const Vec2f& p2 = m_Points[2]->getPosition();
-    const Vec2f& p3 = m_Points[3]->getPosition();
+    const Vec2f& p3 = point->getPosition();
 
     Vec2f p02(p0[0] * p0[0], p0[1] * p0[1]);
     Vec2f p12(p1[0] * p1[0], p1[1] * p1[1]);
@@ -223,12 +230,7 @@ void ControllerDelaunay::triangulate()
         p1[0] - p3[0], p1[1] - p3[1], p12[0] - p32[0] + p12[1] - p32[1],
         p2[0] - p3[0], p2[1] - p3[1], p22[0] - p32[0] + p22[1] - p32[1];
 
-    bool inside = m.determinant() > 0.0f;
-
-    if(inside)
-        qDebug() << "inside";
-    else
-        qDebug() << "not inside";
+    return m.determinant() > 0.0f;
 }
 
 void ControllerDelaunay::updateCircumCircles()
@@ -243,6 +245,9 @@ void ControllerDelaunay::updateCircumCircles()
 
         m_CircumCircles[0]->setVisible(false);
         m_CircumCircles[1]->setVisible(false);
+
+        m_CircumCircles[0]->setColour(Vec4f(0.75f, 0.75f, 0.75f, 1.0f));
+        m_CircumCircles[1]->setColour(Vec4f(0.75f, 0.75f, 0.75f, 1.0f));
 
         m_Scene->addCircle(m_CircumCircles[0]);
         m_Scene->addCircle(m_CircumCircles[1]);

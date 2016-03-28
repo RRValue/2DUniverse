@@ -29,7 +29,7 @@ private:
     Point* const getPointAtPos(const Vec2f& pos) const;
     void updateCircumCircles();
     void updateCircumCircle(Circle* const circle, const std::array<Point* const, 3>& points);
-    void triangulate();
+    bool isPointInCircle(const std::array<Point* const, 3>& points, Point* const point);
     void updateLines();
 
 private:
