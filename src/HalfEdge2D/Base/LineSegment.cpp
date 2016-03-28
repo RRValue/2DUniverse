@@ -59,14 +59,19 @@ Vec2f LineSegment::getNormal()
     return Vec2f((float)m_Normal[0], (float)m_Normal[1]);
 }
 
-void LineSegment::setPositionStart(const Vec2f& pos)
+float LineSegment::getLength() const
+{
+    return m_Lenght;
+}
+
+void LineSegment::setStart(const Vec2f& pos)
 {
     m_Start = pos;
 
     updateParameter();
 }
 
-void LineSegment::setPositionEnd(const Vec2f& pos)
+void LineSegment::setEnd(const Vec2f& pos)
 {
     m_End = pos;
 

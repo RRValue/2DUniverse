@@ -14,10 +14,11 @@ public:
     const Vec2f& getPositionStart() const;
     const Vec2f& getPositionEnd() const;
     Vec2f getNormal();
+    float getLength() const;
 
     //setter
-    void setPositionStart(const Vec2f& pos);
-    void setPositionEnd(const Vec2f& pos);
+    void setStart(const Vec2f& pos);
+    void setEnd(const Vec2f& pos);
 
     // tooling
     Vec2f getRelativePoint(const float& pos) const;
