@@ -4,8 +4,6 @@
 #include "HalfEdge2D/Controlling/Controller.h"
 
 #include <vector>
-#include <map>
-#include <set>
 
 class HESMesh;
 class HESFace;

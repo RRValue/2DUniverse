@@ -21,13 +21,13 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    int getPointAtPos(const QPointF& pos) const;
+    int getPointAtPos(const Vec2f& pos) const;
 
 private:
     bool m_MovePoint;
     
     int m_CurrentIdx;
-    QPointF m_CurrentHitDistance;
+    Vec2f m_CurrentHitDistance;
 
     HESMesh* m_Mesh;
 };

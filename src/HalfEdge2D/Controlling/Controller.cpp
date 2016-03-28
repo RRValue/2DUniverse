@@ -32,10 +32,10 @@ const std::string& Controller::getName() const
     return m_Name;
 }
 
-bool Controller::inViewPort(const QPoint& point) const
+bool Controller::inViewPort(const Vec2i& point) const
 {
     Mat3f inv_device_matrix = m_RenderTarget->getInvDeviceMatrix();
-    Vec3f dev_coord = inv_device_matrix * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+    Vec3f dev_coord = inv_device_matrix * Vec3f((float)point[0], (float)point[1], 1.0f);
 
     const QRectF& vp_size = m_ActiveViewPort->getSize();
 
@@ -47,9 +47,9 @@ bool Controller::inViewPort(const QPoint& point) const
     return false;
 }
 
-QPoint Controller::keepInViewPort(const QPoint& point) const
+Vec2i Controller::keepInViewPort(const Vec2i& point) const
 {
-    Vec3f dev_coord = m_InvDeviceMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+    Vec3f dev_coord = m_InvDeviceMat * Vec3f((float)point[0], (float)point[1], 1.0f);
 
     const QRectF& vp_size = m_ActiveViewPort->getSize();
 
@@ -66,7 +66,7 @@ QPoint Controller::keepInViewPort(const QPoint& point) const
     dev_coord(2) = 1.0;
     dev_coord = m_DeviceMat * dev_coord;
 
-    return QPoint((int)(dev_coord(0) + 0.5f), (int)(dev_coord(1) + 0.5f));
+    return Vec2i((int)(dev_coord(0) + 0.5f), (int)(dev_coord(1) + 0.5f));
 }
 
 void Controller::updateTransMatrix()
@@ -81,16 +81,16 @@ void Controller::updateTransMatrix()
     m_InvTransMat = m_TransMat.inverse();
 }
 
-QPointF Controller::trans(const QPointF& point)
+Vec2f Controller::trans(const Vec2f& point)
 {
-    Vec3f trans_p = m_TransMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+    Vec3f trans_p = m_TransMat * Vec3f(point[0], point[1], 1.0f);
 
-    return QPointF(trans_p.x(), trans_p.y());
+    return Vec2f(trans_p[0], trans_p[1]);
 }
 
-QPointF Controller::invTrans(const QPointF& point)
+Vec2f Controller::invTrans(const Vec2f& point)
 {
-    Vec3f trans_p = m_InvTransMat * Vec3f((float)point.x(), (float)point.y(), 1.0f);
+    Vec3f trans_p = m_InvTransMat * Vec3f(point[0], point[1], 1.0f);
 
-    return QPointF(trans_p.x(), trans_p.y());
+    return Vec2f(trans_p[0], trans_p[1]);
 }

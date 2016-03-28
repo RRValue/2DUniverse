@@ -5,8 +5,6 @@
 
 #include "HalfEdge2D/Base/Vector.h"
 
-#include <QtCore/QPointF>
-
 class Scene;
 class Camera;
 class EventHandler;
@@ -23,12 +21,12 @@ public:
     const std::string& getName() const;
 
 protected:
-    bool inViewPort(const QPoint& point) const;
-    QPoint keepInViewPort(const QPoint& point) const;
+    bool inViewPort(const Vec2i& point) const;
+    Vec2i keepInViewPort(const Vec2i& point) const;
 
     void updateTransMatrix();
-    QPointF trans(const QPointF& point);
-    QPointF invTrans(const QPointF& point);
+    Vec2f trans(const Vec2f& point);
+    Vec2f invTrans(const Vec2f& point);
 
 protected:
     bool m_Active;

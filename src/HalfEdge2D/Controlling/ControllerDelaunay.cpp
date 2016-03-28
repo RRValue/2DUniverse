@@ -44,15 +44,15 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
     if(!m_MovePoint)
         return false;
 
-    QPointF pos = keepInViewPort(event->pos()) + m_CurrentHitDistance;
-    QPointF new_pos = invTrans(pos);
+    Vec2i pos_global(event->pos().x(), event->pos().y());
+    Vec2i pos_in_vp = keepInViewPort(pos_global);
+    Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
+    Vec2f new_pos = invTrans(pos);
 
-    Vec2f(new_pos.x(), new_pos.y());
-    
-    m_Mesh->getVertices()[m_CurrentIdx]->setPosition(Vec2f(new_pos.x(), new_pos.y()));
-    
+    m_Mesh->getVertices()[m_CurrentIdx]->setPosition(new_pos);
+
     m_Renderer->render();
-    
+
     return true;
 }
 
@@ -75,23 +75,20 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     // set to move mode
     if(event->button() == Qt::LeftButton)
         m_MovePoint = true;
-    
+
     if(!m_MovePoint)
         return false;
 
-    QPointF p = keepInViewPort(event->pos());
+    Vec2i pos_global(event->pos().x(), event->pos().y());
+    Vec2i p = keepInViewPort(pos_global);
+    Vec2f p_f(p[0], p[1]);
 
-
-
-    int result = getPointAtPos(invTrans(p));
+    int result = getPointAtPos(invTrans(p_f));
 
     // if hit nothing and point size < 4 -> add
     if(result == -1)
     {
-        QPointF trans_pos = invTrans(p);
-        Vec2f vert_pos(trans_pos.x(), trans_pos.y());
-
-        m_Mesh->addVertex(vert_pos);
+        m_Mesh->addVertex(invTrans(p_f));
 
         m_MovePoint = false;
 
@@ -101,9 +98,7 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     {
         m_CurrentIdx = result;
 
-        Vec2f vert_pos = m_Mesh->getVertices()[m_CurrentIdx]->getPosition();
-        
-        m_CurrentHitDistance = trans(QPointF(vert_pos.x(), vert_pos.y())) - p;
+        m_CurrentHitDistance = trans(m_Mesh->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
     }
 
     return true;
@@ -135,25 +130,17 @@ bool ControllerDelaunay::handleWheelEvent(QWheelEvent* const event)
     return false;
 }
 
-int ControllerDelaunay::getPointAtPos(const QPointF& pos) const
+int ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
 {
     const std::vector<Vertex*>& vertices = m_Mesh->getVertices();
 
     if(vertices.empty())
         return -1;
 
+    // TODO point size from renderable point
     for(size_t i = 0; i < vertices.size(); i++)
-    {
-        const Vec2f& vert_pos = vertices[i]->getPosition();
-
-        QPointF point_pos(vert_pos.x(), vert_pos.y());
-        QPointF delta = point_pos - pos;
-        float distance = std::sqrt(std::pow(delta.x(), 2) + std::pow(delta.y(), 2));
-
-        // TODO point size from renderable point
-        if(distance < 0.05f)
+        if((vertices[i]->getPosition() - pos).norm() < 0.05f)
             return i;
-    }
 
     return -1;
 }
