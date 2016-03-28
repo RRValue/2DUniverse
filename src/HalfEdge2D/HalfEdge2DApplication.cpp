@@ -53,6 +53,7 @@ void HalfEdge2DApplication::init()
     m_MainWidget->show();
 
     // set mesh to show
+    onControllerSelectionChanged(m_CbController->currentText());
     onMeshSelectionChanged(m_MainWindowForm.m_CbMeshSelector->currentIndex());
 }
 
@@ -102,9 +103,13 @@ void HalfEdge2DApplication::createViewPorts()
 
 void HalfEdge2DApplication::createRendering()
 {
-    m_Scene = new Scene();
+    m_Scene01 = new Scene();
+    m_Scene02 = new Scene();
+    m_Scene03 = new Scene();
 
-    m_Scene->setMesh(m_Mesh);
+    m_Scene01->setMesh(m_Mesh);
+    m_Scene02->setMesh(m_Mesh);
+    m_Scene03->setMesh(m_Mesh);
 
     // allocate event handler and add controller and navigator
     m_Navigator = new Navigator();
@@ -112,9 +117,9 @@ void HalfEdge2DApplication::createRendering()
     m_ControllerShowRings = new ControllerShowRings();
     m_ControllerDelaunay = new ControllerDelaunay();
 
-    m_ControllerBuildMesh->setMesh(m_Mesh);
-    m_ControllerShowRings->setMesh(m_Mesh);
-    m_ControllerDelaunay->setMesh(m_Mesh);
+    m_ControllerBuildMesh->setScene(m_Scene01);
+    m_ControllerShowRings->setScene(m_Scene02);
+    m_ControllerDelaunay->setScene(m_Scene03);
 
     // add controller to combobox
     m_CbController->addItem(m_ControllerBuildMesh->getName().c_str());
@@ -127,7 +132,7 @@ void HalfEdge2DApplication::createRendering()
 
     // create renderer
     m_Renderer = new Renderer();
-    m_Renderer->setScene(m_Scene);
+    m_Renderer->setScene(m_Scene01);
 
     // create event handler
     m_EventHandler = new EventHandler(m_RenderTarget);
@@ -244,7 +249,12 @@ void HalfEdge2DApplication::onMeshSelectionChanged(int value)
     HESBuilder builder(m_Mesh);
     builder.build();
 
-    m_ControllerShowRings->setMesh(m_Mesh);
+    m_Scene01->setMesh(m_Mesh);
+    m_Scene02->setMesh(m_Mesh);
+    m_Scene03->setMesh(m_Mesh);
+
+    m_ActiveController->setChanged();
+
     m_Renderer->render();
 }
 
@@ -257,5 +267,7 @@ void HalfEdge2DApplication::onControllerSelectionChanged(const QString& text)
     if(find_controller == m_Controller.end())
         return;
 
-    m_EventHandler->setActiveController(find_controller->second);
+    m_ActiveController = find_controller->second;
+
+    m_EventHandler->setActiveController(m_ActiveController);
 }

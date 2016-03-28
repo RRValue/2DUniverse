@@ -9,15 +9,11 @@
 
 typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> PointVector;
 
-class HESMesh;
-
 class ControllerDelaunay : public Controller
 {
 public:
     ControllerDelaunay();
     virtual ~ControllerDelaunay();
-
-    void setMesh(HESMesh* const mesh);
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -34,8 +30,6 @@ private:
     
     int m_CurrentIdx;
     Vec2f m_CurrentHitDistance;
-
-    HESMesh* m_Mesh;
 
     PointVector m_Points;
 };

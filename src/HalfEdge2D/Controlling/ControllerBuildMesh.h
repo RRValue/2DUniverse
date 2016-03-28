@@ -3,15 +3,11 @@
 
 #include "HalfEdge2D/Controlling/Controller.h"
 
-class HESMesh;
-
 class ControllerBuildMesh : public Controller
 {
 public:
     ControllerBuildMesh();
     virtual ~ControllerBuildMesh();
-
-    void setMesh(HESMesh* const mesh);
 
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
@@ -28,8 +24,6 @@ private:
     
     int m_CurrentIdx;
     Vec2f m_CurrentHitDistance;
-
-    HESMesh* m_Mesh;
 };
 
 #endif //_CONTROLLING_CONTROLLERBUILDMESH_H_

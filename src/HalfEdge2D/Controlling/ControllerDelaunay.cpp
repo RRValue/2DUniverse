@@ -15,7 +15,7 @@
 
 ControllerDelaunay::ControllerDelaunay()
 {
-    m_Mesh = nullptr;
+    m_Scene = nullptr;
     m_MovePoint = false;
     m_Name = "ControllerDelaunay";
 }
@@ -25,23 +25,12 @@ ControllerDelaunay::~ControllerDelaunay()
 
 }
 
-void ControllerDelaunay::setMesh(HESMesh* const mesh)
-{
-    if(mesh == nullptr)
-        return;
-
-    if(mesh == m_Mesh)
-        return;
-
-    m_Mesh = mesh;
-}
-
 bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
         return false;
 
-    if(m_Mesh == nullptr)
+    if(m_Scene == nullptr)
         return false;
 
     if(!m_MovePoint)
@@ -52,7 +41,7 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
     Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
     Vec2f new_pos = invTrans(pos);
 
-    m_Mesh->getVertices()[m_CurrentIdx]->setPosition(new_pos);
+    m_Scene->getMesh()->getVertices()[m_CurrentIdx]->setPosition(new_pos);
 
     m_Renderer->render();
 
@@ -61,7 +50,7 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
 
 bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
 {
-    if(m_Mesh == nullptr)
+    if(m_Scene == nullptr)
         return false;
 
     if(m_MovePoint)
@@ -91,7 +80,7 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     // if hit nothing and point size < 4 -> add
     if(result == -1)
     {
-        m_Mesh->addVertex(invTrans(p_f));
+        m_Scene->getMesh()->addVertex(invTrans(p_f));
 
         m_MovePoint = false;
 
@@ -101,7 +90,7 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     {
         m_CurrentIdx = result;
 
-        m_CurrentHitDistance = trans(m_Mesh->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
+        m_CurrentHitDistance = trans(m_Scene->getMesh()->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
     }
 
     return true;
@@ -109,7 +98,7 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
 
 bool ControllerDelaunay::handleMouseReleaseEvent(QMouseEvent* const event)
 {
-    if(m_Mesh == nullptr)
+    if(m_Scene == nullptr)
         return false;
 
     if(event == nullptr)
@@ -135,7 +124,7 @@ bool ControllerDelaunay::handleWheelEvent(QWheelEvent* const event)
 
 int ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
 {
-    const std::vector<Vertex*>& vertices = m_Mesh->getVertices();
+    const std::vector<Vertex*>& vertices = m_Scene->getMesh()->getVertices();
 
     if(vertices.empty())
         return -1;

@@ -5,13 +5,12 @@
 
 #include <vector>
 
-class HESMesh;
-class HESFace;
 class Scene;
 class Renderer;
 class ViewPort;
 class QPaintTarget;
 class Face;
+class HESFace;
 
 typedef std::vector<HESFace* const> FaceVector;
 typedef std::vector<FaceVector> RingFacesVector;
@@ -34,14 +33,15 @@ public:
     virtual ~ControllerShowRings();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    void setMesh(HESMesh* const mesh);
-
 protected:
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
     virtual bool handleMousePressEvent(QMouseEvent* const event) final override;
     virtual bool handleMouseReleaseEvent(QMouseEvent* const event) final override;
     virtual bool handleResizeEvent(QResizeEvent* const event) final override;
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
+
+protected:
+    virtual void postSceneChanged() final override;
 
 private:
     void updateIdTarget();
@@ -63,8 +63,7 @@ private:
     const size_t m_NumRings;
 
 private:
-    Scene* m_Scene;
-    HESMesh* m_Mesh;
+    Scene* m_IdScene;
 
     QPaintTarget* m_IdTarget;
     

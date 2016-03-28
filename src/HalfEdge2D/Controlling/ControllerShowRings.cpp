@@ -30,8 +30,8 @@ m_NumRings(1)
 {
     m_Name = "ControllerShowRings";
 
-    m_Scene = new Scene();
-    m_Mesh = nullptr;
+    m_IdScene = new Scene();
+    m_Scene = nullptr;
 
     m_IdRenderer = new Renderer();
     m_IdTarget = new QPaintTarget(100, 100);
@@ -39,7 +39,7 @@ m_NumRings(1)
     m_ViewPort = new ViewPort();
 
     m_IdTarget->addViewPort(m_ViewPort);
-    m_IdRenderer->setScene(m_Scene);
+    m_IdRenderer->setScene(m_IdScene);
     m_IdRenderer->setRenderViewport(false);
     m_IdRenderer->setRenderCoordianteAxis(false);
     m_IdRenderer->setRenderVertices(false);
@@ -58,20 +58,9 @@ void ControllerShowRings::clear()
     m_LastColourVector.clear();
 }
 
-void ControllerShowRings::setMesh(HESMesh* const mesh)
+void ControllerShowRings::postSceneChanged()
 {
-    if(mesh == nullptr)
-        return;
-
-    clear();
-
-    m_Mesh = mesh;
-
-    m_Scene->setMesh(m_Mesh);
-    m_Faces = mesh->getFaces();
-
-    m_ViewportContentChanges = true;
-    m_LastHitId = m_MaxId;
+    m_SceneChanges = true;
 }
 
 bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
@@ -242,8 +231,19 @@ bool ControllerShowRings::handleWheelEvent(QWheelEvent* const event)
 
 void ControllerShowRings::updateIdTarget()
 {
-    if(!m_ViewportContentChanges)
+    if(!m_ViewportContentChanges && !m_SceneChanges)
         return;
+
+    if(m_SceneChanges)
+    {
+        clear();
+
+        m_IdScene->setMesh(m_Scene->getMesh());
+        m_Faces = m_Scene->getMesh()->getFaces();
+
+        m_SceneChanges = false;
+        m_LastHitId = m_MaxId;
+    }
 
     m_ViewportContentChanges = false;
 

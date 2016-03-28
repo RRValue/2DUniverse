@@ -15,11 +15,42 @@ Controller::Controller()
     m_Name = "";
     m_Active = false;
     m_ViewportContentChanges = true;
+    m_SceneChanges = false;
 }
 
 Controller::~Controller()
 {
 
+}
+
+void Controller::setChanged()
+{
+    m_SceneChanges = true;
+}
+
+void Controller::preSceneChanged()
+{
+
+}
+
+void Controller::postSceneChanged()
+{
+
+}
+
+void Controller::setScene(Scene* const scene)
+{
+    if(scene == nullptr)
+        return;
+
+    if(scene == m_Scene)
+        return;
+
+    preSceneChanged();
+
+    m_Scene = scene;
+
+    postSceneChanged();
 }
 
 const bool& Controller::isActive() const

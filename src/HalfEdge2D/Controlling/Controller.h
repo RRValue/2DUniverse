@@ -20,6 +20,10 @@ public:
     const bool& isActive() const;
     const std::string& getName() const;
 
+    void setScene(Scene* const scene);
+
+    void setChanged();
+
 protected:
     bool inViewPort(const Vec2i& point) const;
     Vec2i keepInViewPort(const Vec2i& point) const;
@@ -29,11 +33,18 @@ protected:
     Vec2f invTrans(const Vec2f& point);
 
 protected:
+    virtual void preSceneChanged();
+    virtual void postSceneChanged();
+
+protected:
     bool m_Active;
     std::string m_Name;
     bool m_ViewportContentChanges;
+    bool m_SceneChanges;
 
-    // scene matrices    
+    Scene* m_Scene;
+
+    // scene matrices
     Mat3f m_DeviceMat;
     Mat3f m_InvDeviceMat;
     Mat3f m_TransMat;

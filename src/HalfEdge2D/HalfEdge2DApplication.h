@@ -63,7 +63,9 @@ private:
 
     bool m_MultiView;
 
-    Scene* m_Scene;
+    Scene* m_Scene01;
+    Scene* m_Scene02;
+    Scene* m_Scene03;
 
     ViewPort* m_ViewPort0;
     ViewPort* m_ViewPort1;
@@ -78,6 +80,8 @@ private:
     EventHandler* m_EventHandler;
 
     Navigator* m_Navigator;
+    
+    Controller* m_ActiveController;
     ControllerBuildMesh* m_ControllerBuildMesh;
     ControllerShowRings* m_ControllerShowRings;
     ControllerDelaunay* m_ControllerDelaunay;
