@@ -21,7 +21,7 @@ void LineSegment::updateParameter()
 
     m_Lenght = m_Direction.norm();
     m_Min = Vec2f(std::min(m_Start[0], m_End[0]), std::min(m_Start[1], m_End[1]));
-    m_Min = Vec2f(std::max(m_Start[0], m_End[0]), std::max(m_Start[1], m_End[1]));
+    m_Max = Vec2f(std::max(m_Start[0], m_End[0]), std::max(m_Start[1], m_End[1]));
     m_Valid = m_Lenght > 1e-3f;
 }
 
@@ -54,7 +54,7 @@ const Vec2f& LineSegment::getPositionEnd() const
     return m_End;
 }
 
-Vec2f LineSegment::getNormal()
+Vec2f LineSegment::getNormal() const
 {
     return Vec2f((float)m_Normal[0], (float)m_Normal[1]);
 }
@@ -80,7 +80,7 @@ void LineSegment::setEnd(const Vec2f& pos)
 
 Vec2f LineSegment::getRelativePoint(const float& pos) const
 {
-    return m_Start + m_Direction.normalized() * pos;
+    return m_Start + (m_Direction * pos);
 }
 
 bool LineSegment::collinearTo(const LineSegment& l) const

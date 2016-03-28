@@ -13,7 +13,7 @@ public:
     // getter
     const Vec2f& getPositionStart() const;
     const Vec2f& getPositionEnd() const;
-    Vec2f getNormal();
+    Vec2f getNormal() const;
     float getLength() const;
 
     //setter

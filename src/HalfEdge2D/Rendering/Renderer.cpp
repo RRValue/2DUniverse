@@ -238,7 +238,22 @@ void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* con
 
 void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>& lines)
 {
+    for(const auto& l : lines)
+    {
+        QPointF ref = trans(QPointF(0.0f, 0.0f));
+        QPointF tar = trans(QPointF(l->getThickness(), 0.0f));
+        float thickness_px = (tar - ref).manhattanLength();
 
+        const Vec2f& pos0 = l->getPositionStart();
+        const Vec2f& pos1 = l->getPositionEnd();
+        const Vec4f& col = l->getColour();
+
+        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+        painter->setPen(QPen(paint_color));
+        painter->setBrush(Qt::BrushStyle::NoBrush);
+        painter->drawLine(trans(QPointF(pos0[0], pos0[1])), trans(QPointF(pos1[0], pos1[1])));
+    }
 }
 
 void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)

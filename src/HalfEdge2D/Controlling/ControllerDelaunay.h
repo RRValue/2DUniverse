@@ -8,6 +8,7 @@
 #include <set>
 
 class Point;
+class Circle;
 
 class ControllerDelaunay : public Controller
 {
@@ -24,6 +25,7 @@ protected:
 
 private:
     Point* const getPointAtPos(const Vec2f& pos) const;
+    void updateCircumCircle();
 
 private:
     bool m_MovePoint;
@@ -32,6 +34,8 @@ private:
     Vec2f m_CurrentHitDistance;
 
     std::set<Point* const> m_Points;
+
+    Circle* m_CircumCircle;
 };
 
 #endif //_CONTROLLING_CONTROLLERDELAUNAY_H_

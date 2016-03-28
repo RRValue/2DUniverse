@@ -1,5 +1,7 @@
 #include "HalfEdge2D/Controlling/ControllerDelaunay.h"
 
+#include "HalfEdge2D/Base/LineSegment.h"
+
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/Renderer.h"
 
@@ -8,6 +10,8 @@
 #include "HalfEdge2D/Scene/Camera.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
+#include "HalfEdge2D/Renderables/Circle.h"
+#include "HalfEdge2D/Renderables/Line.h"
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 
@@ -21,6 +25,7 @@ ControllerDelaunay::ControllerDelaunay()
     m_MovePoint = false;
     m_Name = "ControllerDelaunay";
     m_CurrentPoint = nullptr;
+    m_CircumCircle = nullptr;
 }
 
 ControllerDelaunay::~ControllerDelaunay()
@@ -45,8 +50,8 @@ bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
     Vec2f new_pos = invTrans(pos);
 
     m_CurrentPoint->setPosition(new_pos);
-    
-    m_Scene->setPoints(m_Points);
+
+    updateCircumCircle();
 
     m_Renderer->render();
 
@@ -85,6 +90,9 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
     // if hit nothing and point size < 4 -> add
     if(m_CurrentPoint == nullptr)
     {
+        if(m_Points.size() >= 3)
+            return true;
+
         m_CurrentPoint = new Point();
         m_CurrentPoint->setPosition(invTrans(p_f));
         
@@ -92,9 +100,22 @@ bool ControllerDelaunay::handleMousePressEvent(QMouseEvent* const event)
 
         m_Points.insert(m_CurrentPoint);
         m_Scene->addPoint(m_CurrentPoint);
-        
-        m_Renderer->render();
     }
+
+    if(m_Points.size() == 3 && m_CircumCircle == nullptr)
+    {
+        // add circumcircle
+        m_CircumCircle = new Circle();
+        m_CircumCircle->setPosition(Vec2f(0.0f, 0.0f));
+        m_CircumCircle->setColour(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+        m_CircumCircle->setRadius(0.5f);
+
+        m_Scene->addCircle(m_CircumCircle);
+
+        updateCircumCircle();
+    }
+
+    m_Renderer->render();
     
     m_MovePoint = true;
     m_CurrentHitDistance = trans(m_CurrentPoint->getPosition()) - p_f;
@@ -139,4 +160,56 @@ Point* const ControllerDelaunay::getPointAtPos(const Vec2f& pos) const
             return p;
 
     return nullptr;
+}
+
+void ControllerDelaunay::updateCircumCircle()
+{
+    if(m_Points.size() != 3 || m_CircumCircle == nullptr)
+        return;
+
+    auto pos_iter = m_Points.begin();
+
+    Vec2f pos0 = (*(pos_iter++))->getPosition();
+    Vec2f pos1 = (*(pos_iter++))->getPosition();
+    Vec2f pos2 = (*(pos_iter++))->getPosition();
+        
+    LineSegment l01;
+    LineSegment l12;
+
+    l01.setStart(pos0);
+    l01.setEnd(pos1);
+    l12.setStart(pos1);
+    l12.setEnd(pos2);
+
+    float length = 1000.0f * (l01.getLength() + l12.getLength());
+
+    Vec2f bn0(l01.getNormal()[1], -l01.getNormal()[0]);
+    Vec2f bn1(l12.getNormal()[1], -l12.getNormal()[0]);
+    
+    Vec2f sp0 = l01.getRelativePoint(0.5f);
+    Vec2f sp1 = l12.getRelativePoint(0.5f);
+
+    Vec2f bs0s = sp0 - bn0 * length;
+    Vec2f bs0e = sp0 + bn0 * length;
+    Vec2f bs1s = sp1 - bn1 * length;
+    Vec2f bs1e = sp1 + bn1 * length;
+
+    LineSegment bisect0;
+    LineSegment bisect1;
+
+    bisect0.setStart(bs0s);
+    bisect0.setEnd(bs0e);
+    bisect1.setStart(bs1s);
+    bisect1.setEnd(bs1e);
+
+    bool intersects = false;
+    Vec2f center = bisect0.intersect(bisect1, &intersects);
+
+    if(!intersects)
+        return;
+
+    float radius = (pos0 - center).norm();
+
+    m_CircumCircle->setPosition(center);
+    m_CircumCircle->setRadius(radius);
 }
