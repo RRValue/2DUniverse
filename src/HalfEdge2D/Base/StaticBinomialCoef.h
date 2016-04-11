@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _BASE_STATICBINOMIALCOEF_H_
+#define _BASE_STATICBINOMIALCOEF_H_
 
 #include "HalfEdge2D/Base/StaticFactorial.h"
 
@@ -10,3 +11,5 @@ struct StaticBinomialCoef
 
     static const unsigned int m_Value = StaticFactorial<N>::m_Value / (StaticFactorial<K>::m_Value * StaticFactorial<N - K>::m_Value);
 };
+
+#endif //_BASE_STATICBINOMIALCOEF_H_

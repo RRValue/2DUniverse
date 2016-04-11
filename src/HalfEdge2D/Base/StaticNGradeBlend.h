@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _BASE_NGRADEBLEND_H_
+#define _BASE_NGRADEBLEND_H_
 
 #include "HalfEdge2D/Base/StaticBinomialRow.h"
 #include "HalfEdge2D/Base/StaticGroupElements.h"
@@ -22,3 +23,4 @@ public:
     }
 };
 
+#endif //_BASE_NGRADEBLEND_H_

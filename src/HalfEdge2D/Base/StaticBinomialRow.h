@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _BASE_STATICBINOMIALROW_H_
+#define _BASE_STATICBINOMIALROW_H_
 
 #include "HalfEdge2D/Base/StaticBinomialCoef.h"
 
@@ -37,3 +38,5 @@ protected:
     const unsigned int m_Grade;
     std::array<float, N + 1> m_Factors;
 };
+
+#endif //_BASE_STATICBINOMIALROW_H_

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _BASE_STATICGROUPELEMENT_H_
+#define _BASE_STATICGROUPELEMENT_H_
 
 struct Identites
 {
@@ -28,3 +29,5 @@ struct Identites
 };
 
 static Identites StaticIdentities;
+
+#endif //_BASE_STATICGROUPELEMENT_H_
