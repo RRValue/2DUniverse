@@ -36,6 +36,12 @@ void Scene::clear()
         delete l;
 
     m_Lines.clear();
+
+    // clear cubic beziers
+    for(const auto& b : m_CubicBeziers)
+        delete b;
+
+    m_CubicBeziers.clear();
     
     m_Mesh->clear();
 }
