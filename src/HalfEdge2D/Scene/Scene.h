@@ -9,6 +9,7 @@ class Mesh;
 class Point;
 class Circle;
 class Line;
+class CubicBezier;
 
 class Scene
 {
@@ -22,18 +23,22 @@ public:
     const std::set<Point* const>& getPoints() const;
     const std::set<Circle* const>& getCircles() const;
     const std::set<Line* const>& getLines() const;
+    const std::set<CubicBezier* const>& getCubicBeziers() const;
 
     void setMesh(Mesh* const mesh);
     void setPoints(const std::set<Point* const>& points);
     void setCircles(const std::set<Circle* const>& circles);
     void setLines(const std::set<Line* const>& lines);
+    void setCubicBeziers(const std::set<CubicBezier* const>& beziers);
 
     void addPoint(Point* const point);
     void addCircle(Circle* const circle);
     void addLine(Line* const line);
+    void addCubicBeziers(CubicBezier* const cubicBezier);
     void removePoint(Point* const point);
     void removeCircle(Circle* const circle);
     void removeLine(Line* const line);
+    void removeCubicBeziers(CubicBezier* const cubicBezier);
 
 private:
     float m_PointSize;
@@ -42,6 +47,7 @@ private:
     std::set<Point* const> m_Points;
     std::set<Circle* const> m_Circles;
     std::set<Line* const> m_Lines;
+    std::set<CubicBezier* const> m_CubicBeziers;
 };
 
 #endif //_SCENE_SCENE_H_
