@@ -16,6 +16,7 @@ class Controller;
 class ControllerBuildMesh;
 class ControllerShowRings;
 class ControllerDelaunay;
+class ControllerCubicBezier;
 class EventHandler;
 class Scene;
 
@@ -83,6 +84,7 @@ private:
     ControllerBuildMesh* m_ControllerBuildMesh;
     ControllerShowRings* m_ControllerShowRings;
     ControllerDelaunay* m_ControllerDelaunay;
+    ControllerCubicBezier* m_ControllerCubicBezier;
 
     std::map<std::string, Controller* const> m_Controller;
 
