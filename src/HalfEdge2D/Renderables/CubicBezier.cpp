@@ -2,6 +2,7 @@
 
 CubicBezier::CubicBezier()
 {
+    m_Thickness = 0.01f;
     m_Colour= Vec4f(0.0f, 0.0f, 0.0f, 1.0f);
     m_Visible = true;
 
@@ -11,6 +12,11 @@ CubicBezier::CubicBezier()
 CubicBezier::~CubicBezier()
 {
 
+}
+
+const float& CubicBezier::getThickness() const
+{
+    return m_Thickness;
 }
 
 const std::array<Vec2f, 4>& CubicBezier::getPoints() const
@@ -38,6 +44,11 @@ const bool& CubicBezier::isVisible() const
 Vec2f CubicBezier::pointAt(const float& alpha)
 {
     return blend(m_Points, alpha);
+}
+
+void CubicBezier::setThickness(const float& thickness)
+{
+    m_Thickness = thickness;
 }
 
 void CubicBezier::setPoint(const size_t& idx, const Vec2f& point)
