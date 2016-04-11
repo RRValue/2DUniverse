@@ -15,6 +15,7 @@
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Circle.h"
 #include "HalfEdge2D/Renderables/Line.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
 
 #include <QtGui/QPainter>
 
@@ -192,6 +193,7 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
     renderPoints(painter, scene->getPoints());
     renderCircles(painter, scene->getCircles());
     renderLines(painter, scene->getLines());
+    renderCubicBezier(painter, scene->getCubicBeziers());
 }
 
 void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const>& points)
@@ -260,6 +262,11 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawLine(trans(QPointF(pos0[0], pos0[1])), trans(QPointF(pos1[0], pos1[1])));
     }
+}
+
+void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBezier* const>& cubicBeziers)
+{
+
 }
 
 void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)

@@ -19,6 +19,7 @@ class Scene;
 class Point;
 class Circle;
 class Line;
+class CubicBezier;
 class RenderTarget;
 class ViewPort;
 class Mesh;
@@ -58,6 +59,7 @@ private:
     void renderPoints(QPainter* const painter, const std::set<Point* const>& points);
     void renderCircles(QPainter* const painter, const std::set<Circle* const>& circles);
     void renderLines(QPainter* const painter, const std::set<Line* const>& lines);
+    void renderCubicBezier(QPainter* const painter, const std::set<CubicBezier* const>& cubicBeziers);
     void renderMesh(QPainter* const painter, Mesh* const mesh);
     void renderViewport(QPainter* const painter, const QRectF& vp);
     void renderCoordinateCross(QPainter* const painter);

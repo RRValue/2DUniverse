@@ -93,7 +93,6 @@ bool ControllerCubicBezier::handleMousePressEvent(QMouseEvent* const event)
     {
         if(m_Points.size() >= 4)
         {
-            m_Bezier->setVisible(true);
             m_MovePoint = false;
 
             return true;
@@ -108,6 +107,13 @@ bool ControllerCubicBezier::handleMousePressEvent(QMouseEvent* const event)
 
         m_Points.push_back(m_CurrentPoint);
         m_Scene->addPoint(m_CurrentPoint);
+
+        if(m_Points.size() == 4)
+        {
+            m_Bezier->setVisible(true);
+
+            m_Scene->addCubicBeziers(m_Bezier);
+        }
     }
 
     m_Renderer->render();

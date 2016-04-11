@@ -5,6 +5,7 @@
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Circle.h"
 #include "HalfEdge2D/Renderables/Line.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
 
 Scene::Scene()
 {
