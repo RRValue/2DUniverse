@@ -22,7 +22,7 @@ ControllerCubicBezier::ControllerCubicBezier()
 {
     m_Scene = nullptr;
     m_MovePoint = false;
-    m_Name = "ControllerCubicSpline";
+    m_Name = "ControllerCubicBezier";
     m_CurrentPoint = nullptr;
     m_Bezier = new CubicBezier();
     m_Bezier->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
@@ -31,17 +31,26 @@ ControllerCubicBezier::ControllerCubicBezier()
 
 ControllerCubicBezier::~ControllerCubicBezier()
 {
+    for(const auto& p : m_Points)
+        delete p;
 
+    delete m_Bezier;
 }
 
 void ControllerCubicBezier::activate()
 {
+    m_Scene->addCubicBeziers(m_Bezier);
 
+    for(const auto& p : m_Points)
+        m_Scene->addPoint(p);
 }
 
 void ControllerCubicBezier::deactivate()
 {
+    m_Scene->removeCubicBeziers(m_Bezier);
 
+    for(const auto& p : m_Points)
+        m_Scene->removePoint(p);
 }
 
 bool ControllerCubicBezier::handleMouseMoveEvent(QMouseEvent* const event)
@@ -119,11 +128,7 @@ bool ControllerCubicBezier::handleMousePressEvent(QMouseEvent* const event)
         m_Scene->addPoint(m_CurrentPoint);
 
         if(m_Points.size() == 4)
-        {
             m_Bezier->setVisible(true);
-
-            m_Scene->addCubicBeziers(m_Bezier);
-        }
     }
 
     m_Renderer->render();

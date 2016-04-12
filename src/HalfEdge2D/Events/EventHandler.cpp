@@ -89,6 +89,8 @@ void EventHandler::setActiveController(Controller* const controller)
     m_ActiveController->m_Renderer = m_Renderer;
 
     m_ActiveController->activate();
+
+    m_Renderer->render();
 }
 
 void EventHandler::setRenderer(Renderer* const renderer)
