@@ -308,9 +308,14 @@ void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBe
         // get alpha steps
         QPointF diag = max - min;
         float bb_diag_length = std::sqrt((diag.x() * diag.x()) + (diag.y() * diag.y()));
-        float max_bezier_length = 3.0f * bb_diag_length;
-        float paint_bezier_length = max_bezier_length / 100.0f;
-        unsigned int num_lines = (unsigned int)(paint_bezier_length + 0.5f);
+        float max_bezier_length = 2.5f * bb_diag_length;
+
+        // defines num lines when bezier length is 1000 px
+        int max_ration = 100;
+        float coef_a = (-1.0f + (float)max_ration) / 999.0f;
+        float coef_b = (1000.0f - (float)max_ration) / 999.0f;
+
+        unsigned int num_lines = (unsigned int)(((coef_a * max_bezier_length) + coef_b) + 0.5f);
         float alpha_step = 1.0f / (float)num_lines;
 
         // build lines
