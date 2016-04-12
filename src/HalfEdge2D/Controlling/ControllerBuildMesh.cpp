@@ -51,7 +51,7 @@ bool ControllerBuildMesh::handleMouseMoveEvent(QMouseEvent* const event)
     Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
     Vec2f new_pos = invTrans(pos);
     
-    m_Scene->getMesh()->getVertices()[m_CurrentIdx]->setPosition(new_pos);
+    (*m_Scene->getMeshes().begin())->getVertices()[m_CurrentIdx]->setPosition(new_pos);
     
     m_Renderer->render();
     
@@ -90,7 +90,7 @@ bool ControllerBuildMesh::handleMousePressEvent(QMouseEvent* const event)
     // if hit nothing and point size < 4 -> add
     if(result == -1)
     {
-        m_Scene->getMesh()->addVertex(invTrans(p_f));
+        (*m_Scene->getMeshes().begin())->addVertex(invTrans(p_f));
 
         m_MovePoint = false;
 
@@ -100,7 +100,7 @@ bool ControllerBuildMesh::handleMousePressEvent(QMouseEvent* const event)
     {
         m_CurrentIdx = result;
         
-        m_CurrentHitDistance = trans(m_Scene->getMesh()->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
+        m_CurrentHitDistance = trans((*m_Scene->getMeshes().begin())->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
     }
 
     return true;
@@ -134,7 +134,7 @@ bool ControllerBuildMesh::handleWheelEvent(QWheelEvent* const event)
 
 int ControllerBuildMesh::getPointAtPos(const Vec2f& pos) const
 {
-    const std::vector<Vertex*>& vertices = m_Scene->getMesh()->getVertices();
+    const std::vector<Vertex*>& vertices = (*m_Scene->getMeshes().begin())->getVertices();
 
     if(vertices.empty())
         return -1;

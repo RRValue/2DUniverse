@@ -56,6 +56,7 @@ private:
 
 private:
     void renderScene(QPainter* const painter, Scene* const scene);
+    void renderMeshes(QPainter* const painter, const std::set<Mesh* const>& meshes);
     void renderPoints(QPainter* const painter, const std::set<Point* const>& points);
     void renderCircles(QPainter* const painter, const std::set<Circle* const>& circles);
     void renderLines(QPainter* const painter, const std::set<Line* const>& lines);

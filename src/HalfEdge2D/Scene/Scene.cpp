@@ -19,6 +19,12 @@ Scene::~Scene()
 
 void Scene::clear()
 {
+    // clear meshes
+    for(const auto& m : m_Meshes)
+        delete m;
+
+    m_Meshes.clear();
+
     // clear points
     for(const auto& p : m_Points)
         delete p;
@@ -42,13 +48,11 @@ void Scene::clear()
         delete b;
 
     m_CubicBeziers.clear();
-    
-    m_Mesh->clear();
 }
 
-Mesh* const Scene::getMesh() const
+const std::set<Mesh* const>& Scene::getMeshes() const
 {
-    return m_Mesh;
+    return m_Meshes;
 }
 
 const std::set<Point* const>& Scene::getPoints() const
@@ -71,12 +75,9 @@ const std::set<CubicBezier* const>& Scene::getCubicBeziers() const
     return m_CubicBeziers;
 }
 
-void Scene::setMesh(Mesh* const mesh)
+void Scene::setMeshes(const std::set<Mesh* const>& meshes)
 {
-    if(mesh == nullptr)
-        return;
-
-    m_Mesh = mesh;
+    m_Meshes = meshes;
 }
 
 void Scene::setPoints(const std::set<Point* const>& points)
@@ -100,6 +101,19 @@ void Scene::setLines(const std::set<Line* const>& lines)
 void Scene::setCubicBeziers(const std::set<CubicBezier* const>& cubicBeziers)
 {
     m_CubicBeziers = cubicBeziers;
+}
+
+void Scene::addMesh(Mesh* const mesh)
+{
+    if(mesh == nullptr)
+        return;
+
+    const auto& find_iter = m_Meshes.find(mesh);
+
+    if(find_iter != m_Meshes.end())
+        return;
+
+    m_Meshes.insert(mesh);
 }
 
 void Scene::addPoint(Point* const point)
@@ -152,6 +166,19 @@ void Scene::addCubicBeziers(CubicBezier* const cubicBezier)
         return;
 
     m_CubicBeziers.insert(cubicBezier);
+}
+
+void Scene::removeMesh(Mesh* const mesh)
+{
+    if(mesh == nullptr)
+        return;
+
+    const auto& find_iter = m_Meshes.find(mesh);
+
+    if(find_iter == m_Meshes.end())
+        return;
+
+    m_Meshes.erase(find_iter);
 }
 
 void Scene::removePoint(Point* const point)

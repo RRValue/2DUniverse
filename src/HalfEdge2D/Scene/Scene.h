@@ -19,22 +19,25 @@ public:
 
     void clear();
 
-    Mesh* const getMesh() const;
+    const std::set<Mesh* const>& getMeshes() const;
     const std::set<Point* const>& getPoints() const;
     const std::set<Circle* const>& getCircles() const;
     const std::set<Line* const>& getLines() const;
     const std::set<CubicBezier* const>& getCubicBeziers() const;
 
-    void setMesh(Mesh* const mesh);
+    void setMeshes(const std::set<Mesh* const>& meshes);
     void setPoints(const std::set<Point* const>& points);
     void setCircles(const std::set<Circle* const>& circles);
     void setLines(const std::set<Line* const>& lines);
     void setCubicBeziers(const std::set<CubicBezier* const>& beziers);
 
+    void addMesh(Mesh* const mesh);
     void addPoint(Point* const point);
     void addCircle(Circle* const circle);
     void addLine(Line* const line);
     void addCubicBeziers(CubicBezier* const cubicBezier);
+
+    void removeMesh(Mesh* const mesh);
     void removePoint(Point* const point);
     void removeCircle(Circle* const circle);
     void removeLine(Line* const line);
@@ -43,7 +46,7 @@ public:
 private:
     float m_PointSize;
 
-    Mesh* m_Mesh;
+    std::set<Mesh* const> m_Meshes;
     std::set<Point* const> m_Points;
     std::set<Circle* const> m_Circles;
     std::set<Line* const> m_Lines;

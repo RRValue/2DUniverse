@@ -248,8 +248,8 @@ void ControllerShowRings::updateIdTarget()
     {
         clear();
 
-        m_IdScene->setMesh(m_Scene->getMesh());
-        m_Faces = m_Scene->getMesh()->getFaces();
+        m_IdScene->addMesh((*m_Scene->getMeshes().begin()));
+        m_Faces = (*m_Scene->getMeshes().begin())->getFaces();
 
         m_SceneChanges = false;
         m_LastHitId = m_MaxId;

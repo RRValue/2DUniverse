@@ -106,8 +106,6 @@ void HalfEdge2DApplication::createRendering()
 {
     m_Scene = new Scene();
 
-    m_Scene->setMesh(m_Mesh);
-
     // allocate event handler and add controller and navigator
     m_Navigator = new Navigator();
     m_ControllerBuildMesh = new ControllerBuildMesh();
@@ -212,7 +210,7 @@ void HalfEdge2DApplication::onVSliderChanged(int value)
 
 void HalfEdge2DApplication::onMeshSelectionChanged(int value)
 {
-    m_Scene->clear();
+    m_Scene->removeMesh(m_Mesh);
 
     if(value < 0 || value >= 3)
     {
@@ -253,7 +251,7 @@ void HalfEdge2DApplication::onMeshSelectionChanged(int value)
     HESBuilder builder(m_Mesh);
     builder.build();
 
-    m_Scene->setMesh(m_Mesh);
+    m_Scene->addMesh(m_Mesh);
 
     m_ActiveController->setChanged();
 
