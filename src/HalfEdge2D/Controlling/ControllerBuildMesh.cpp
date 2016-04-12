@@ -134,6 +134,9 @@ bool ControllerBuildMesh::handleWheelEvent(QWheelEvent* const event)
 
 int ControllerBuildMesh::getPointAtPos(const Vec2f& pos) const
 {
+    if(m_Scene->getMeshes().empty())
+        return -1;
+
     const std::vector<Vertex*>& vertices = (*m_Scene->getMeshes().begin())->getVertices();
 
     if(vertices.empty())

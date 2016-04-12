@@ -212,6 +212,8 @@ void HalfEdge2DApplication::onMeshSelectionChanged(int value)
 {
     m_Scene->removeMesh(m_Mesh);
 
+    m_Mesh->clear();
+
     if(value < 0 || value >= 3)
     {
         m_ActiveController->setChanged();

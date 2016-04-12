@@ -19,34 +19,10 @@ Scene::~Scene()
 
 void Scene::clear()
 {
-    // clear meshes
-    for(const auto& m : m_Meshes)
-        delete m;
-
     m_Meshes.clear();
-
-    // clear points
-    for(const auto& p : m_Points)
-        delete p;
-
     m_Points.clear();
-
-    // clear circles
-    for(const auto& c : m_Circles)
-        delete c;
-
     m_Circles.clear();
-
-    // clear lines
-    for(const auto& l : m_Lines)
-        delete l;
-
     m_Lines.clear();
-
-    // clear cubic beziers
-    for(const auto& b : m_CubicBeziers)
-        delete b;
-
     m_CubicBeziers.clear();
 }
 

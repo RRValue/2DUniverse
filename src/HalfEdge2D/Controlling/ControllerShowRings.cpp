@@ -248,6 +248,9 @@ void ControllerShowRings::updateIdTarget()
     {
         clear();
 
+        if(m_Scene->getMeshes().empty())
+            return;
+
         m_IdScene->addMesh((*m_Scene->getMeshes().begin()));
         m_Faces = (*m_Scene->getMeshes().begin())->getFaces();
 

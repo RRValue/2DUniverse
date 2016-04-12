@@ -34,12 +34,26 @@ ControllerDelaunay::~ControllerDelaunay()
 
 void ControllerDelaunay::activate()
 {
+    for(const auto& p : m_Points)
+        m_Scene->addPoint(p);
 
+    for(const auto& c : m_CircumCircles)
+        m_Scene->addCircle(c);
+
+    for(const auto& l : m_Lines)
+        m_Scene->addLine(l);
 }
 
 void ControllerDelaunay::deactivate()
 {
+    for(const auto& p : m_Points)
+        m_Scene->removePoint(p);
 
+    for(const auto& c : m_CircumCircles)
+        m_Scene->removeCircle(c);
+
+    for(const auto& l : m_Lines)
+        m_Scene->removeLine(l);
 }
 
 bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
