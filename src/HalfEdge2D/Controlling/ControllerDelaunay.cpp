@@ -32,6 +32,16 @@ ControllerDelaunay::~ControllerDelaunay()
 
 }
 
+void ControllerDelaunay::activate()
+{
+
+}
+
+void ControllerDelaunay::deactivate()
+{
+
+}
+
 bool ControllerDelaunay::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)

@@ -34,6 +34,16 @@ ControllerCubicBezier::~ControllerCubicBezier()
 
 }
 
+void ControllerCubicBezier::activate()
+{
+
+}
+
+void ControllerCubicBezier::deactivate()
+{
+
+}
+
 bool ControllerCubicBezier::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)

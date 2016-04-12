@@ -68,6 +68,9 @@ void EventHandler::setActiveController(Controller* const controller)
     for(const auto& controller : m_Controller)
         controller->m_Active = false;
 
+    if(m_ActiveController != nullptr)
+        m_ActiveController->deactivate();
+
     m_ActiveController = nullptr;
 
     if(controller == nullptr)
@@ -84,6 +87,8 @@ void EventHandler::setActiveController(Controller* const controller)
     m_ActiveController->m_ActiveCamera = m_ActiveCamera;
     m_ActiveController->m_ActiveViewPort = m_ActiveViewPort;
     m_ActiveController->m_Renderer = m_Renderer;
+
+    m_ActiveController->activate();
 }
 
 void EventHandler::setRenderer(Renderer* const renderer)

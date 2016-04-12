@@ -53,6 +53,16 @@ ControllerShowRings::~ControllerShowRings()
 
 }
 
+void ControllerShowRings::activate()
+{
+
+}
+
+void ControllerShowRings::deactivate()
+{
+
+}
+
 void ControllerShowRings::clear()
 {
     m_LastColourVector.clear();

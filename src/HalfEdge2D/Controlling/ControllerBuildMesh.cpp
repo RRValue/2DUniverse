@@ -25,6 +25,16 @@ ControllerBuildMesh::~ControllerBuildMesh()
 
 }
 
+void ControllerBuildMesh::activate()
+{
+
+}
+
+void ControllerBuildMesh::deactivate()
+{
+
+}
+
 bool ControllerBuildMesh::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)

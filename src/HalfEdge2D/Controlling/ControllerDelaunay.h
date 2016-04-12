@@ -19,6 +19,9 @@ public:
     virtual ~ControllerDelaunay();
 
 protected:
+    virtual void activate() final override;
+    virtual void deactivate() final override;
+
     virtual bool handleMouseMoveEvent(QMouseEvent* const event) final override;
     virtual bool handleMousePressEvent(QMouseEvent* const event) final override;
     virtual bool handleMouseReleaseEvent(QMouseEvent* const event) final override;

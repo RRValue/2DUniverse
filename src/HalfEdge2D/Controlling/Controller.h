@@ -17,6 +17,9 @@ public:
     Controller();
     virtual ~Controller();
 
+    virtual void activate() = 0;
+    virtual void deactivate() = 0;
+
     const bool& isActive() const;
     const std::string& getName() const;
 
