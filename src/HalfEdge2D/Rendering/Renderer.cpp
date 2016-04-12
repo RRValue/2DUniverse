@@ -197,13 +197,21 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
 void Renderer::renderMeshes(QPainter* const painter, const std::set<Mesh* const>& meshes)
 {
     for(const auto& m : meshes)
+    {
+        if(!m->isVisible())
+            continue;
+
         renderMesh(painter, m);
+    }
 }
 
 void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const>& points)
 {
     for(const auto& p : points)
     {
+        if(!p->isVisible())
+            continue;
+
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(p->getSize(), 0.0f));
         float point_size_px = (tar - ref).manhattanLength();

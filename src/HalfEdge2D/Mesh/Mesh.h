@@ -20,6 +20,9 @@ public:
     const std::vector<Vertex*>& getVertices() const;
     const std::vector<Face*>& getFaces() const;
 
+    const bool& isVisible() const;
+    void setVisible(const bool& visible);
+
     Vertex* const getVertex(const size_t& idx) const;
     Face* const getFace(const size_t& idx) const;
 
@@ -41,6 +44,9 @@ protected:
 protected:
     std::vector<Vertex*> m_Vertices;
     std::vector<Face*> m_Faces;
+
+private:
+    bool m_Visible;
 };
 
 #endif //_MESH_MESH_H_

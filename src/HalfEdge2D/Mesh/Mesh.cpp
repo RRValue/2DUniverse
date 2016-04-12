@@ -7,7 +7,7 @@
 
 Mesh::Mesh()
 {
-
+    m_Visible = true;
 }
 
 Mesh::~Mesh()
@@ -25,6 +25,16 @@ void Mesh::clear()
 
     m_Vertices.clear();
     m_Faces.clear();
+}
+
+const bool& Mesh::isVisible() const
+{
+    return m_Visible;
+}
+
+void Mesh::setVisible(const bool& visible)
+{
+    m_Visible = visible;
 }
 
 const std::vector<Vertex*>& Mesh::getVertices() const
