@@ -2,11 +2,13 @@
 #define _BASE_LINESEGMENT_H_
 
 #include "HalfEdge2D/Base/Vector.h"
+#include "HalfEdge2D/Base/StaticNGradeBlend.h"
 
 class LineSegment
 {
 public:
     LineSegment();
+    LineSegment(const Vec2f& start, const Vec2f& end);
     ~LineSegment();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -40,6 +42,8 @@ private:
     bool m_Valid;
 
     float m_Lenght;
+
+    const StaticNGradeBlend<Vec2f, 2> m_Blender;
 };
 
 #endif //_BASE_LINESEGMENT_H_

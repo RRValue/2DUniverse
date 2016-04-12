@@ -1,9 +1,19 @@
 #include "HalfEdge2D/Base/LineSegment.h"
 
+#include "HalfEdge2D/Base/MathDefines.h"
+
 LineSegment::LineSegment()
 {
     m_Start = Vec2f(-1.0f, 0.0);
     m_End = Vec2f(1.0f, 0.0);
+
+    updateParameter();
+}
+
+LineSegment::LineSegment(const Vec2f& start, const Vec2f& end)
+{
+    m_Start = start;
+    m_End = end;
 
     updateParameter();
 }
@@ -93,84 +103,63 @@ bool LineSegment::collinearTo(const LineSegment& l) const
     return std::abs(1.0 - std::abs(norm_add)) < 1e-5;
 }
 
-Vec2f LineSegment::intersect(const LineSegment& l, bool* const intersect) const
+Vec2f LineSegment::intersect(const LineSegment& other, bool* const intersect) const
 {
+    if(intersect != nullptr)
+        *intersect = false;
+
     Vec2f intersec_point(0.0f, 0.0f);
 
-    // check collinear //
-    if(collinearTo(l))
-    {
-        bool intersection = false;
+    const Vec2f& l0p0 = m_Start;
+    const Vec2f& l0p1 = m_End;
 
-        if(m_Start == l.m_Start && m_End != l.m_End)
-        {
-            intersection = true;
-            intersec_point = m_Start;
-        }
-        if(m_End == l.m_Start && m_Start!= l.m_End)
-        {
-            intersection = true;
-            intersec_point = m_End;
-        }
-        else
-            intersection = false;
+    Vec2f t = l0p0;
+    Vec2f p = l0p1 - t;
 
-        if(intersect != NULL)
-            (*intersect) = intersection;
+    float l = p.norm();
+    float a = std::asin(p.y() / l);
 
-        return intersec_point;
-    }
+    if(p.x() < 0.0f)
+        a = PI_F - a;
 
-    // intersect
-    Vec2f s0 = m_Start;
-    Vec2f s1 = l.m_Start;
+    if(a < 0.0f)
+        a += PI2_F;
 
-    Vec2f e0 = m_End;
-    Vec2f e1 = l.m_End;
+    Mat2f m_r;
+    Mat2f m_r_inv;
 
-    float A0 = e0.y() - s0.y();
-    float B0 = s0.x() - e0.x();
-    float C0 = (A0 * s0.x()) + (B0 * s0.y());
+    m_r << std::cos(-a), -std::sin(-a), std::sin(-a), std::cos(-a);
+    m_r_inv = m_r.inverse();
 
-    float A1 = e1.y() - s1.y();
-    float B1 = s1.x() - e1.x();
-    float C1 = (A1 * s1.x()) + (B1 * s1.y());
+    Vec2f l1p0 = m_r * (other.m_Start - t);
+    Vec2f l1p1 = m_r * (other.m_End - t);
 
-    float det = (A0 * B1) - (A1 * B0);
+    // cut:
+    // find root of y0 * (1 - a) + y1
+    // a = y0 / (y0 - y1)
+    // y0 - y1 must be greater than epslion (1e-5f)
+    // a must be between 0.0 and 1.0 -> we have a cut
 
-    if(det == 0.0f || fabs(det) < 1e-3f)
-    {
-        if(intersect != NULL)
-            (*intersect) = false;
-    }
-    else
-    {
-        float x = (((B1 * C0) - (B0 * C1))) / det;
-        float y = (((A0 * C1) - (A1 * C0))) / det;
+    Vec2f cut_pos(0.0f, 0.0f);
+    float alpha = l1p0.y() - l1p1.y();
 
-        intersec_point = Vec2f(x, y);
+    if(std::abs(alpha) < 1e-5f)
+        return cut_pos;
 
-        if(intersect != 0)
-        {
-            bool is_greater =
-                (((x - m_Min.x()) > 0.0f) || ((m_Min.x() - x) < 1e-3f)) &&
-                (((y - m_Min.y()) > 0.0f) || ((m_Min.y() - y) < 1e-3f));
+    alpha = l1p0.y() / alpha;
 
-            bool is_smaller =
-                (((m_Max.x() - x) > 0.0f) || ((x - m_Max.x()) < 1e-3f)) &&
-                (((m_Max.y() - y) > 0.0f) || ((y - m_Max.y()) < 1e-3f));
+    if(alpha < 0.0f || alpha > 1.0f)
+        return cut_pos;
 
-            bool is_greater_l =
-                (((x - l.m_Min.x()) > 0.0f) || ((l.m_Min.x() - x) < 1e-3f)) &&
-                (((y - l.m_Min.y()) > 0.0f) || ((l.m_Min.y() - y) < 1e-3f));
+    cut_pos = m_Blender.blend({l1p0, l1p1}, alpha);
 
-            bool is_smaller_l =
-                (((l.m_Max.x() - x) > 0.0f) || ((x - l.m_Max.x()) < 1e-3f)) &&
-                (((l.m_Max.y() - y) > 0.0f) || ((y - l.m_Max.y()) < 1e-3f));
+    if(cut_pos.x() < 0.0f || cut_pos.x() > l)
+        return cut_pos;
 
-            (*intersect) = is_greater && is_smaller && is_greater_l && is_smaller_l;
-        }
-    }
+    if(intersect != nullptr)
+        *intersect = true;
 
-    return intersec_point;
+    cut_pos = (m_r_inv * cut_pos) + t;
+
+    return cut_pos;
 }

@@ -29,7 +29,7 @@ protected:
 
 private:
     Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
-    void updateTransformedLines();
+    void cut();
 
 private:
     bool m_MovePoint;
@@ -42,8 +42,7 @@ private:
     Line* m_Line0;
     Line* m_Line1;
 
-    Line* m_LineTrans0;
-    Line* m_LineTrans1;
+    Point* m_CutPoint;
 };
 
 #endif //_CONTROLLING_CONTROLLERCUTLINE_H_

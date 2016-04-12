@@ -10,7 +10,7 @@ class StaticNGradeBlend : StaticBinomialRow<N - 1>
     static_assert(N <= 13, "13 Is max for StaticBlend<N>");
 
 public:
-    T blend(const std::array<T, N>& values, const float& alpha)
+    T blend(const std::array<T, N>& values, const float& alpha) const
     {
         T result = StaticIdentities.identityAdd<T>();
         float a0 = (1.0f - alpha);

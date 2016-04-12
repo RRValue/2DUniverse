@@ -1,13 +1,10 @@
 #include "HalfEdge2D/Controlling/ControllerCutLine.h"
 
-#include "HalfEdge2D/Base/LineSegment.h"
-
-#include "HalfEdge2D/Rendering/RenderTarget.h"
-#include "HalfEdge2D/Rendering/Renderer.h"
+#include <HalfEdge2D/Base/LineSegment.h>
 
 #include "HalfEdge2D/Scene/Scene.h"
-#include "HalfEdge2D/Scene/ViewPort.h"
-#include "HalfEdge2D/Scene/Camera.h"
+
+#include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
@@ -23,18 +20,17 @@ ControllerCutLine::ControllerCutLine()
 
     m_Line0 = new Line();
     m_Line1 = new Line();
-    m_LineTrans0 = new Line();
-    m_LineTrans1 = new Line();
+    m_CutPoint = new Point();
 
     m_Line0->setVisible(false);
     m_Line1->setVisible(false);
-    m_LineTrans0->setVisible(false);
-    m_LineTrans1->setVisible(false);
+    m_CutPoint->setVisible(false);
 
-    m_Line0->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-    m_Line1->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-    m_LineTrans0->setColour(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
-    m_LineTrans1->setColour(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+    m_Line0->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_Line1->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_CutPoint->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+
+    m_CutPoint->setSize(0.02f);
 }
 
 ControllerCutLine::~ControllerCutLine()
@@ -44,30 +40,30 @@ ControllerCutLine::~ControllerCutLine()
 
     delete m_Line0;
     delete m_Line1;
-    delete m_LineTrans0;
-    delete m_LineTrans1;
+
+    delete m_CutPoint;
 }
 
 void ControllerCutLine::activate()
 {
     m_Scene->addLine(m_Line0);
     m_Scene->addLine(m_Line1);
-    m_Scene->addLine(m_LineTrans0);
-    m_Scene->addLine(m_LineTrans1);
-
+    
     for(const auto& p : m_Points)
         m_Scene->addPoint(p);
+
+    m_Scene->addPoint(m_CutPoint);
 }
 
 void ControllerCutLine::deactivate()
 {
     m_Scene->removeLine(m_Line0);
     m_Scene->removeLine(m_Line1);
-    m_Scene->removeLine(m_LineTrans0);
-    m_Scene->removeLine(m_LineTrans1);
-
+    
     for(const auto& p : m_Points)
         m_Scene->removePoint(p);
+
+    m_Scene->removePoint(m_CutPoint);
 }
 
 bool ControllerCutLine::handleMouseMoveEvent(QMouseEvent* const event)
@@ -100,7 +96,7 @@ bool ControllerCutLine::handleMouseMoveEvent(QMouseEvent* const event)
     if(m_CurrentPointIdx == 3)
         m_Line1->setPositionEnd(m_CurrentPoint->getPosition());
 
-    updateTransformedLines();
+    cut();
 
     m_Renderer->render();
 
@@ -173,13 +169,7 @@ bool ControllerCutLine::handleMousePressEvent(QMouseEvent* const event)
         }
     }
 
-    if(m_Points.size() == 4)
-    {
-        m_LineTrans0->setVisible(true);
-        m_LineTrans1->setVisible(true);
-    }
-
-    updateTransformedLines();
+    cut();
 
     m_Renderer->render();
 
@@ -233,20 +223,23 @@ Point* const ControllerCutLine::getPointAtPos(const Vec2f& pos, size_t* const id
     return nullptr;
 }
 
-void ControllerCutLine::updateTransformedLines()
+void ControllerCutLine::cut()
 {
     if(m_Points.size() != 4)
         return;
 
-    Vec2f offset(0.01f, 0.01f);
+    // reset cut point
+    m_CutPoint->setVisible(false);
 
-    const Vec2f& l00 = m_Line0->getPositionStart();
-    const Vec2f& l01 = m_Line0->getPositionEnd();
-    const Vec2f& l10 = m_Line1->getPositionStart();
-    const Vec2f& l11 = m_Line1->getPositionEnd();
+    LineSegment l0(m_Line0->getPositionStart(), m_Line0->getPositionEnd());
+    LineSegment l1(m_Line1->getPositionStart(), m_Line1->getPositionEnd());
 
-    m_LineTrans0->setPositionStart(l00 + offset);
-    m_LineTrans0->setPositionEnd(l01 + offset);
-    m_LineTrans1->setPositionStart(l10 + offset);
-    m_LineTrans1->setPositionEnd(l11 + offset);
+    bool intersect = false;
+    Vec2f cut_point = l0.intersect(l1, &intersect);
+
+    if(!intersect)
+        return;
+
+    m_CutPoint->setVisible(true);
+    m_CutPoint->setPosition(cut_point);
 }
