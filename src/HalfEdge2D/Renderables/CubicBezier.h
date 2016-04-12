@@ -6,12 +6,12 @@
 
 #include <array>
 
-class CubicBezier : StaticNGradeBlend<Vec2f, 4>
+class CubicBezier : protected StaticNGradeBlend<Vec2f, 4>
 {
 public:
     CubicBezier();
     ~CubicBezier();
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // getter
     const float& getThickness() const;
