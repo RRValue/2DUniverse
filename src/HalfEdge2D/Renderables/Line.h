@@ -5,6 +5,11 @@
 #include "HalfEdge2D/Base/StaticNGradeBlend.h"
 #include "HalfEdge2D/Base/StaticPolynomialSolver.h"
 
+#include "HalfEdge2D/Renderables/QuadraticBezier.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
+
+#include <vector>
+
 class Line : protected StaticNGradeBlend<Vec2f, 2>, protected StaticPolynomialSolver<float, 1>
 {
 public:
@@ -29,9 +34,12 @@ public:
     // tooling
     Vec2f getRelativePoint(const float& pos) const;
     bool collinearTo(const Line& l) const;
-    Vec2f intersect(const Line& l, bool* const intersect) const;
     float getLength() const;
     Vec2f getNormal() const;
+
+    Vec2fVec intersect(const Line& l) const;
+    Vec2fVec intersect(const QuadraticBezier& b) const;
+    Vec2fVec intersect(const CubicBezier& b) const;
 
 private:
     float m_Thickness;

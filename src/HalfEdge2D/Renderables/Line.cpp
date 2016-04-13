@@ -66,10 +66,37 @@ void Line::setVisible(const bool& visible)
     m_Visible = visible;
 }
 
-Vec2f Line::intersect(const Line& other, bool* const intersect) const
+Vec2f Line::getRelativePoint(const float& pos) const
 {
-    if(intersect != nullptr)
-        *intersect = false;
+    return blend({m_Start, m_End}, pos);
+}
+
+bool Line::collinearTo(const Line& l) const
+{
+    Vec2f nf0 = (m_End - m_Start).normalized();
+    Vec2f nf1 = (l.m_End - l.m_Start).normalized();
+
+    Vec2d n0((double)nf0[0], (double)nf0[1]);
+    Vec2d n1((double)nf1[0], (double)nf1[1]);
+    
+    double res = (n0[0] * n1[0]) + (n0[1] * n1[1]);
+
+    return std::abs(1.0 - std::abs(res)) < 1e-5;
+}
+
+float Line::getLength() const
+{
+    return (m_Start - m_End).norm();
+}
+
+Vec2f Line::getNormal() const
+{
+    return (m_Start - m_End).normalized();
+}
+
+Vec2fVec Line::intersect(const Line& other) const
+{
+    Vec2fVec results;
 
     Vec2f intersec_point(0.0f, 0.0f);
 
@@ -110,51 +137,32 @@ Vec2f Line::intersect(const Line& other, bool* const intersect) const
     Vec2f cut_pos(0.0f, 0.0f);
 
     if(!solved)
-        return cut_pos;
+        return results;
 
     // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
     if(alpha < 0.0f || alpha > 1.0f)
-        return cut_pos;
+        return results;
 
     //cut_pos = other.getRelativePoint(alpha);
     cut_pos = blend({l1p0, l1p1}, alpha);
 
     // cut_pos.x must be between 0.0 and lenght of source line
     if(cut_pos.x() < 0.0f || cut_pos.x() > l)
-        return cut_pos;
-
-    if(intersect != nullptr)
-        *intersect = true;
+        return results;
 
     cut_pos = (m_r_inv * cut_pos) + t;
 
-    return cut_pos;
-}
-
-Vec2f Line::getRelativePoint(const float& pos) const
-{
-    return blend({m_Start, m_End}, pos);
-}
-
-bool Line::collinearTo(const Line& l) const
-{
-    Vec2f nf0 = (m_End - m_Start).normalized();
-    Vec2f nf1 = (l.m_End - l.m_Start).normalized();
-
-    Vec2d n0((double)nf0[0], (double)nf0[1]);
-    Vec2d n1((double)nf1[0], (double)nf1[1]);
+    results.push_back(cut_pos);
     
-    double res = (n0[0] * n1[0]) + (n0[1] * n1[1]);
-
-    return std::abs(1.0 - std::abs(res)) < 1e-5;
+    return results;
 }
 
-float Line::getLength() const
+Vec2fVec Line::intersect(const QuadraticBezier& b) const
 {
-    return (m_Start - m_End).norm();
+    return Vec2fVec();
 }
 
-Vec2f Line::getNormal() const
+Vec2fVec Line::intersect(const CubicBezier& b) const
 {
-    return (m_Start - m_End).normalized();
+    return Vec2fVec();
 }

@@ -313,13 +313,12 @@ void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::arr
     bisect1.setPositionStart(bs1s);
     bisect1.setPositionEnd(bs1e);
 
-    bool intersects = false;
-    Vec2f center = bisect0.intersect(bisect1, &intersects);
+    Vec2fVec center = bisect0.intersect(bisect1);
 
-    circle->setVisible(intersects);
+    circle->setVisible(!center.empty());
 
-    float radius = (points[0]->getPosition() - center).norm();
+    float radius = (points[0]->getPosition() - center[0]).norm();
 
-    circle->setPosition(center);
+    circle->setPosition(center[0]);
     circle->setRadius(radius);
 }

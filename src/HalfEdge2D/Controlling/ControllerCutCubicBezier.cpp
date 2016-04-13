@@ -254,14 +254,27 @@ void ControllerCutCubicBezier::cut()
         return;
 
     // reset cut point
-    /*m_CutPoint->setVisible(false);
+    m_CutPoint0->setVisible(false);
+    m_CutPoint1->setVisible(false);
+    m_CutPoint2->setVisible(false);
 
-    bool intersect = false;
-    Vec2f cut_point = m_Line0->intersect(*m_Line1, &intersect);
+    Vec2fVec cut_points = m_Line->intersect(*m_Bezier);
 
-    if(!intersect)
+    if(cut_points.empty())
         return;
-
-    m_CutPoint->setVisible(true);
-    m_CutPoint->setPosition(cut_point);*/
+    else if(cut_points.size() <= 1)
+    {
+        m_CutPoint0->setVisible(true);
+        m_CutPoint0->setPosition(cut_points[0]);
+    }
+    else if(cut_points.size() <= 2)
+    {
+        m_CutPoint1->setVisible(true);
+        m_CutPoint1->setPosition(cut_points[1]);
+    }
+    else if(cut_points.size() <= 3)
+    {
+        m_CutPoint2->setVisible(true);
+        m_CutPoint2->setPosition(cut_points[2]);
+    }
 }
