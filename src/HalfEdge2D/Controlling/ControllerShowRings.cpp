@@ -19,8 +19,6 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QImage>
 
-#include <qdebug.h>
-
 ControllerShowRings::ControllerShowRings() :
 m_ChannelBitRange(6),
 m_ChannelRange(1 << m_ChannelBitRange),

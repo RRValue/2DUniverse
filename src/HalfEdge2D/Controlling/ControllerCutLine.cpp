@@ -1,7 +1,5 @@
 #include "HalfEdge2D/Controlling/ControllerCutLine.h"
 
-#include <HalfEdge2D/Base/LineSegment.h>
-
 #include "HalfEdge2D/Scene/Scene.h"
 
 #include "HalfEdge2D/Rendering/Renderer.h"
@@ -231,11 +229,8 @@ void ControllerCutLine::cut()
     // reset cut point
     m_CutPoint->setVisible(false);
 
-    LineSegment l0(m_Line0->getPositionStart(), m_Line0->getPositionEnd());
-    LineSegment l1(m_Line1->getPositionStart(), m_Line1->getPositionEnd());
-
     bool intersect = false;
-    Vec2f cut_point = l0.intersect(l1, &intersect);
+    Vec2f cut_point = m_Line0->intersect(*m_Line1, &intersect);
 
     if(!intersect)
         return;

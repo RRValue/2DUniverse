@@ -2,8 +2,10 @@
 #define _RENDERABLE_LINE_H_
 
 #include "HalfEdge2D/Base/Vector.h"
+#include "HalfEdge2D/Base/StaticNGradeBlend.h"
+#include "HalfEdge2D/Base/StaticPolynomialSolver.h"
 
-class Line
+class Line : protected StaticNGradeBlend<Vec2f, 2>, protected StaticPolynomialSolver<float, 1>
 {
 public:
     Line();
@@ -24,10 +26,17 @@ public:
     void setColour(const Vec4f& colour);
     void setVisible(const bool& visible);
 
+    // tooling
+    Vec2f getRelativePoint(const float& pos) const;
+    bool collinearTo(const Line& l) const;
+    Vec2f intersect(const Line& l, bool* const intersect) const;
+    float getLength() const;
+    Vec2f getNormal() const;
+
 private:
     float m_Thickness;
-    Vec2f m_PositionStart;
-    Vec2f m_PositionEnd;
+    Vec2f m_Start;
+    Vec2f m_End;
     Vec4f m_Colour;
     bool m_Visible;
 };

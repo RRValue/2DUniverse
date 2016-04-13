@@ -1,7 +1,5 @@
 #include "HalfEdge2D/Controlling/ControllerDelaunay.h"
 
-#include "HalfEdge2D/Base/LineSegment.h"
-
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/Renderer.h"
 
@@ -286,13 +284,13 @@ void ControllerDelaunay::updateCircumCircles()
 
 void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::array<Point* const, 3>& points)
 {
-    LineSegment l01;
-    LineSegment l12;
+    Line l01;
+    Line l12;
 
-    l01.setStart(points[0]->getPosition());
-    l01.setEnd(points[1]->getPosition());
-    l12.setStart(points[1]->getPosition());
-    l12.setEnd(points[2]->getPosition());
+    l01.setPositionStart(points[0]->getPosition());
+    l01.setPositionEnd(points[1]->getPosition());
+    l12.setPositionStart(points[1]->getPosition());
+    l12.setPositionEnd(points[2]->getPosition());
 
     float length = 1000.0f * (l01.getLength() + l12.getLength());
 
@@ -307,13 +305,13 @@ void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::arr
     Vec2f bs1s = sp1 - bn1 * length;
     Vec2f bs1e = sp1 + bn1 * length;
 
-    LineSegment bisect0;
-    LineSegment bisect1;
+    Line bisect0;
+    Line bisect1;
 
-    bisect0.setStart(bs0s);
-    bisect0.setEnd(bs0e);
-    bisect1.setStart(bs1s);
-    bisect1.setEnd(bs1e);
+    bisect0.setPositionStart(bs0s);
+    bisect0.setPositionEnd(bs0e);
+    bisect1.setPositionStart(bs1s);
+    bisect1.setPositionEnd(bs1e);
 
     bool intersects = false;
     Vec2f center = bisect0.intersect(bisect1, &intersects);
