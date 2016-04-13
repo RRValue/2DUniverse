@@ -46,6 +46,11 @@ const std::set<Line* const>& Scene::getLines() const
     return m_Lines;
 }
 
+const std::set<QuadraticBezier* const>& Scene::getQuadraticBeziers() const
+{
+    return m_QuadraticBeziers;
+}
+
 const std::set<CubicBezier* const>& Scene::getCubicBeziers() const
 {
     return m_CubicBeziers;
@@ -74,9 +79,14 @@ void Scene::setLines(const std::set<Line* const>& lines)
         addLine(l);
 }
 
-void Scene::setCubicBeziers(const std::set<CubicBezier* const>& cubicBeziers)
+void Scene::setQuadraticBeziers(const std::set<QuadraticBezier* const>& beziers)
 {
-    m_CubicBeziers = cubicBeziers;
+    m_QuadraticBeziers = beziers;
+}
+
+void Scene::setCubicBeziers(const std::set<CubicBezier* const>& beziers)
+{
+    m_CubicBeziers = beziers;
 }
 
 void Scene::addMesh(Mesh* const mesh)
@@ -131,17 +141,30 @@ void Scene::addLine(Line* const line)
     m_Lines.insert(line);
 }
 
-void Scene::addCubicBeziers(CubicBezier* const cubicBezier)
+void Scene::addQuadraticBeziers(QuadraticBezier* const bezier)
 {
-    if(cubicBezier == nullptr)
+    if(bezier == nullptr)
         return;
 
-    const auto& find_iter = m_CubicBeziers.find(cubicBezier);
+    const auto& find_iter = m_QuadraticBeziers.find(bezier);
+
+    if(find_iter != m_QuadraticBeziers.end())
+        return;
+
+    m_QuadraticBeziers.insert(bezier);
+}
+
+void Scene::addCubicBeziers(CubicBezier* const bezier)
+{
+    if(bezier == nullptr)
+        return;
+
+    const auto& find_iter = m_CubicBeziers.find(bezier);
 
     if(find_iter != m_CubicBeziers.end())
         return;
 
-    m_CubicBeziers.insert(cubicBezier);
+    m_CubicBeziers.insert(bezier);
 }
 
 void Scene::removeMesh(Mesh* const mesh)
@@ -196,12 +219,25 @@ void Scene::removeLine(Line* const line)
     m_Lines.erase(find_iter);
 }
 
-void Scene::removeCubicBeziers(CubicBezier* const cubicBezier)
+void Scene::removeQuadraticBeziers(QuadraticBezier* const bezier)
 {
-    if(cubicBezier == nullptr)
+    if(bezier == nullptr)
         return;
 
-    const auto& find_iter = m_CubicBeziers.find(cubicBezier);
+    const auto& find_iter = m_QuadraticBeziers.find(bezier);
+
+    if(find_iter == m_QuadraticBeziers.end())
+        return;
+
+    m_QuadraticBeziers.erase(find_iter);
+}
+
+void Scene::removeCubicBeziers(CubicBezier* const bezier)
+{
+    if(bezier == nullptr)
+        return;
+
+    const auto& find_iter = m_CubicBeziers.find(bezier);
 
     if(find_iter == m_CubicBeziers.end())
         return;
