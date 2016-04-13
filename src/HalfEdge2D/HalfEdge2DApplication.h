@@ -20,6 +20,7 @@ class ControllerQuadraticBezier;
 class ControllerCubicBezier;
 class ControllerCutLine;
 class ControllerCutQuadraticBezier;
+class ControllerCutCubicBezier;
 class EventHandler;
 class Scene;
 
@@ -91,6 +92,7 @@ private:
     ControllerCubicBezier* m_ControllerCubicBezier;
     ControllerCutLine* m_ControllerCutLine;
     ControllerCutQuadraticBezier* m_ControllerCutQuadraticBezier;
+    ControllerCutCubicBezier* m_ControllerCutCubicBezier;
 
     std::map<std::string, Controller* const> m_Controller;
 
