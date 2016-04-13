@@ -41,7 +41,7 @@ const bool& QuadraticBezier::isVisible() const
     return m_Visible;
 }
 
-Vec2f QuadraticBezier::pointAt(const float& alpha)
+Vec2f QuadraticBezier::pointAt(const float& alpha) const
 {
     return blend(m_Points, alpha);
 }
@@ -66,4 +66,48 @@ void QuadraticBezier::setColour(const Vec4f& colour)
 void QuadraticBezier::setVisible(const bool& visible)
 {
     m_Visible = visible;
+}
+
+void QuadraticBezier::transform(const Mat3f& m)
+{
+    for(auto& p : m_Points)
+    {
+        Vec3f p_t = m * Vec3f(p[0], p[1], 1.0f);
+        p = Vec2f(p_t[0], p_t[1]);
+    }
+}
+
+QuadraticBezier QuadraticBezier::transformed(const Mat3f& m) const
+{
+    QuadraticBezier b;
+
+    for(size_t i = 0; i < m_Points.size(); i++)
+    {
+        Vec3f p_t = m * Vec3f(m_Points[i][0], m_Points[i][1], 1.0f);
+        b.setPoint(i, Vec2f(p_t[0], p_t[1]));
+    }
+
+    return b;
+}
+
+std::vector<float> QuadraticBezier::rootsX() const
+{
+    Result solution = solve({&(float)m_Points[0][0], &(float)m_Points[1][0], &(float)m_Points[2][0]});
+    std::vector<float> roots;
+
+    for(size_t i = 0; i < solution.m_Solutions; i++)
+        roots.push_back(solution[0]);
+
+    return roots;
+}
+
+std::vector<float> QuadraticBezier::rootsY() const
+{
+    Result solution = solve({&(float)m_Points[0][1], &(float)m_Points[1][1], &(float)m_Points[2][1]});
+    std::vector<float> roots;
+
+    for(size_t i = 0; i < solution.m_Solutions; i++)
+        roots.push_back(solution[0]);
+
+    return roots;
 }

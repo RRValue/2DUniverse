@@ -66,7 +66,7 @@ void Line::setVisible(const bool& visible)
     m_Visible = visible;
 }
 
-Vec2f Line::getRelativePoint(const float& pos) const
+Vec2f Line::pointAt(const float& pos) const
 {
     return blend({m_Start, m_End}, pos);
 }
@@ -174,7 +174,6 @@ std::vector<float> Line::rootsY() const
 Vec2fVec Line::intersect(const Line& other) const
 {
     Mat3f trans = getOrthoBaseMatrix();
-    Mat3f trans_inv = trans.inverse();
 
     Line t_line = other.transformed(trans);
 
@@ -195,23 +194,83 @@ Vec2fVec Line::intersect(const Line& other) const
         return results;
 
     //cut_pos = other.getRelativePoint(alpha);
-    Vec2f cut_pos = t_line.getRelativePoint(alpha);
+    Vec2f cut_pos = t_line.pointAt(alpha);
 
     // cut_pos.x must be between 0.0 and lenght of source line
     if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
         return results;
 
-    results.push_back(other.getRelativePoint(alpha));
+    results.push_back(other.pointAt(alpha));
     
     return results;
 }
 
 Vec2fVec Line::intersect(const QuadraticBezier& b) const
 {
-    return Vec2fVec();
+    Mat3f trans = getOrthoBaseMatrix();
+
+    QuadraticBezier t_bezier = b.transformed(trans);
+
+    // find root y compontent (cuts with x axis)
+    // bool solved;
+    // float alpha = rootX(solved);
+
+    Vec2fVec results;
+    std::vector<float> roots = t_bezier.rootsY();
+
+    if(roots.empty())
+        return results;
+
+    for(const auto& alpha : roots)
+    {
+        // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
+        if(alpha < 0.0f || alpha > 1.0f)
+            return results;
+
+        //cut_pos = other.getRelativePoint(alpha);
+        Vec2f cut_pos = t_bezier.pointAt(alpha);
+
+        // cut_pos.x must be between 0.0 and lenght of source line
+        if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
+            return results;
+
+        results.push_back(b.pointAt(alpha));
+    }
+
+    return results;
 }
 
 Vec2fVec Line::intersect(const CubicBezier& b) const
 {
-    return Vec2fVec();
+    Mat3f trans = getOrthoBaseMatrix();
+
+    CubicBezier t_bezier = b.transformed(trans);
+
+    // find root y compontent (cuts with x axis)
+    // bool solved;
+    // float alpha = rootX(solved);
+
+    Vec2fVec results;
+    std::vector<float> roots = t_bezier.rootsY();
+
+    if(roots.empty())
+        return results;
+
+    for(const auto& alpha : roots)
+    {
+        // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
+        if(alpha < 0.0f || alpha > 1.0f)
+            return results;
+
+        //cut_pos = other.getRelativePoint(alpha);
+        Vec2f cut_pos = t_bezier.pointAt(alpha);
+
+        // cut_pos.x must be between 0.0 and lenght of source line
+        if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
+            return results;
+
+        results.push_back(b.pointAt(alpha));
+    }
+
+    return results;
 }

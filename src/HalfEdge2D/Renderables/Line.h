@@ -32,7 +32,7 @@ public:
     void setVisible(const bool& visible);
 
     // tooling
-    Vec2f getRelativePoint(const float& pos) const;
+    Vec2f pointAt(const float& pos) const;
     bool collinearTo(const Line& l) const;
     float getLength() const;
     Vec2f getNormal() const;

@@ -3,10 +3,11 @@
 
 #include "HalfEdge2D/Base/Vector.h"
 #include "HalfEdge2D/Base/StaticNGradeBlend.h"
+#include "HalfEdge2D/Base/StaticPolynomialSolver.h"
 
 #include <array>
 
-class QuadraticBezier : protected StaticNGradeBlend<Vec2f, 3>
+class QuadraticBezier : protected StaticNGradeBlend<Vec2f, 3>, protected StaticPolynomialSolver<float, 2>
 {
 public:
     QuadraticBezier();
@@ -19,13 +20,19 @@ public:
     const Vec2f& getPoint(const size_t& idx) const;
     const Vec4f& getColour() const;
     const bool& isVisible() const;
-    Vec2f pointAt(const float& alpha);
+    Vec2f pointAt(const float& alpha) const;
 
     //setter
     void setThickness(const float& thickness);
     void setPoint(const size_t& idx, const Vec2f& point);
     void setColour(const Vec4f& colour);
     void setVisible(const bool& visible);
+
+    // tooling
+    void transform(const Mat3f& m);
+    QuadraticBezier transformed(const Mat3f& m) const;
+    std::vector<float> rootsX() const;
+    std::vector<float> rootsY() const;
 
 private:
     float m_Thickness;

@@ -297,8 +297,8 @@ void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::arr
     Vec2f bn0(l01.getNormal()[1], -l01.getNormal()[0]);
     Vec2f bn1(l12.getNormal()[1], -l12.getNormal()[0]);
 
-    Vec2f sp0 = l01.getRelativePoint(0.5f);
-    Vec2f sp1 = l12.getRelativePoint(0.5f);
+    Vec2f sp0 = l01.pointAt(0.5f);
+    Vec2f sp1 = l12.pointAt(0.5f);
 
     Vec2f bs0s = sp0 - bn0 * length;
     Vec2f bs0e = sp0 + bn0 * length;
