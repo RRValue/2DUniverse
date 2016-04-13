@@ -94,12 +94,30 @@ Vec2f Line::getNormal() const
     return (m_Start - m_End).normalized();
 }
 
-Vec2fVec Line::intersect(const Line& other) const
+void Line::transform(const Mat3f& m)
 {
-    Vec2fVec results;
+    Vec3f s = m * Vec3f(m_Start[0], m_Start[1], 1.0f);
+    Vec3f e = m * Vec3f(m_End[0], m_End[1], 1.0f);
 
-    Vec2f intersec_point(0.0f, 0.0f);
+    m_Start = Vec2f(s[0], s[1]);
+    m_End = Vec2f(e[0], e[1]);
+}
 
+Line Line::transformed(const Mat3f& m) const
+{
+    Vec3f s = m * Vec3f(m_Start[0], m_Start[1], 1.0f);
+    Vec3f e = m * Vec3f(m_End[0], m_End[1], 1.0f);
+
+    Line line;
+
+    line.m_Start = Vec2f(s[0], s[1]);
+    line.m_End = Vec2f(e[0], e[1]);
+
+    return line;
+}
+
+Mat3f Line::getOrthoBaseMatrix() const
+{
     const Vec2f& l0p0 = m_Start;
     const Vec2f& l0p1 = m_End;
 
@@ -115,44 +133,75 @@ Vec2fVec Line::intersect(const Line& other) const
     if(a < 0.0f)
         a += PI2_F;
 
-    Mat2f m_r;
-    Mat2f m_r_inv;
+    Mat3f m_r;
+    Mat3f m_t;
 
-    m_r << std::cos(-a), -std::sin(-a), std::sin(-a), std::cos(-a);
-    m_r_inv = m_r.inverse();
+    m_r <<
+        std::cos(-a), -std::sin(-a), 0.0f,
+        std::sin(-a),  std::cos(-a), 0.0f,
+                0.0f,          0.0f, 1.0f;
 
-    Vec2f l1p0 = m_r * (other.m_Start - t);
-    Vec2f l1p1 = m_r * (other.m_End - t);
+    m_t <<
+        1.0f, 0.0f, -t[0],
+        0.0f, 1.0f, -t[1],
+        0.0f, 0.0f,  1.0f;
+
+    return m_r * m_t;
+}
+
+std::vector<float> Line::rootsX() const
+{
+    Result solution = solve({&(float)m_Start[0], &(float)m_End[0]});
+    std::vector<float> roots;
+    
+    for(size_t i = 0; i < solution.m_Solutions; i++)
+        roots.push_back(solution[0]);
+
+    return roots;
+}
+
+std::vector<float> Line::rootsY() const
+{
+    Result solution = solve({&(float)m_Start[1], &(float)m_End[1]});
+    std::vector<float> roots;
+
+    for(size_t i = 0; i < solution.m_Solutions; i++)
+        roots.push_back(solution[0]);
+
+    return roots;
+}
+
+Vec2fVec Line::intersect(const Line& other) const
+{
+    Mat3f trans = getOrthoBaseMatrix();
+    Mat3f trans_inv = trans.inverse();
+
+    Line t_line = other.transformed(trans);
 
     // find root y compontent (cuts with x axis)
+    // bool solved;
+    // float alpha = rootX(solved);
 
-    //bool solved;
-    //float alpha = rootX(solved);
+    Vec2fVec results;
+    std::vector<float> root = t_line.rootsY();
 
-    Result res = solve({&(float)l1p0[1], &(float)l1p1[1]});
-
-    bool solved = res.m_Solutions == 1;
-    float alpha = res[0];
-
-    Vec2f cut_pos(0.0f, 0.0f);
-
-    if(!solved)
+    if(root.empty())
         return results;
+
+    float alpha = root[0];
 
     // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
     if(alpha < 0.0f || alpha > 1.0f)
         return results;
 
     //cut_pos = other.getRelativePoint(alpha);
-    cut_pos = blend({l1p0, l1p1}, alpha);
+    Vec2f cut_pos = t_line.getRelativePoint(alpha);
 
     // cut_pos.x must be between 0.0 and lenght of source line
-    if(cut_pos.x() < 0.0f || cut_pos.x() > l)
+    if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
         return results;
 
-    cut_pos = (m_r_inv * cut_pos) + t;
-
-    results.push_back(cut_pos);
+    results.push_back(other.getRelativePoint(alpha));
     
     return results;
 }

@@ -36,10 +36,17 @@ public:
     bool collinearTo(const Line& l) const;
     float getLength() const;
     Vec2f getNormal() const;
+    void transform(const Mat3f& m);
+    Line transformed(const Mat3f& m) const;
+    std::vector<float> rootsX() const;
+    std::vector<float> rootsY() const;
 
     Vec2fVec intersect(const Line& l) const;
     Vec2fVec intersect(const QuadraticBezier& b) const;
     Vec2fVec intersect(const CubicBezier& b) const;
+
+private:
+    Mat3f getOrthoBaseMatrix() const;
 
 private:
     float m_Thickness;
