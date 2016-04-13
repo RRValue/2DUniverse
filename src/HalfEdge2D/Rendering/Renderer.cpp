@@ -216,8 +216,10 @@ void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const
 
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(p->getSize(), 0.0f));
-        float point_size_px = (tar - ref).manhattanLength();
+        QPointF val = tar - ref;
 
+        float point_size_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+        
         const Vec2f& pos = p->getPosition();
         const Vec4f& col = p->getColour();
 
@@ -240,7 +242,9 @@ void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* con
 
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(c->getRadius(), 0.0f));
-        float radius_px = (tar - ref).manhattanLength();
+        QPointF val = tar - ref;
+        
+        float radius_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
         const Vec2f& pos = c->getPosition();
         const Vec4f& col = c->getColour();
@@ -264,7 +268,9 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
 
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(l->getThickness(), 0.0f));
-        float thickness_px = (tar - ref).manhattanLength();
+        QPointF val = tar - ref;
+
+        float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
         const Vec2f& pos0 = l->getPositionStart();
         const Vec2f& pos1 = l->getPositionEnd();
@@ -272,7 +278,7 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
 
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
-        painter->setPen(QPen(paint_color));
+        painter->setPen(QPen(paint_color, line_with));
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawLine(trans(QPointF(pos0[0], pos0[1])), trans(QPointF(pos1[0], pos1[1])));
     }
@@ -287,7 +293,9 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<Qua
 
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(b->getThickness(), 0.0f));
-        float thickness_px = (tar - ref).manhattanLength();
+        QPointF val = tar - ref;
+
+        float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
         // get points
         const std::array<Vec2f, 3>& points = b->getPoints();
@@ -349,7 +357,7 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<Qua
         // paint bezier
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
-        painter->setPen(QPen(paint_color));
+        painter->setPen(QPen(paint_color, line_with));
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawLines(lines);
     }
@@ -364,8 +372,10 @@ void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBe
 
         QPointF ref = trans(QPointF(0.0f, 0.0f));
         QPointF tar = trans(QPointF(b->getThickness(), 0.0f));
-        float thickness_px = (tar - ref).manhattanLength();
+        QPointF val = tar - ref;
 
+        float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+        
         // get points
         const std::array<Vec2f, 4>& points = b->getPoints();
 
@@ -427,7 +437,7 @@ void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBe
         // paint bezier
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
-        painter->setPen(QPen(paint_color));
+        painter->setPen(QPen(paint_color, line_with));
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawLines(lines);
     }
@@ -438,8 +448,10 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
     // get point point size to paint
     QPointF ref = trans(QPointF(0.0f, 0.0f));
     QPointF tar = trans(QPointF(m_PointSize, 0.0f));
-    float point_size_px = (tar - ref).manhattanLength();
+    QPointF val = tar - ref;
 
+    float point_size_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+    
     const std::vector<Vertex*>& vertices = mesh->getVertices();
     const std::vector<Face*>& faces = mesh->getFaces();
 
