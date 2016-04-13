@@ -15,6 +15,7 @@
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Circle.h"
 #include "HalfEdge2D/Renderables/Line.h"
+#include "HalfEdge2D/Renderables/QuadraticBezier.h"
 #include "HalfEdge2D/Renderables/CubicBezier.h"
 
 #include <QtGui/QPainter>
@@ -191,6 +192,7 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
     renderPoints(painter, scene->getPoints());
     renderCircles(painter, scene->getCircles());
     renderLines(painter, scene->getLines());
+    renderQuadraticBezier(painter, scene->getQuadraticBeziers());
     renderCubicBezier(painter, scene->getCubicBeziers());
 }
 
@@ -276,9 +278,86 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
     }
 }
 
-void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBezier* const>& cubicBeziers)
+void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<QuadraticBezier* const>& beziers)
 {
-    for(const auto& b : cubicBeziers)
+    for(const auto& b : beziers)
+    {
+        if(!b->isVisible())
+            continue;
+
+        QPointF ref = trans(QPointF(0.0f, 0.0f));
+        QPointF tar = trans(QPointF(b->getThickness(), 0.0f));
+        float thickness_px = (tar - ref).manhattanLength();
+
+        // get points
+        const std::array<Vec2f, 3>& points = b->getPoints();
+
+        // get colour
+        const Vec4f& col = b->getColour();
+
+        // get bb
+        std::array<QPointF, 3> bb_points =
+        {
+            trans(QPointF(points[0][0], points[0][1])),
+            trans(QPointF(points[1][0], points[1][1])),
+            trans(QPointF(points[2][0], points[2][1]))
+        };
+
+        float pos_inf = std::numeric_limits<float>::infinity();
+        float neg_inf = -pos_inf;
+
+        QPointF min(pos_inf, pos_inf);
+        QPointF max(neg_inf, neg_inf);
+
+        for(const auto& bb_p : bb_points)
+        {
+            if(bb_p.x() < min.x()) min.setX(bb_p.x());
+            if(bb_p.y() < min.y()) min.setY(bb_p.y());
+
+            if(bb_p.x() > max.x()) max.setX(bb_p.x());
+            if(bb_p.y() > max.y()) max.setY(bb_p.y());
+        }
+
+        // get alpha steps
+        QPointF diag = max - min;
+        float bb_diag_length = std::sqrt((diag.x() * diag.x()) + (diag.y() * diag.y()));
+        float max_bezier_length = 1.5f * bb_diag_length;
+
+        // defines num lines when bezier length is 1000 px
+        int max_ration = 100;
+        float coef_a = (-1.0f + (float)max_ration) / 999.0f;
+        float coef_b = (1000.0f - (float)max_ration) / 999.0f;
+
+        unsigned int num_lines = (unsigned int)(((coef_a * max_bezier_length) + coef_b) + 0.5f);
+        float alpha_step = 1.0f / (float)num_lines;
+
+        // build lines
+        QVector<QLineF> lines;
+
+        float alpha = 0.0;
+
+        for(unsigned int i = 0; i < num_lines; i++)
+        {
+            Vec2f bp0 = b->pointAt(alpha);
+            Vec2f bp1 = b->pointAt(alpha + alpha_step);
+
+            lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
+
+            alpha += alpha_step;
+        }
+
+        // paint bezier
+        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+        painter->setPen(QPen(paint_color));
+        painter->setBrush(Qt::BrushStyle::NoBrush);
+        painter->drawLines(lines);
+    }
+}
+
+void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBezier* const>& beziers)
+{
+    for(const auto& b : beziers)
     {
         if(!b->isVisible())
             continue;

@@ -16,6 +16,7 @@ class Controller;
 class ControllerBuildMesh;
 class ControllerShowRings;
 class ControllerDelaunay;
+class ControllerQuadraticBezier;
 class ControllerCubicBezier;
 class ControllerCutLine;
 class EventHandler;
@@ -85,6 +86,7 @@ private:
     ControllerBuildMesh* m_ControllerBuildMesh;
     ControllerShowRings* m_ControllerShowRings;
     ControllerDelaunay* m_ControllerDelaunay;
+    ControllerQuadraticBezier* m_ControllerQuadraticBezier;
     ControllerCubicBezier* m_ControllerCubicBezier;
     ControllerCutLine* m_ControllerCutLine;
 
