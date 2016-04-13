@@ -225,14 +225,14 @@ Vec2fVec Line::intersect(const QuadraticBezier& b) const
     {
         // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
         if(alpha < 0.0f || alpha > 1.0f)
-            return results;
+            continue;
 
         //cut_pos = other.getRelativePoint(alpha);
         Vec2f cut_pos = t_bezier.pointAt(alpha);
 
         // cut_pos.x must be between 0.0 and lenght of source line
         if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
-            return results;
+            continue;
 
         results.push_back(b.pointAt(alpha));
     }
@@ -260,14 +260,14 @@ Vec2fVec Line::intersect(const CubicBezier& b) const
     {
         // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
         if(alpha < 0.0f || alpha > 1.0f)
-            return results;
+            continue;
 
         //cut_pos = other.getRelativePoint(alpha);
         Vec2f cut_pos = t_bezier.pointAt(alpha);
 
         // cut_pos.x must be between 0.0 and lenght of source line
         if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
-            return results;
+            continue;
 
         results.push_back(b.pointAt(alpha));
     }

@@ -126,7 +126,46 @@ private:
     template<>
     Result solveImpl<3>(const CoefArray<3>& coef) const
     {
+        TypeRef(T) c0 = VoidToType(T, coef[0]);
+        TypeRef(T) c1 = VoidToType(T, coef[1]);
+        TypeRef(T) c2 = VoidToType(T, coef[2]);
+
+        static Mat3f coef_mat3 = []
+        {
+            Mat3f m;
+            m <<
+                 1.0f, -2.0f, 1.0f,
+                -2.0f,  2.0f, 0.0f,
+                 1.0f,  0.0f, 0.0f;
+            
+            return m;
+        }();
+
         Result result;
+
+        // transform coeficent
+        Vec3f t_coef = coef_mat3 * Vec3f(c0, c1, c2);
+        float a = t_coef[1] / t_coef[0];
+        float b = t_coef[2] / t_coef[0];
+
+        float det = (a * a) - (4.0f * b);
+        float t = -a / 2.0f;
+
+        if(det < 0.0f)
+            return result;
+        else if(det < 1e-5f)
+        {
+            result.m_Solutions = 1;
+            result[0] = t;
+
+            return result;
+        }
+
+        det = std::sqrt(det) / 2.0f;
+
+        result.m_Solutions = 2;
+        result[0] = t - det;
+        result[1] = t + det;
 
         return result;
     }
@@ -138,6 +177,9 @@ private:
 
         return result;
     }
+
+private:
+
 };
 
 #endif //_BASE_STATICPOLYNOMIALSOLVER_H_

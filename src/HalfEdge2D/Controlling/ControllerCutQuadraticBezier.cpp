@@ -248,12 +248,12 @@ void ControllerCutQuadraticBezier::cut()
 
     if(cut_points.empty())
         return;
-    else if(cut_points.size() <= 1)
+    if(cut_points.size() >= 1)
     {
         m_CutPoint0->setVisible(true);
         m_CutPoint0->setPosition(cut_points[0]);
     }
-    else if(cut_points.size() <= 2)
+    if(cut_points.size() >= 2)
     {
         m_CutPoint1->setVisible(true);
         m_CutPoint1->setPosition(cut_points[1]);
