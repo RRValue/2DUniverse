@@ -96,7 +96,7 @@ std::vector<float> CubicBezier::rootsX() const
     std::vector<float> roots;
 
     for(size_t i = 0; i < solution.m_Solutions; i++)
-        roots.push_back(solution[0]);
+        roots.push_back(solution[i]);
 
     return roots;
 }
@@ -107,7 +107,7 @@ std::vector<float> CubicBezier::rootsY() const
     std::vector<float> roots;
 
     for(size_t i = 0; i < solution.m_Solutions; i++)
-        roots.push_back(solution[0]);
+        roots.push_back(solution[i]);
 
     return roots;
 }

@@ -7,7 +7,7 @@
 
 #include <array>
 
-class CubicBezier : protected StaticNGradeBlend<Vec2f, 4>, protected StaticPolynomialSolver<float, 2>
+class CubicBezier : protected StaticNGradeBlend<Vec2f, 4>, protected StaticPolynomialSolver<float, 3>
 {
 public:
     CubicBezier();

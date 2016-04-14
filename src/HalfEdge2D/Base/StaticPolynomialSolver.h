@@ -130,13 +130,13 @@ private:
         TypeRef(T) c1 = VoidToType(T, coef[1]);
         TypeRef(T) c2 = VoidToType(T, coef[2]);
 
-        static Mat3f coef_mat3 = []
+        static Eigen::Matrix<T, 3, 3> coef_mat3 = []
         {
-            Mat3f m;
+            Eigen::Matrix<T, 3, 3> m;
             m <<
-                 1.0f, -2.0f, 1.0f,
-                -2.0f,  2.0f, 0.0f,
-                 1.0f,  0.0f, 0.0f;
+                T( 1), T(-2), T(1),
+                T(-2), T( 2), T(0),
+                T( 1), T( 0), T(0);
             
             return m;
         }();
@@ -144,16 +144,18 @@ private:
         Result result;
 
         // transform coeficent
-        Vec3f t_coef = coef_mat3 * Vec3f(c0, c1, c2);
-        float a = t_coef[1] / t_coef[0];
-        float b = t_coef[2] / t_coef[0];
+        Eigen::Matrix<T, 3, 1> t_coef = coef_mat3 * Eigen::Matrix<T, 3, 1>(c0, c1, c2);
 
-        float det = (a * a) - (4.0f * b);
-        float t = -a / 2.0f;
+        // solve quadratic param
+        T a = t_coef[1] / t_coef[0];
+        T b = t_coef[2] / t_coef[0];
+
+        T det = (a * a) - (T(4) * b);
+        T t = -a / T(2);
 
         if(det < 0.0f)
             return result;
-        else if(det < 1e-5f)
+        else if(det < T(1e-5f))
         {
             result.m_Solutions = 1;
             result[0] = t;
@@ -161,7 +163,7 @@ private:
             return result;
         }
 
-        det = std::sqrt(det) / 2.0f;
+        det = std::sqrt(det) / T(2);
 
         result.m_Solutions = 2;
         result[0] = t - det;
@@ -173,7 +175,94 @@ private:
     template<>
     Result solveImpl<4>(const CoefArray<4>& coef) const
     {
+        TypeRef(T) c0 = VoidToType(T, coef[0]);
+        TypeRef(T) c1 = VoidToType(T, coef[1]);
+        TypeRef(T) c2 = VoidToType(T, coef[2]);
+        TypeRef(T) c3 = VoidToType(T, coef[3]);
+
+        static Eigen::Matrix<T, 4, 4> coef_mat = []
+        {
+            Eigen::Matrix<T, 4, 4> m;
+            m <<
+                T(-1), T( 3), T(-3), T( 1),
+                T( 3), T(-6), T( 3), T( 0),
+                T(-3), T( 3), T( 0), T( 0),
+                T( 1), T( 0), T( 0), T( 0);
+
+            return m;
+        }();
+
         Result result;
+
+        // transform coeficent
+        Eigen::Matrix<T, 4, 1> t_coef = coef_mat * Eigen::Matrix<T, 4, 1>(c0, c1, c2, c3);
+
+        // solce cubic
+        const T& a = t_coef[0];
+        const T& b = t_coef[1];
+        const T& c = t_coef[2];
+        const T& d = t_coef[3];
+
+        T a2 = a * a;
+        T a3 = a2 * a;
+        T b2 = b * b;
+        T b3 = b2 * b;
+
+        T f = ((T(3) * c / a) - (b2 / a2)) / T(3);
+        T g = ((T(2) * b3 / a3) - (T(9) * b * c / a2) + (T(27) * d / a)) / T(27);
+
+        T f3 = f * f * f;
+        T g2 = g * g;
+
+        T h = (g2 / T(4)) + (f3 / T(27));
+
+        // check for one solution (f == g == h)
+        if(std::abs(f) < T(1e-10) && std::abs(g) < T(1e-10) && std::abs(h) < T(1e-10))
+        {
+            result.m_Solutions = 1;
+
+            result[0] = -std::cbrt(d / a);
+
+            return result;
+        }
+        else if(h > T(0))
+        {
+            T h_sqrt = std::sqrt(h);
+            T g_half = g / T(2);
+
+            T s = std::cbrt(-g_half + h_sqrt);
+            T u = std::cbrt(-g_half - h_sqrt);
+
+            result.m_Solutions = 1;
+
+            result[0] = (s + u) - (b / (T(3) * a));
+
+            return result;
+        }
+
+        T i = std::sqrt((g2 / T(4)) - h);
+        T j = std::cbrt(i);
+        T k = std::acos(-g / (T(2) * i));
+
+        T k_third = k / T(3);
+
+        T m = std::cos(k_third);
+        T n = std::sqrt(T(3)) * std::sin(k_third);
+        T p = -b / (T(3) * a);
+
+        if(std::abs(n) < T(1e-10))
+        {
+            result.m_Solutions = 2;
+
+            result[0] = (-j * m) + p;
+            result[1] = 2 * j * m + p;
+        }
+
+        result.m_Solutions = 3;
+
+        result[0] = (-j * (m + n)) + p;
+        result[1] = (-j * (m - n)) + p;
+        result[2] = 2 * j * m + p;
 
         return result;
     }
