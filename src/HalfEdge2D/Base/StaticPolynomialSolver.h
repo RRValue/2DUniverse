@@ -175,6 +175,8 @@ private:
     template<>
     Result solveImpl<4>(const CoefArray<4>& coef) const
     {
+        // algorithmic source: http://www.1728.org/cubic2.htm
+
         TypeRef(T) c0 = VoidToType(T, coef[0]);
         TypeRef(T) c1 = VoidToType(T, coef[1]);
         TypeRef(T) c2 = VoidToType(T, coef[2]);
