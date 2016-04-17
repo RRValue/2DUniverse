@@ -13,6 +13,7 @@
 template <typename T, unsigned int G, unsigned int D, unsigned N = G + 1>
 class StaticNGradeBezier : StaticPolynomialSolver<T, G>
 {
+private:
     // typedefs
     typedef Eigen::Matrix<T, D, N> BezierParamType;
     typedef Eigen::Matrix<T, D, 1> BezierPointType;
@@ -21,6 +22,9 @@ class StaticNGradeBezier : StaticPolynomialSolver<T, G>
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
     typedef Eigen::Matrix<T, N, N> ExpandMatrixType;
     typedef std::vector<T> RootsVecType;
+
+public:
+    typedef BezierParamType BezierPointsType;
 
     static_assert(G <= 13, "13 Is max for StaticNGradeBezier");
 
@@ -34,6 +38,11 @@ public:
     BezierPointType getPoint(const size_t& idx) const
     {
         return m_Params.col(idx);
+    }
+
+    const BezierPointsType& getPoints() const
+    {
+        return m_Params;
     }
 
     void setPoint(const size_t& idx, const BezierPointType& p)

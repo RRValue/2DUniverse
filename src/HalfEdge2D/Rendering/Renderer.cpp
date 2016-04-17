@@ -272,15 +272,23 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
 
         float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
-        const Vec2f& pos0 = l->getPoint(0);
-        const Vec2f& pos1 = l->getPoint(1);
+        // get points
+        const Line::BezierPointsType& points = l->getPoints();
+
+        // get colour
         const Vec4f& col = l->getColour();
+
+        // get bb
+        std::array<QPointF, 2> pts;
+
+        for(size_t i = 0; i < 2; i++)
+            pts[i] = trans(QPointF(points(0, i), points(1, i)));
 
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
         painter->setPen(QPen(paint_color, line_with));
         painter->setBrush(Qt::BrushStyle::NoBrush);
-        painter->drawLine(trans(QPointF(pos0[0], pos0[1])), trans(QPointF(pos1[0], pos1[1])));
+        painter->drawLine(pts[0], pts[1]);
     }
 }
 
@@ -298,23 +306,16 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<Qua
         float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
         // get points
-        const std::array<Vec2f, 3>& points = 
-        {
-            b->getPoint(0),
-            b->getPoint(1),
-            b->getPoint(2)
-        };
+        const QuadraticBezier::BezierPointsType& points = b->getPoints();
 
         // get colour
         const Vec4f& col = b->getColour();
 
         // get bb
-        std::array<QPointF, 3> bb_points =
-        {
-            trans(QPointF(points[0][0], points[0][1])),
-            trans(QPointF(points[1][0], points[1][1])),
-            trans(QPointF(points[2][0], points[2][1]))
-        };
+        std::array<QPointF, 3> bb_points;
+
+        for(size_t i = 0; i < 3; i++)
+            bb_points[i] = trans(QPointF(points(0, i), points(1, i)));
 
         float pos_inf = std::numeric_limits<float>::infinity();
         float neg_inf = -pos_inf;
@@ -382,26 +383,16 @@ void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBe
         float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
         
         // get points
-        // get points
-        const std::array<Vec2f, 4>& points =
-        {
-            b->getPoint(0),
-            b->getPoint(1),
-            b->getPoint(2),
-            b->getPoint(3)
-        };
+        const CubicBezier::BezierPointsType& points = b->getPoints();
 
         // get colour
         const Vec4f& col = b->getColour();
 
         // get bb
-        std::array<QPointF, 4> bb_points =
-        {
-            trans(QPointF(points[0][0], points[0][1])),
-            trans(QPointF(points[1][0], points[1][1])),
-            trans(QPointF(points[2][0], points[2][1])),
-            trans(QPointF(points[3][0], points[3][1]))
-        };
+        std::array<QPointF, 4> bb_points;
+
+        for(size_t i = 0; i < 4; i++)
+            bb_points[i] = trans(QPointF(points(0, i), points(1, i)));
 
         float pos_inf = std::numeric_limits<float>::infinity();
         float neg_inf = -pos_inf;
