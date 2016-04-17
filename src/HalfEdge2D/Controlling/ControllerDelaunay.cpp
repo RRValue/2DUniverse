@@ -157,37 +157,37 @@ void ControllerDelaunay::updateLines()
 
     if(m_Points.size() >= 2)
     {
-        m_Lines[0]->setPositionStart(m_Points[0]->getPosition());
-        m_Lines[0]->setPositionEnd(m_Points[1]->getPosition());
+        m_Lines[0]->setPoint(0, m_Points[0]->getPosition());
+        m_Lines[0]->setPoint(1, m_Points[1]->getPosition());
         m_Lines[0]->setVisible(true);
     }
 
     if(m_Points.size() >= 3)
     {
-        m_Lines[1]->setPositionStart(m_Points[1]->getPosition());
-        m_Lines[1]->setPositionEnd(m_Points[2]->getPosition());
+        m_Lines[1]->setPoint(0, m_Points[1]->getPosition());
+        m_Lines[1]->setPoint(1, m_Points[2]->getPosition());
         m_Lines[1]->setVisible(true);
     }
 
     if(m_Points.size() >= 4)
     {
-        m_Lines[2]->setPositionStart(m_Points[2]->getPosition());
-        m_Lines[2]->setPositionEnd(m_Points[3]->getPosition());
+        m_Lines[2]->setPoint(0, m_Points[2]->getPosition());
+        m_Lines[2]->setPoint(1, m_Points[3]->getPosition());
         m_Lines[2]->setVisible(true);
 
-        m_Lines[3]->setPositionStart(m_Points[3]->getPosition());
-        m_Lines[3]->setPositionEnd(m_Points[0]->getPosition());
+        m_Lines[3]->setPoint(0, m_Points[3]->getPosition());
+        m_Lines[3]->setPoint(1, m_Points[0]->getPosition());
         m_Lines[3]->setVisible(true);
 
         if(isPointInCircle({m_Points[0], m_Points[1], m_Points[2]}, m_Points[3]))
         {
-            m_Lines[4]->setPositionStart(m_Points[0]->getPosition());
-            m_Lines[4]->setPositionEnd(m_Points[2]->getPosition());
+            m_Lines[4]->setPoint(0, m_Points[0]->getPosition());
+            m_Lines[4]->setPoint(1, m_Points[2]->getPosition());
         }
         else
         {
-            m_Lines[4]->setPositionStart(m_Points[1]->getPosition());
-            m_Lines[4]->setPositionEnd(m_Points[3]->getPosition());
+            m_Lines[4]->setPoint(0, m_Points[1]->getPosition());
+            m_Lines[4]->setPoint(1, m_Points[3]->getPosition());
         }
 
         m_Lines[4]->setVisible(true);
@@ -287,10 +287,10 @@ void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::arr
     Line l01;
     Line l12;
 
-    l01.setPositionStart(points[0]->getPosition());
-    l01.setPositionEnd(points[1]->getPosition());
-    l12.setPositionStart(points[1]->getPosition());
-    l12.setPositionEnd(points[2]->getPosition());
+    l01.setPoint(0, points[0]->getPosition());
+    l01.setPoint(1, points[1]->getPosition());
+    l12.setPoint(0, points[1]->getPosition());
+    l12.setPoint(1, points[2]->getPosition());
 
     float length = 1000.0f * (l01.getLength() + l12.getLength());
 
@@ -308,10 +308,10 @@ void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::arr
     Line bisect0;
     Line bisect1;
 
-    bisect0.setPositionStart(bs0s);
-    bisect0.setPositionEnd(bs0e);
-    bisect1.setPositionStart(bs1s);
-    bisect1.setPositionEnd(bs1e);
+    bisect0.setPoint(0, bs0s);
+    bisect0.setPoint(1, bs0e);
+    bisect1.setPoint(0, bs1s);
+    bisect1.setPoint(1, bs1e);
 
     Vec2fVec center = bisect0.intersect(bisect1);
 

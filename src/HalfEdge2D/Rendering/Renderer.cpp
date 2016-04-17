@@ -272,8 +272,8 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
 
         float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
-        const Vec2f& pos0 = l->getPositionStart();
-        const Vec2f& pos1 = l->getPositionEnd();
+        const Vec2f& pos0 = l->getPoint(0);
+        const Vec2f& pos1 = l->getPoint(1);
         const Vec4f& col = l->getColour();
 
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
@@ -298,7 +298,12 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<Qua
         float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
         // get points
-        const std::array<Vec2f, 3>& points = b->getPoints();
+        const std::array<Vec2f, 3>& points = 
+        {
+            b->getPoint(0),
+            b->getPoint(1),
+            b->getPoint(2)
+        };
 
         // get colour
         const Vec4f& col = b->getColour();
@@ -377,7 +382,14 @@ void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBe
         float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
         
         // get points
-        const std::array<Vec2f, 4>& points = b->getPoints();
+        // get points
+        const std::array<Vec2f, 4>& points =
+        {
+            b->getPoint(0),
+            b->getPoint(1),
+            b->getPoint(2),
+            b->getPoint(3)
+        };
 
         // get colour
         const Vec4f& col = b->getColour();

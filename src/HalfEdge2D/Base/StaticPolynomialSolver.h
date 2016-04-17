@@ -24,20 +24,17 @@ struct StaticPolynomialSolverTypeTrait<double>
     StaticPolynomialSolverTypeTrait() {}
 };
 
-#define TypeRef(T) T&
-#define VoidToType(T, V) *(T*)V
-#define TypeToVoid(V) (void*)&V
-#define TypePointerToVoid(V) (void*)V
+#define ConstTypeRef(T) const T&
 
 // define solver
-template <typename T, unsigned int N>
+template <typename T, unsigned int G, unsigned int N = G + 1>
 class StaticPolynomialSolver : protected StaticPolynomialSolverTypeTrait<T>
 {
-    static_assert(N >= 1 && N <= 4, "Grade must between 1 and 4");
+    static_assert(G >= 1 && G <= 4, "Grade must between 1 and 4");
 
 private:
-    template<typename T, unsigned int N>
-    struct PolynomialSolveResult : public std::array<T, N>
+    template<typename T, unsigned int G>
+    struct PolynomialSolveResult : public std::array<T, G>
     {
         PolynomialSolveResult()
         {
@@ -48,107 +45,52 @@ private:
     };
 
 public:
-    typedef PolynomialSolveResult<T, N> Result;
+    typedef PolynomialSolveResult<T, G> Result;
+    typedef Eigen::Matrix<T, N, 1> CoefVec;
 
 public:
-    template<unsigned int M>
-    class CoefArray : public std::array<void*, M>
+    Result solve(const CoefVec& coef) const
     {
-        typedef std::initializer_list<T> TypeInitList;
-        typedef std::initializer_list<T* const> TypePointerInitList;
-
-    public:
-        CoefArray() = delete;
-        CoefArray(const TypeInitList& list)
-        {
-            assert(list.size() == M && "Coef list size not correct");
-
-            size_t i = 0;
-            for(const auto& e : list)
-                (*this)[i++] = TypeToVoid(e);
-        }
-
-        CoefArray(const TypePointerInitList& list)
-        {
-            assert(list.size() == M && "Coef list size not correct");
-
-            size_t i = 0;
-            for(const auto& e : list)
-                (*this)[i++] = TypePointerToVoid(e);
-        }
-
-        CoefArray(const std::array<T, M>& array)
-        {
-            size_t i = 0;
-            for(const auto& e : array)
-                (*this)[i++] = TypeToVoid(e);
-        }
-    };
-
-public:
-    Result solve(const CoefArray<N + 1>& coef) const
-    {
-        return solveImpl(coef);
+        return solveImpl<G>(coef);
     }
 
 private:
     template<unsigned int M>
-    Result solveImpl(const CoefArray<M>& coef) const
+    Result solveImpl(const CoefVec& coef) const
     {
         static_assert(false, "Solve impl. not defined");
     }
 
     template<>
-    Result solveImpl<2>(const CoefArray<2>& coef) const
+    Result solveImpl<1>(const CoefVec& coef) const
     {
-        // solve: c0 * (1 - a) + c1 == 0
-        // a = c0 / (c0 - c1)
+        // solve: a*x + b == 0
+        // a = -b / a
 
-        // (c0 - c1) must be greater than epslion (1e-5f)
+        // a must be greater than epslion (1e-5f)
         // otherwise -> no root
 
         Result res;
 
-        TypeRef(T) c0 = VoidToType(T, coef[0]);
-        TypeRef(T) c1 = VoidToType(T, coef[1]);
-
-        T a = c0 - c1;
+        ConstTypeRef(T) a = coef(0);
+        ConstTypeRef(T) b = coef(1);
 
         if(std::abs(a) < 1e-5f)
             return res;
 
-        res[0] = c0 / a;
+        res[0] = -b / a;
         res.m_Solutions = 1;
 
         return res;
     }
 
     template<>
-    Result solveImpl<3>(const CoefArray<3>& coef) const
+    Result solveImpl<2>(const CoefVec& coef) const
     {
-        TypeRef(T) c0 = VoidToType(T, coef[0]);
-        TypeRef(T) c1 = VoidToType(T, coef[1]);
-        TypeRef(T) c2 = VoidToType(T, coef[2]);
-
-        static Eigen::Matrix<T, 3, 3> coef_mat3 = []
-        {
-            Eigen::Matrix<T, 3, 3> m;
-            m <<
-                T( 1), T(-2), T(1),
-                T(-2), T( 2), T(0),
-                T( 1), T( 0), T(0);
-            
-            return m;
-        }();
-
         Result result;
 
-        // transform coeficent
-        Eigen::Matrix<T, 3, 1> t_coef = coef_mat3 * Eigen::Matrix<T, 3, 1>(c0, c1, c2);
-
-        // solve quadratic param
-        T a = t_coef[1] / t_coef[0];
-        T b = t_coef[2] / t_coef[0];
+        T a = coef[1] / coef[0];
+        T b = coef[2] / coef[0];
 
         T det = (a * a) - (T(4) * b);
         T t = -a / T(2);
@@ -173,37 +115,17 @@ private:
     }
 
     template<>
-    Result solveImpl<4>(const CoefArray<4>& coef) const
+    Result solveImpl<3>(const CoefVec& coef) const
     {
         // algorithmic source: http://www.1728.org/cubic2.htm
 
-        TypeRef(T) c0 = VoidToType(T, coef[0]);
-        TypeRef(T) c1 = VoidToType(T, coef[1]);
-        TypeRef(T) c2 = VoidToType(T, coef[2]);
-        TypeRef(T) c3 = VoidToType(T, coef[3]);
-
-        static Eigen::Matrix<T, 4, 4> coef_mat = []
-        {
-            Eigen::Matrix<T, 4, 4> m;
-            m <<
-                T(-1), T( 3), T(-3), T( 1),
-                T( 3), T(-6), T( 3), T( 0),
-                T(-3), T( 3), T( 0), T( 0),
-                T( 1), T( 0), T( 0), T( 0);
-
-            return m;
-        }();
-
         Result result;
 
-        // transform coeficent
-        Eigen::Matrix<T, 4, 1> t_coef = coef_mat * Eigen::Matrix<T, 4, 1>(c0, c1, c2, c3);
-
         // solce cubic
-        const T& a = t_coef[0];
-        const T& b = t_coef[1];
-        const T& c = t_coef[2];
-        const T& d = t_coef[3];
+        const T& a = coef[0];
+        const T& b = coef[1];
+        const T& c = coef[2];
+        const T& d = coef[3];
 
         T a2 = a * a;
         T a3 = a2 * a;
@@ -268,9 +190,6 @@ private:
 
         return result;
     }
-
-private:
-
 };
 
 #endif //_BASE_STATICPOLYNOMIALSOLVER_H_

@@ -100,10 +100,10 @@ bool ControllerCutQuadraticBezier::handleMouseMoveEvent(QMouseEvent* const event
         m_Bezier->setPoint(2, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 3)
-        m_Line->setPositionStart(m_CurrentPoint->getPosition());
+        m_Line->setPoint(0, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 4)
-        m_Line->setPositionEnd(m_CurrentPoint->getPosition());
+        m_Line->setPoint(1, m_CurrentPoint->getPosition());
 
     cut();
 
@@ -172,11 +172,11 @@ bool ControllerCutQuadraticBezier::handleMousePressEvent(QMouseEvent* const even
         }
 
         if(m_CurrentPointIdx == 3)
-            m_Line->setPositionStart(m_CurrentPoint->getPosition());
+            m_Line->setPoint(0, m_CurrentPoint->getPosition());
 
         if(m_CurrentPointIdx == 4)
         {
-            m_Line->setPositionEnd(m_CurrentPoint->getPosition());
+            m_Line->setPoint(1, m_CurrentPoint->getPosition());
             m_Line->setVisible(true);
         }
     }

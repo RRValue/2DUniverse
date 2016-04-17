@@ -110,10 +110,10 @@ bool ControllerCutCubicBezier::handleMouseMoveEvent(QMouseEvent* const event)
         m_Bezier->setPoint(3, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 4)
-        m_Line->setPositionStart(m_CurrentPoint->getPosition());
+        m_Line->setPoint(0, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 5)
-        m_Line->setPositionEnd(m_CurrentPoint->getPosition());
+        m_Line->setPoint(1, m_CurrentPoint->getPosition());
 
     cut();
 
@@ -185,11 +185,11 @@ bool ControllerCutCubicBezier::handleMousePressEvent(QMouseEvent* const event)
         }
 
         if(m_CurrentPointIdx == 4)
-            m_Line->setPositionStart(m_CurrentPoint->getPosition());
+            m_Line->setPoint(0, m_CurrentPoint->getPosition());
 
         if(m_CurrentPointIdx == 5)
         {
-            m_Line->setPositionEnd(m_CurrentPoint->getPosition());
+            m_Line->setPoint(1, m_CurrentPoint->getPosition());
             m_Line->setVisible(true);
         }
     }

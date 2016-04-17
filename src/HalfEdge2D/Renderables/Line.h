@@ -2,45 +2,36 @@
 #define _RENDERABLE_LINE_H_
 
 #include "HalfEdge2D/Base/Vector.h"
-#include "HalfEdge2D/Base/StaticNGradeBlend.h"
-#include "HalfEdge2D/Base/StaticPolynomialSolver.h"
+#include "HalfEdge2D/Base/StaticNGradeBezier.h"
+
+#include "HalfEdge2D/Renderables/Renderable.h"
 
 #include "HalfEdge2D/Renderables/QuadraticBezier.h"
 #include "HalfEdge2D/Renderables/CubicBezier.h"
 
 #include <vector>
 
-class Line : protected StaticNGradeBlend<Vec2f, 2>, protected StaticPolynomialSolver<float, 1>
+typedef StaticNGradeBezier<float, 1, 2> Line2F;
+
+class Line : public Line2F, public Renderable
 {
 public:
     Line();
+    Line(const Line& other);
     ~Line();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
     // getter
     const float& getThickness() const;
-    const Vec2f& getPositionStart() const;
-    const Vec2f& getPositionEnd() const;
-    const Vec4f& getColour() const;
-    const bool& isVisible() const;
-
+    
     //setter
     void setThickness(const float& thickness);
-    void setPositionStart(const Vec2f& pos);
-    void setPositionEnd(const Vec2f& pos);
-    void setColour(const Vec4f& colour);
-    void setVisible(const bool& visible);
-
+    
     // tooling
-    Vec2f pointAt(const float& pos) const;
     bool collinearTo(const Line& l) const;
     float getLength() const;
     Vec2f getNormal() const;
-    void transform(const Mat3f& m);
-    Line transformed(const Mat3f& m) const;
-    std::vector<float> rootsX() const;
-    std::vector<float> rootsY() const;
-
+    
     Vec2fVec intersect(const Line& l) const;
     Vec2fVec intersect(const QuadraticBezier& b) const;
     Vec2fVec intersect(const CubicBezier& b) const;
@@ -50,10 +41,6 @@ private:
 
 private:
     float m_Thickness;
-    Vec2f m_Start;
-    Vec2f m_End;
-    Vec4f m_Colour;
-    bool m_Visible;
 };
 
 #endif //_RENDERABLE_LINE_H_

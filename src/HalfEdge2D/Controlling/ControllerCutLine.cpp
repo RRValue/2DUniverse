@@ -83,16 +83,16 @@ bool ControllerCutLine::handleMouseMoveEvent(QMouseEvent* const event)
     m_CurrentPoint->setPosition(new_pos);
 
     if(m_CurrentPointIdx == 0)
-        m_Line0->setPositionStart(m_CurrentPoint->getPosition());
+        m_Line0->setPoint(0, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 1)
-        m_Line0->setPositionEnd(m_CurrentPoint->getPosition());
+        m_Line0->setPoint(1, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 2)
-        m_Line1->setPositionStart(m_CurrentPoint->getPosition());
+        m_Line1->setPoint(0, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 3)
-        m_Line1->setPositionEnd(m_CurrentPoint->getPosition());
+        m_Line1->setPoint(1, m_CurrentPoint->getPosition());
 
     cut();
 
@@ -149,20 +149,20 @@ bool ControllerCutLine::handleMousePressEvent(QMouseEvent* const event)
         m_Scene->addPoint(m_CurrentPoint);
 
         if(m_CurrentPointIdx == 0)
-            m_Line0->setPositionStart(m_CurrentPoint->getPosition());
+            m_Line0->setPoint(0, m_CurrentPoint->getPosition());
 
         if(m_CurrentPointIdx == 1)
         {
-            m_Line0->setPositionEnd(m_CurrentPoint->getPosition());
+            m_Line0->setPoint(1, m_CurrentPoint->getPosition());
             m_Line0->setVisible(true);
         }
 
         if(m_CurrentPointIdx == 2)
-            m_Line1->setPositionStart(m_CurrentPoint->getPosition());
+            m_Line1->setPoint(0, m_CurrentPoint->getPosition());
 
         if(m_CurrentPointIdx == 3)
         {
-            m_Line1->setPositionEnd(m_CurrentPoint->getPosition());
+            m_Line1->setPoint(1, m_CurrentPoint->getPosition());
             m_Line1->setVisible(true);
         }
     }
