@@ -5,13 +5,12 @@
 
 #include "HalfEdge2D/Base/StaticGroupElements.h"
 #include "HalfEdge2D/Base/StaticPolynomialSolver.h"
+#include "HalfEdge2D/Base/StaticBernsteinMatrix.h"
 
 #include <cassert>
 
-#include <iostream>
-
 template <typename T, unsigned int G, unsigned int D, unsigned N = G + 1>
-class StaticNGradeBezier : StaticPolynomialSolver<T, G>
+class StaticNGradeBezier : StaticPolynomialSolver<T, G>, StaticBernsteinMatrix<T, G>
 {
 private:
     // typedefs
@@ -103,82 +102,7 @@ public:
 private:
     void updateParams()
     {
-        m_ExpandParams = m_Params * getExpandMatrix<N>();
-    }
-
-    template<unsigned int M>
-    inline const ExpandMatrixType& getExpandMatrix() const
-    {
-        static_assert(false, "Not defined for Dimension M");
-    }
-
-    template<>
-    inline const ExpandMatrixType& getExpandMatrix<1>() const
-    {
-        static ExpandMatrixType expandMatrixD1 = []
-        {
-            ExpandMatrixType m;
-
-            m(0, 0) = T(1);
-
-            return m;
-        }();
-
-        return expandMatrixD1;
-    }
-
-    template<>
-    inline const ExpandMatrixType& getExpandMatrix<2>() const
-    {
-        static ExpandMatrixType expandMatrixD2 = []
-        {
-            ExpandMatrixType m;
-
-            m <<
-                T(-1), T(1),
-                T( 1), T(0);
-
-            return m;
-        }();
-
-        return expandMatrixD2;
-    }
-
-    template<>
-    inline const ExpandMatrixType& getExpandMatrix<3>() const
-    {
-        static ExpandMatrixType expandMatrixD3 = []
-        {
-            ExpandMatrixType m;
-
-            m <<
-                T( 1), T(-2), T(1),
-                T(-2), T( 2), T(0),
-                T( 1), T( 0), T(0);
-
-            return m;
-        }();
-
-        return expandMatrixD3;
-    }
-
-    template<>
-    inline const ExpandMatrixType& getExpandMatrix<4>() const
-    {
-        static ExpandMatrixType expandMatrixD4 = []
-        {
-            ExpandMatrixType m;
-
-            m <<
-                T(-1), T( 3), T(-3), T( 1),
-                T( 3), T(-6), T( 3), T( 0),
-                T(-3), T( 3), T( 0), T( 0),
-                T( 1), T( 0), T( 0), T( 0);
-
-            return m;
-        }();
-
-        return expandMatrixD4;
+        m_ExpandParams = m_Params * getBernsteinMatrix();
     }
 
 private:
