@@ -93,7 +93,7 @@ Vec2fVec Line::intersect(const Line& other) const
     // float alpha = rootX(solved);
 
     Vec2fVec results;
-    std::vector<float> root = t_line.componentRoots(1);
+    Line::Roots root = t_line.componentRoots(1);
 
     if(root.empty())
         return results;
@@ -129,13 +129,15 @@ Vec2fVec Line::intersect(const QuadraticBezier& b) const
     // float alpha = rootX(solved);
 
     Vec2fVec results;
-    std::vector<float> roots = t_bezier.componentRoots(1);
+    QuadraticBezier::Roots roots = t_bezier.componentRoots(1);
 
     if(roots.empty())
         return results;
 
-    for(const auto& alpha : roots)
+    for(unsigned int i = 0; i < roots.m_Solutions; i++)
     {
+        float alpha = roots[i];
+
         // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
         if(alpha < 0.0f || alpha > 1.0f)
             continue;
@@ -165,13 +167,15 @@ Vec2fVec Line::intersect(const CubicBezier& b) const
     // float alpha = rootX(solved);
 
     Vec2fVec results;
-    std::vector<float> roots = t_bezier.componentRoots(1);
+    CubicBezier::Roots roots = t_bezier.componentRoots(1);
 
     if(roots.empty())
         return results;
 
-    for(const auto& alpha : roots)
+    for(unsigned int i = 0; i < roots.m_Solutions; i++)
     {
+        float alpha = roots[i];
+
         // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
         if(alpha < 0.0f || alpha > 1.0f)
             continue;

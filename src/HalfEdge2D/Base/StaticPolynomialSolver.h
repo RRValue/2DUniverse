@@ -46,6 +46,8 @@ private:
 
 public:
     typedef PolynomialSolveResult<T, G> Result;
+
+private:
     typedef Eigen::Matrix<T, N, 1> CoefVec;
 
 public:

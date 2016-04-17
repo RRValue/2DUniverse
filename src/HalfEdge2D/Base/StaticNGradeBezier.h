@@ -7,8 +7,6 @@
 #include "HalfEdge2D/Base/StaticPolynomialSolver.h"
 #include "HalfEdge2D/Base/StaticBernsteinMatrix.h"
 
-#include <cassert>
-
 template <typename T, unsigned int G, unsigned int D, unsigned N = G + 1>
 class StaticNGradeBezier : StaticPolynomialSolver<T, G>, StaticBernsteinMatrix<T, G>
 {
@@ -19,11 +17,10 @@ private:
     typedef Eigen::Matrix<T, N, 1> ComponentValuesType;
     typedef Eigen::Matrix<T, D + 1, 1> TransformPointType;
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
-    typedef Eigen::Matrix<T, N, N> ExpandMatrixType;
-    typedef std::vector<T> RootsVecType;
 
 public:
     typedef BezierParamType BezierPointsType;
+    typedef Result Roots;
 
     static_assert(G <= 13, "13 Is max for StaticNGradeBezier");
 
@@ -87,16 +84,9 @@ public:
         updateParams();
     }
 
-    RootsVecType componentRoots(const size_t& c) const
+    Roots componentRoots(const size_t& c) const
     {
-        Result res = solve(m_ExpandParams.row(c));
-
-        RootsVecType result;
-
-        for(size_t i = 0; i < res.m_Solutions; i++)
-            result.push_back(res[i]);
-
-        return result;
+        return solve(m_ExpandParams.row(c));
     }
 
 private:
