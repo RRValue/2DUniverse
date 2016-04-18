@@ -4,10 +4,10 @@
 
 Line::Line()
 {
-    m_Thickness = 0.01f;
+
 }
 
-Line::Line(const Line& other) : Line2F(other), Renderable(other), m_Thickness(other.m_Thickness)
+Line::Line(const Line& other) : Line2F(other), RenderableLine(other)
 {
 
 }
@@ -15,16 +15,6 @@ Line::Line(const Line& other) : Line2F(other), Renderable(other), m_Thickness(ot
 Line::~Line()
 {
 
-}
-
-const float& Line::getThickness() const
-{
-    return m_Thickness;
-}
-
-void Line::setThickness(const float& thickness)
-{
-    m_Thickness = thickness;
 }
 
 bool Line::collinearTo(const Line& l) const
@@ -89,8 +79,6 @@ Vec2fVec Line::intersect(const Line& other) const
     t_line.transform(trans);
 
     // find root y compontent (cuts with x axis)
-    // bool solved;
-    // float alpha = rootX(solved);
 
     Vec2fVec results;
     Line::Roots root = t_line.componentRoots(1);
@@ -104,7 +92,6 @@ Vec2fVec Line::intersect(const Line& other) const
     if(alpha < 0.0f || alpha > 1.0f)
         return results;
 
-    //cut_pos = other.getRelativePoint(alpha);
     Vec2f cut_pos = t_line.pointAt(alpha);
 
     // cut_pos.x must be between 0.0 and lenght of source line
@@ -125,8 +112,6 @@ Vec2fVec Line::intersect(const QuadraticBezier& b) const
     t_bezier.transform(trans);
 
     // find root y compontent (cuts with x axis)
-    // bool solved;
-    // float alpha = rootX(solved);
 
     Vec2fVec results;
     QuadraticBezier::Roots roots = t_bezier.componentRoots(1);
@@ -142,7 +127,6 @@ Vec2fVec Line::intersect(const QuadraticBezier& b) const
         if(alpha < 0.0f || alpha > 1.0f)
             continue;
 
-        //cut_pos = other.getRelativePoint(alpha);
         Vec2f cut_pos = t_bezier.pointAt(alpha);
 
         // cut_pos.x must be between 0.0 and lenght of source line
@@ -163,9 +147,6 @@ Vec2fVec Line::intersect(const CubicBezier& b) const
     t_bezier.transform(trans);
 
     // find root y compontent (cuts with x axis)
-    // bool solved;
-    // float alpha = rootX(solved);
-
     Vec2fVec results;
     CubicBezier::Roots roots = t_bezier.componentRoots(1);
 
@@ -180,7 +161,6 @@ Vec2fVec Line::intersect(const CubicBezier& b) const
         if(alpha < 0.0f || alpha > 1.0f)
             continue;
 
-        //cut_pos = other.getRelativePoint(alpha);
         Vec2f cut_pos = t_bezier.pointAt(alpha);
 
         // cut_pos.x must be between 0.0 and lenght of source line

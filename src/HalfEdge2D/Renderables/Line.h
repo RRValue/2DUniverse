@@ -4,7 +4,7 @@
 #include "HalfEdge2D/Base/Vector.h"
 #include "HalfEdge2D/Base/StaticNGradeBezier.h"
 
-#include "HalfEdge2D/Renderables/Renderable.h"
+#include "HalfEdge2D/Renderables/RenderableLine.h"
 
 #include "HalfEdge2D/Renderables/QuadraticBezier.h"
 #include "HalfEdge2D/Renderables/CubicBezier.h"
@@ -13,19 +13,13 @@
 
 typedef StaticNGradeBezier<float, 1, 2> Line2F;
 
-class Line : public Line2F, public Renderable
+class Line : public Line2F, public RenderableLine
 {
 public:
     Line();
     Line(const Line& other);
     ~Line();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
-    // getter
-    const float& getThickness() const;
-    
-    //setter
-    void setThickness(const float& thickness);
     
     // tooling
     bool collinearTo(const Line& l) const;
@@ -38,9 +32,6 @@ public:
 
 private:
     Mat3f getOrthoBaseMatrix() const;
-
-private:
-    float m_Thickness;
 };
 
 #endif //_RENDERABLE_LINE_H_

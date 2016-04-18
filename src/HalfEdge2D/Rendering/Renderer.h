@@ -55,6 +55,8 @@ private:
 
     void paint(QPaintDevice* const paintDevice, RenderTarget* const renderTarget);
 
+    float getPixelSize(const float& value);
+
 private:
     void renderScene(QPainter* const painter, Scene* const scene);
     void renderMeshes(QPainter* const painter, const std::set<Mesh* const>& meshes);

@@ -239,12 +239,9 @@ void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* con
     {
         if(!c->isVisible())
             continue;
-
-        QPointF ref = trans(QPointF(0.0f, 0.0f));
-        QPointF tar = trans(QPointF(c->getRadius(), 0.0f));
-        QPointF val = tar - ref;
         
-        float radius_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+        float radius_px = getPixelSize(c->getRadius());
+        float thickness_px = getPixelSize(c->getThickness());
 
         const Vec2f& pos = c->getPosition();
         const Vec4f& col = c->getColour();
@@ -253,7 +250,7 @@ void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* con
 
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
-        painter->setPen(QPen(paint_color));
+        painter->setPen(QPen(paint_color, thickness_px));
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawEllipse(trans(circle_pos), radius_px, radius_px);
     }
@@ -266,11 +263,7 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
         if(!l->isVisible())
             continue;
 
-        QPointF ref = trans(QPointF(0.0f, 0.0f));
-        QPointF tar = trans(QPointF(l->getThickness(), 0.0f));
-        QPointF val = tar - ref;
-
-        float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+        float thickness_px = getPixelSize(l->getThickness());
 
         // get points
         const Line::BezierPointsType& points = l->getPoints();
@@ -286,7 +279,7 @@ void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>&
 
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
-        painter->setPen(QPen(paint_color, line_with));
+        painter->setPen(QPen(paint_color, thickness_px));
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawLine(pts[0], pts[1]);
     }
@@ -299,11 +292,7 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<Qua
         if(!b->isVisible())
             continue;
 
-        QPointF ref = trans(QPointF(0.0f, 0.0f));
-        QPointF tar = trans(QPointF(b->getThickness(), 0.0f));
-        QPointF val = tar - ref;
-
-        float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+        float thickness_px = getPixelSize(b->getThickness());
 
         // get points
         const QuadraticBezier::BezierPointsType& points = b->getPoints();
@@ -363,7 +352,7 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<Qua
         // paint bezier
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
-        painter->setPen(QPen(paint_color, line_with));
+        painter->setPen(QPen(paint_color, thickness_px));
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawLines(lines);
     }
@@ -376,11 +365,7 @@ void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBe
         if(!b->isVisible())
             continue;
 
-        QPointF ref = trans(QPointF(0.0f, 0.0f));
-        QPointF tar = trans(QPointF(b->getThickness(), 0.0f));
-        QPointF val = tar - ref;
-
-        float line_with = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+        float thickness_px = getPixelSize(b->getThickness());
         
         // get points
         const CubicBezier::BezierPointsType& points = b->getPoints();
@@ -440,7 +425,7 @@ void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBe
         // paint bezier
         QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
 
-        painter->setPen(QPen(paint_color, line_with));
+        painter->setPen(QPen(paint_color, thickness_px));
         painter->setBrush(Qt::BrushStyle::NoBrush);
         painter->drawLines(lines);
     }
@@ -551,4 +536,13 @@ QPointF Renderer::transToDevice(const QPointF& point)
     Vec3f res = m_DeviceMat * Vec3f(point.x(), point.y(), 1.0f);
 
     return QPointF(res.x(), res.y());
+}
+
+float Renderer::getPixelSize(const float& value)
+{
+    QPointF ref = trans(QPointF(0.0f, 0.0f));
+    QPointF tar = trans(QPointF(value, 0.0f));
+    QPointF val = tar - ref;
+
+    return std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 }

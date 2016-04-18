@@ -3,26 +3,17 @@
 
 #include "HalfEdge2D/Base/StaticNGradeBezier.h"
 
-#include "HalfEdge2D/Renderables/Renderable.h"
+#include "HalfEdge2D/Renderables/RenderableLine.h"
 
 typedef StaticNGradeBezier<float, 3, 2> CBez2F;
 
-class CubicBezier : public CBez2F, public Renderable
+class CubicBezier : public CBez2F, public RenderableLine
 {
 public:
     CubicBezier();
     CubicBezier(const CubicBezier& other);
     ~CubicBezier();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    // getter
-    const float& getThickness() const;
-    
-    //setter
-    void setThickness(const float& thickness);
-
-private:
-    float m_Thickness;
 };
 
 #endif //_RENDERABLE_CUBICBEZIER_H_
