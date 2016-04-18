@@ -7,17 +7,51 @@ template <typename T, unsigned int G, unsigned int N = G + 1>
 struct StaticBernsteinMatrix
 {
     typedef Eigen::Matrix<T, N, N> MatrixType;
+    typedef Eigen::Matrix<T, N, 1> MatrixRowType;
 
+    template<unsigned int DEV>
+    inline static MatrixType& getDerivedBernsteinMatrix()
+    {
+        static MatrixType mat = []
+        {
+            MatrixType d_mat = getDerivedBernsteinMatrix<DEV - 1>();
+
+            MatrixRowType dvalues;
+            dvalues.setZero();
+
+            float cv = float(N - DEV);
+            for(size_t i = 0; i < N - DEV + 1; i++)
+            {
+                dvalues[i] = cv;
+                cv -= T(1);
+            }
+
+            for(size_t i = 0; i < N; i++)
+                d_mat.col(i) *= dvalues(i);
+
+            return d_mat;
+        }();
+
+        return mat;
+    }
+
+    template<>
+    inline static MatrixType& getDerivedBernsteinMatrix<0>()
+    {
+        return getBernsteinMatrix();
+    }
+
+private:
     template<unsigned int M = N>
-    inline const MatrixType& getBernsteinMatrix() const
+    inline static MatrixType& getBernsteinMatrix()
     {
         static_assert(false, "not defned for this Grade");
     }
 
     template<>
-    inline const MatrixType& getBernsteinMatrix<1>() const
+    inline static MatrixType& getBernsteinMatrix<1>()
     {
-        static MatrixType expandMatrixD1 = []
+        static MatrixType mat = []
         {
             MatrixType m;
 
@@ -26,13 +60,13 @@ struct StaticBernsteinMatrix
             return m;
         }();
 
-        return expandMatrixD1;
+        return mat;
     }
 
     template<>
-    inline const MatrixType& getBernsteinMatrix<2>() const
+    inline static MatrixType& getBernsteinMatrix<2>()
     {
-        static MatrixType expandMatrixD2 = []
+        static MatrixType mat = []
         {
             MatrixType m;
 
@@ -43,13 +77,13 @@ struct StaticBernsteinMatrix
             return m;
         }();
 
-        return expandMatrixD2;
+        return mat;
     }
 
     template<>
-    inline const MatrixType& getBernsteinMatrix<3>() const
+    inline static MatrixType& getBernsteinMatrix<3>()
     {
-        static MatrixType expandMatrixD3 = []
+        static MatrixType mat = []
         {
             MatrixType m;
 
@@ -61,13 +95,13 @@ struct StaticBernsteinMatrix
             return m;
         }();
 
-        return expandMatrixD3;
+        return mat;
     }
 
     template<>
-    inline const MatrixType& getBernsteinMatrix<4>() const
+    inline static MatrixType& getBernsteinMatrix<4>()
     {
-        static MatrixType expandMatrixD4 = []
+        static MatrixType mat = []
         {
             MatrixType m;
 
@@ -80,7 +114,7 @@ struct StaticBernsteinMatrix
             return m;
         }();
 
-        return expandMatrixD4;
+        return mat;
     }
 };
 

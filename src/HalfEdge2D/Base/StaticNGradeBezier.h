@@ -8,15 +8,19 @@
 #include "HalfEdge2D/Base/StaticBernsteinMatrix.h"
 
 template <typename T, unsigned int G, unsigned int D, unsigned N = G + 1>
-class StaticNGradeBezier : StaticPolynomialSolver<T, G>, StaticBernsteinMatrix<T, G>
+class StaticNGradeBezier : StaticPolynomialSolver<T, G>, public StaticBernsteinMatrix<T, G>
 {
 private:
     // typedefs
     typedef Eigen::Matrix<T, D, N> BezierParamType;
     typedef Eigen::Matrix<T, D, 1> BezierPointType;
-    typedef Eigen::Matrix<T, N, 1> ComponentValuesType;
     typedef Eigen::Matrix<T, D + 1, 1> TransformPointType;
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
+
+public:
+    typedef Eigen::Matrix<T, N, 1> ComponentValuesType;
+    typedef Eigen::Matrix<T, 1, N> RowValuesType;
+    typedef Eigen::Matrix<T, N, N> ParamTransformMatrixType;
 
 public:
     typedef BezierParamType BezierPointsType;
@@ -28,7 +32,9 @@ public:
     StaticNGradeBezier()
     {
         m_Params.setZero();
-        m_ExpandParams.setZero();
+        m_DerivedParams[0].setZero();
+        m_DerivedParams[1].setZero();
+        m_DerivedParams[2].setZero();
     }
 
     BezierPointType getPoint(const size_t& idx) const
@@ -50,18 +56,79 @@ public:
 
     BezierPointType pointAt(const T& alpha) const
     {
-        ComponentValuesType a_vec;
+        return derived<0>(alpha);
+    }
 
-        float ca = StaticIdentities.identityMult<T>();
+    BezierPointType tangentAt(const T& alpha) const
+    {
+        return derived<1>(alpha).normalized();
+    }
 
-        for(size_t i = 0; i < N; i++)
-        {
-            a_vec[N - 1 - i] = ca;
+    template<unsigned int Dim = D>
+    BezierPointType normalAt(const T& alpha) const
+    {
+        static_assert(false, "normalAt not defined for this Dimension")
+    }
 
-            ca *= alpha;
-        }
+    template<>
+    BezierPointType normalAt<2>(const T& alpha) const
+    {
+        BezierPointType der1 = tangentAt(alpha);
 
-        return m_ExpandParams * a_vec;
+        return BezierPointType(-der1(1), der1(0));
+    }
+
+    template<>
+    BezierPointType normalAt<3>(const T& alpha) const
+    {
+        BezierPointType der1 = derived<1>(alpha);
+        BezierPointType der2 = derived<2>(alpha);
+
+        return der1.cross(der1.cross(der2)).normalized();
+    }
+
+    template<unsigned int Dim = D>
+    BezierPointType biNormalAt(const T& alpha) const
+    {
+        static_assert(false, "biNormalAt not defined for this Dimension")
+    }
+
+    template<>
+    BezierPointType biNormalAt<3>(const T& alpha) const
+    {
+        BezierPointType der1 = derived<1>(alpha);
+        BezierPointType der2 = derived<1>(alpha);
+
+        return der1.cross(der2).normalized();
+    }
+
+    template<unsigned int Dim = D>
+    T curvationAt(const T& alpha) const
+    {
+        static_assert(false, "biNormalAt not defined for this Dimension")
+    }
+
+    template<>
+    T curvationAt<2>(const T& alpha) const
+    {
+        BezierPointType der1 = derived<1>(alpha);
+        BezierPointType der2 = derived<2>(alpha);
+
+        T a = (der1(0) * der2(1)) - (der1(1) * der2(0));
+        T b = (der1(0) * der1(0)) + (der2(0) * der2(0));
+
+        b = std::sqrt(std::pow(b, T(3)));
+
+        return a / b;
+    }
+
+    template<>
+    T curvationAt<3>(const T& alpha) const
+    {
+        BezierPointType der1 = derived<1>(alpha);
+        BezierPointType der2 = derived<2>(alpha);
+
+        return der1.cross(der2).norm() / std::pow(der1.norm(), T(3));
     }
 
     void transform(const TransformType& m)
@@ -86,22 +153,42 @@ public:
 
     Roots componentRoots(const size_t& c) const
     {
-        return solve(m_ExpandParams.row(c));
+        return solve(m_DerivedParams[0].row(c));
     }
 
 private:
     void updateParams()
     {
-        m_ExpandParams = m_Params * getBernsteinMatrix();
+        m_DerivedParams[0] = m_Params * getDerivedBernsteinMatrix<0>();
+        m_DerivedParams[1] = m_Params * getDerivedBernsteinMatrix<1>();
+        m_DerivedParams[2] = m_Params * getDerivedBernsteinMatrix<2>();
+    }
+
+    template<unsigned int DEV>
+    inline BezierPointType derived(const float& alpha) const
+    {
+        ComponentValuesType a_vec;
+
+        T ca = StaticIdentities.identityMult<T>();
+
+        for(size_t i = 0; i < N - DEV; i++)
+        {
+            a_vec[N - 1 - i - DEV] = ca;
+
+            ca *= alpha;
+        }
+
+        return m_DerivedParams[DEV] * a_vec;
     }
 
 private:
-    BezierParamType m_Params;
-    BezierParamType m_ExpandParams;
-    
     static const size_t m_Grade = G;
     static const size_t m_Dim = D;
     static const size_t m_NumPoints = N;
+    static const size_t m_Derivations = 2;
+
+    BezierParamType m_Params;
+    BezierParamType m_DerivedParams[m_Derivations + 1];
 };
 
 #endif //_BASE_NGRADEBEZIER_H_
