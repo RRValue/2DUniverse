@@ -21,7 +21,7 @@ ControllerDelaunay::ControllerDelaunay()
 {
     m_Scene = nullptr;
     m_MovePoint = false;
-    m_Name = "Delaunay";
+    m_Name = "ControllerDelaunay";
     m_CurrentPoint = nullptr;
 }
 

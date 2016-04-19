@@ -14,7 +14,7 @@ ControllerCutQuadraticBezier::ControllerCutQuadraticBezier()
 {
     m_Scene = nullptr;
     m_MovePoint = false;
-    m_Name = "QuadraticBezier";
+    m_Name = "ControllerCutQuadraticBezier";
     m_CurrentPoint = nullptr;
 
     m_Line = new Line();

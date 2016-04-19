@@ -18,7 +18,7 @@
     <widget class="RenderWidget" name="m_RenderWidget" native="true"/>
    </item>
    <item>
-    <widget class="QWidget" name="widget_3" native="true">
+    <widget class="QWidget" name="m_MainOptionWidget" native="true">
      <property name="minimumSize">
       <size>
        <width>200</width>
@@ -101,6 +101,9 @@
       <item>
        <widget class="QWidget" name="widget_2" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -150,6 +153,27 @@
       </item>
       <item>
        <widget class="QComboBox" name="m_CbController"/>
+      </item>
+      <item>
+       <widget class="QWidget" name="m_OptionWidgetContainer" native="true">
+        <layout class="QGridLayout" name="m_OptionLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
+          <number>0</number>
+         </property>
+        </layout>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer">

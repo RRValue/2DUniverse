@@ -9,6 +9,8 @@ class Scene;
 class Camera;
 class EventHandler;
 
+class QWidget;
+
 class Controller : public EventInterface
 {
     friend class EventHandler;
@@ -22,6 +24,8 @@ public:
 
     const bool& isActive() const;
     const std::string& getName() const;
+
+    QWidget* const getOptionWidget() const;
 
     void setScene(Scene* const scene);
 
@@ -52,6 +56,9 @@ protected:
     Mat3f m_InvDeviceMat;
     Mat3f m_TransMat;
     Mat3f m_InvTransMat;
+
+    // option widget
+    QWidget* m_OptionWidget;
 };
 
 #endif //_CONTROLLER_CONTROLLER_H_

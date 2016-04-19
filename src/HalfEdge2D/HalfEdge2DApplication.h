@@ -10,7 +10,6 @@ class ViewPort;
 class Camera;
 class Renderer;
 class HESMesh;
-class QComboBox;
 class Navigator;
 class Controller;
 class ControllerBuildMesh;
@@ -24,6 +23,11 @@ class ControllerCutCubicBezier;
 class ControllerCutCircle;
 class EventHandler;
 class Scene;
+class DefaultOptionWidget;
+
+class QComboBox;
+class QGridLayout;
+class QWidget;
 
 class HalfEdge2DApplication : public QApplication
 {
@@ -64,6 +68,14 @@ private:
 
     QSlider* m_SldHPart;
     QSlider* m_SldVPart;
+
+    // qt styling
+    QWidget* m_OptionWidgetContainer;
+    QWidget* m_CurrentOptionWidget;
+    QGridLayout* m_OptionLayout;
+
+    // controller widgets
+    DefaultOptionWidget* m_DefaultOptionWidget;
 
     Renderer* m_Renderer;
 

@@ -16,6 +16,7 @@ Controller::Controller()
     m_Active = false;
     m_ViewportContentChanges = true;
     m_SceneChanges = false;
+    m_OptionWidget = nullptr;
 }
 
 Controller::~Controller()
@@ -61,6 +62,11 @@ const bool& Controller::isActive() const
 const std::string& Controller::getName() const
 {
     return m_Name;
+}
+
+QWidget* const Controller::getOptionWidget() const
+{
+    return m_OptionWidget;
 }
 
 bool Controller::inViewPort(const Vec2i& point) const

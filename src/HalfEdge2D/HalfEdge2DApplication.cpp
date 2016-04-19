@@ -2,6 +2,8 @@
 
 #include "HalfEdge2D/Events/EventHandler.h"
 
+#include "HalfEdge2D/Controller/DefaultOptionWidget.h"
+
 #include "HalfEdge2D/Controller/BuildMesh/ControllerBuildMesh.h"
 #include "HalfEdge2D/Controller/ShowRings/ControllerShowRings.h"
 #include "HalfEdge2D/Controller/Delaunay/ControllerDelaunay.h"
@@ -35,6 +37,8 @@ HalfEdge2DApplication::HalfEdge2DApplication(int& argc, char** argv) : QApplicat
     m_VPartition = 0.5f;
 
     m_Mesh = new HESMesh();
+
+    m_CurrentOptionWidget = nullptr;
 }
 
 HalfEdge2DApplication::~HalfEdge2DApplication()
@@ -79,12 +83,18 @@ void HalfEdge2DApplication::createGui()
 
     m_CbController = m_MainWindowForm.m_CbController;
 
+    m_OptionWidgetContainer = m_MainWindowForm.m_OptionWidgetContainer;
+    m_OptionLayout = m_MainWindowForm.m_OptionLayout;
+
     // connect
     connect(m_MainWindowForm.m_CbMultiView, &QCheckBox::stateChanged, this, &HalfEdge2DApplication::onMultiViewChanged);
     connect(m_SldHPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onHSliderChanged);
     connect(m_SldVPart, &QAbstractSlider::valueChanged, this, &HalfEdge2DApplication::onVSliderChanged);
     connect(m_MainWindowForm.m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
     connect(m_CbController, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onControllerSelectionChanged(const QString&)));
+
+    // create default option widget
+    m_DefaultOptionWidget = new DefaultOptionWidget();
 }
 
 void HalfEdge2DApplication::createViewPorts()
@@ -171,7 +181,9 @@ void HalfEdge2DApplication::createRendering()
     m_EventHandler->addController(m_ControllerCutCubicBezier);
     m_EventHandler->addController(m_ControllerCutCircle);
     m_EventHandler->setRenderer(m_Renderer);
-    m_EventHandler->setActiveController(m_ControllerBuildMesh);
+
+    // activate via cb
+    m_CbController->setCurrentIndex(0);
 
     m_RenderTarget->setEventHandler(m_EventHandler);
 }
@@ -302,4 +314,21 @@ void HalfEdge2DApplication::onControllerSelectionChanged(const QString& text)
     m_ActiveController = find_controller->second;
 
     m_EventHandler->setActiveController(m_ActiveController);
+
+    // add controller widget
+    QWidget* option_widget = m_ActiveController->getOptionWidget();
+
+    if(option_widget == nullptr)
+        option_widget = m_DefaultOptionWidget;
+
+    if(m_CurrentOptionWidget != nullptr)
+    {
+        m_OptionLayout->removeWidget(m_CurrentOptionWidget);
+        m_CurrentOptionWidget->setParent(nullptr);
+    }
+
+    m_CurrentOptionWidget = option_widget;
+
+    m_OptionLayout->addWidget(m_CurrentOptionWidget);
+    m_CurrentOptionWidget->setParent(m_OptionWidgetContainer);
 }
