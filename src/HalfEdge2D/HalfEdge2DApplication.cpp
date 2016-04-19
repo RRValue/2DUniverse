@@ -329,6 +329,6 @@ void HalfEdge2DApplication::onControllerSelectionChanged(const QString& text)
 
     m_CurrentOptionWidget = option_widget;
 
-    m_OptionLayout->addWidget(m_CurrentOptionWidget);
     m_CurrentOptionWidget->setParent(m_OptionWidgetContainer);
+    m_OptionLayout->addWidget(m_CurrentOptionWidget);
 }

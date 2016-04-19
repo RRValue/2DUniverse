@@ -1,5 +1,7 @@
 #include "HalfEdge2D/Controller/CutCircle/ControllerCutCircle.h"
 
+#include "HalfEdge2D/Controller/CutCircle/CutCircleOption_uic.h"
+
 #include "HalfEdge2D/Scene/Scene.h"
 
 #include "HalfEdge2D/Rendering/Renderer.h"
@@ -10,7 +12,7 @@
 
 #include <QtGui/QMouseEvent>
 
-ControllerCutCircle::ControllerCutCircle()
+ControllerCutCircle::ControllerCutCircle() : m_RadusMin(0.001f), m_RadusMax(1.0f)
 {
     m_Scene = nullptr;
     m_MovePoint = false;
@@ -34,6 +36,18 @@ ControllerCutCircle::ControllerCutCircle()
 
     m_CutPoint0->setSize(0.02f);
     m_CutPoint1->setSize(0.02f);
+
+    // create option widget
+    m_OptionWidget = new QWidget();
+
+    Ui_m_Widget m_OptionWidgetSetUp;
+    m_OptionWidgetSetUp.setupUi(m_OptionWidget);
+
+    m_OptionWidgetSetUp.m_RadiusLbl->setText(tr("Radius: %0 ... %1").arg(QString::number(m_RadusMin, 'f', 3)).arg(QString::number(m_RadusMax, 'f', 3)));
+
+    m_RadiusSlider = m_OptionWidgetSetUp.m_RadiusSld;
+
+    connect(m_RadiusSlider, &QSlider::sliderMoved, this, &ControllerCutCircle::onRadiusSliderMoved);
 }
 
 ControllerCutCircle::~ControllerCutCircle()
@@ -250,4 +264,34 @@ void ControllerCutCircle::cut()
         m_CutPoint1->setVisible(true);
         m_CutPoint1->setPosition(cut_points[1]);
     }
+}
+
+#include <qdebug.h>
+
+void ControllerCutCircle::onRadiusSliderMoved(int value)
+{
+    // slider properties
+    float sld_min = (float)m_RadiusSlider->minimum();
+    float sld_max = (float)m_RadiusSlider->maximum();
+    float range = sld_max - sld_min;
+
+    // radius
+    float r = (float)value;
+
+    // to 0 .. 1 range
+    r -= sld_min;
+    r /= range;
+
+    // to m_RadusMin ... m_RadusMax range
+    r *= m_RadusMax - m_RadusMin;
+    r += m_RadusMin;
+
+    // set to circle
+    m_Circle->setRadius(r);
+
+    // cut
+    cut();
+
+    // render
+    m_Renderer->render();
 }
