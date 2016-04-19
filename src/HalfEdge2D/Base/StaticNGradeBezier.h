@@ -191,4 +191,20 @@ private:
     BezierParamType m_DerivedParams[m_Derivations + 1];
 };
 
+typedef StaticNGradeBezier<float, 1, 2> Line2F;
+typedef StaticNGradeBezier<float, 2, 2> QBezier2F;
+typedef StaticNGradeBezier<float, 3, 2> CBezier2F;
+
+typedef StaticNGradeBezier<float, 1, 3> Line3F;
+typedef StaticNGradeBezier<float, 2, 3> QBezier3F;
+typedef StaticNGradeBezier<float, 3, 3> CBezier3F;
+
+typedef StaticNGradeBezier<double, 1, 2> Line2D;
+typedef StaticNGradeBezier<double, 2, 2> QBezier2D;
+typedef StaticNGradeBezier<double, 3, 2> CBezier2D;
+
+typedef StaticNGradeBezier<double, 1, 3> Line3D;
+typedef StaticNGradeBezier<double, 2, 3> QBezier3D;
+typedef StaticNGradeBezier<double, 3, 3> CBezier3D;
+
 #endif //_BASE_NGRADEBEZIER_H_

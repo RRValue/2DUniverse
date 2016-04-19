@@ -5,7 +5,7 @@ QuadraticBezier::QuadraticBezier()
 
 }
 
-QuadraticBezier::QuadraticBezier(const QuadraticBezier& other) : QBez2F(other), RenderableLine(other)
+QuadraticBezier::QuadraticBezier(const QuadraticBezier& other) : QBezier2F(other), RenderableLine(other)
 {
 
 }

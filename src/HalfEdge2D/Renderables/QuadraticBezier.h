@@ -5,9 +5,7 @@
 
 #include "HalfEdge2D/Renderables/RenderableLine.h"
 
-typedef StaticNGradeBezier<float, 2, 2> QBez2F;
-
-class QuadraticBezier : public QBez2F, public RenderableLine
+class QuadraticBezier : public QBezier2F, public RenderableLine
 {
 public:
     QuadraticBezier();

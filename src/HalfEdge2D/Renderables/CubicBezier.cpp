@@ -5,7 +5,7 @@ CubicBezier::CubicBezier()
 
 }
 
-CubicBezier::CubicBezier(const CubicBezier& other) : CBez2F(other), RenderableLine(other)
+CubicBezier::CubicBezier(const CubicBezier& other) : CBezier2F(other), RenderableLine(other)
 {
 
 }

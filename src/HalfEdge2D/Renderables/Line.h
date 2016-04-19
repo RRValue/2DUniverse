@@ -13,8 +13,6 @@
 
 #include <vector>
 
-typedef StaticNGradeBezier<float, 1, 2> Line2F;
-
 class Line : public Line2F, public RenderableLine
 {
 public:
