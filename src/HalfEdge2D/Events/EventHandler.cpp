@@ -1,6 +1,6 @@
 #include "HalfEdge2D/Events/EventHandler.h"
 
-#include "HalfEdge2D/Controlling/Controller.h"
+#include "HalfEdge2D/Controller/Controller.h"
 
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/RenderTarget.h"

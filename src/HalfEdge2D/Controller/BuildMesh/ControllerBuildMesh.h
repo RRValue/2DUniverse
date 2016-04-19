@@ -1,7 +1,7 @@
-#ifndef _CONTROLLING_CONTROLLERBUILDMESH_H_
-#define _CONTROLLING_CONTROLLERBUILDMESH_H_
+#ifndef _CONTROLLER_CONTROLLERBUILDMESH_H_
+#define _CONTROLLER_CONTROLLERBUILDMESH_H_
 
-#include "HalfEdge2D/Controlling/Controller.h"
+#include "HalfEdge2D/Controller/Controller.h"
 
 class ControllerBuildMesh : public Controller
 {
@@ -29,4 +29,4 @@ private:
     Vec2f m_CurrentHitDistance;
 };
 
-#endif //_CONTROLLING_CONTROLLERBUILDMESH_H_
+#endif //_CONTROLLER_CONTROLLERBUILDMESH_H_

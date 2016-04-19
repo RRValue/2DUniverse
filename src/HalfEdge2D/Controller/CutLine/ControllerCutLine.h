@@ -1,7 +1,7 @@
-#ifndef _CONTROLLING_CONTROLLERDELAUNAY_H_
-#define _CONTROLLING_CONTROLLERDELAUNAY_H_
+#ifndef _CONTROLLER_CONTROLLERCUTLINE_H_
+#define _CONTROLLER_CONTROLLERCUTLINE_H_
 
-#include "HalfEdge2D/Controlling/Controller.h"
+#include "HalfEdge2D/Controller/Controller.h"
 
 #include <HalfEdge2D/Base/Vector.h>
 
@@ -9,14 +9,13 @@
 #include <array>
 
 class Point;
-class Circle;
 class Line;
 
-class ControllerDelaunay : public Controller
+class ControllerCutLine : public Controller
 {
 public:
-    ControllerDelaunay();
-    virtual ~ControllerDelaunay();
+    ControllerCutLine();
+    virtual ~ControllerCutLine();
 
 protected:
     virtual void activate() final override;
@@ -29,21 +28,21 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    Point* const getPointAtPos(const Vec2f& pos) const;
-    void updateCircumCircles();
-    void updateCircumCircle(Circle* const circle, const std::array<Point* const, 3>& points);
-    bool isPointInCircle(const std::array<Point* const, 3>& points, Point* const point);
-    void updateLines();
+    Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
+    void cut();
 
 private:
     bool m_MovePoint;
-    
+
     Point* m_CurrentPoint;
+    size_t m_CurrentPointIdx;
     Vec2f m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
-    std::vector<Circle* const> m_CircumCircles;
-    std::vector<Line* const> m_Lines;
+    Line* m_Line0;
+    Line* m_Line1;
+
+    Point* m_CutPoint;
 };
 
-#endif //_CONTROLLING_CONTROLLERDELAUNAY_H_
+#endif //_CONTROLLER_CONTROLLERCUTLINE_H_

@@ -1,7 +1,7 @@
-#ifndef _CONTROLLING_CONTROLLERSHOWRINGS_H_
-#define _CONTROLLING_CONTROLLERSHOWRINGS_H_
+#ifndef _CONTROLLER_CONTROLLERSHOWRINGS_H_
+#define _CONTROLLER_CONTROLLERSHOWRINGS_H_
 
-#include "HalfEdge2D/Controlling/Controller.h"
+#include "HalfEdge2D/Controller/Controller.h"
 
 #include <vector>
 
@@ -81,4 +81,4 @@ private:
     LastColourVector m_LastColourVector;
 };
 
-#endif //_CONTROLLING_CONTROLLERSHOWRINGS_H_
+#endif //_CONTROLLER_CONTROLLERSHOWRINGS_H_

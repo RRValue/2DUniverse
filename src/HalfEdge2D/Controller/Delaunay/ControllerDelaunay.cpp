@@ -1,4 +1,4 @@
-#include "HalfEdge2D/Controlling/ControllerDelaunay.h"
+#include "HalfEdge2D/Controller/Delaunay/ControllerDelaunay.h"
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/Renderer.h"
@@ -21,7 +21,7 @@ ControllerDelaunay::ControllerDelaunay()
 {
     m_Scene = nullptr;
     m_MovePoint = false;
-    m_Name = "ControllerDelaunay";
+    m_Name = "Delaunay";
     m_CurrentPoint = nullptr;
 }
 

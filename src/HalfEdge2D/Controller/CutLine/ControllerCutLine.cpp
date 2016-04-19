@@ -1,4 +1,4 @@
-#include "HalfEdge2D/Controlling/ControllerCutCircle.h"
+#include "HalfEdge2D/Controller/CutLine/ControllerCutLine.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 
@@ -6,75 +6,65 @@
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
-#include "HalfEdge2D/Renderables/Circle.h"
 
 #include <QtGui/QMouseEvent>
 
-ControllerCutCircle::ControllerCutCircle()
+ControllerCutLine::ControllerCutLine()
 {
     m_Scene = nullptr;
     m_MovePoint = false;
-    m_Name = "ControllerCutCircle";
+    m_Name = "ControllerCutLine";
     m_CurrentPoint = nullptr;
 
-    m_Line = new Line();
-    m_Circle = new Circle();
-    m_CutPoint0 = new Point();
-    m_CutPoint1 = new Point();
+    m_Line0 = new Line();
+    m_Line1 = new Line();
+    m_CutPoint = new Point();
 
-    m_Line->setVisible(false);
-    m_Circle->setVisible(false);
-    m_CutPoint0->setVisible(false);
-    m_CutPoint1->setVisible(false);
+    m_Line0->setVisible(false);
+    m_Line1->setVisible(false);
+    m_CutPoint->setVisible(false);
 
-    m_Line->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
-    m_Circle->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
-    m_CutPoint0->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
-    m_CutPoint1->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
+    m_Line0->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_Line1->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_CutPoint->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
 
-    m_CutPoint0->setSize(0.02f);
-    m_CutPoint1->setSize(0.02f);
+    m_CutPoint->setSize(0.02f);
 }
 
-ControllerCutCircle::~ControllerCutCircle()
+ControllerCutLine::~ControllerCutLine()
 {
     for(const auto& p : m_Points)
         delete p;
 
-    delete m_Line;
-    delete m_Circle;
+    delete m_Line0;
+    delete m_Line1;
 
-    delete m_CutPoint0;
-    delete m_CutPoint1;
+    delete m_CutPoint;
 }
 
-void ControllerCutCircle::activate()
+void ControllerCutLine::activate()
 {
-    m_Scene->addLine(m_Line);
-    
-    m_Scene->addCircle(m_Circle);
+    m_Scene->addLine(m_Line0);
+    m_Scene->addLine(m_Line1);
     
     for(const auto& p : m_Points)
         m_Scene->addPoint(p);
 
-    m_Scene->addPoint(m_CutPoint0);
-    m_Scene->addPoint(m_CutPoint1);
+    m_Scene->addPoint(m_CutPoint);
 }
 
-void ControllerCutCircle::deactivate()
+void ControllerCutLine::deactivate()
 {
-    m_Scene->removeLine(m_Line);
-    
-    m_Scene->removeCircle(m_Circle);
+    m_Scene->removeLine(m_Line0);
+    m_Scene->removeLine(m_Line1);
     
     for(const auto& p : m_Points)
         m_Scene->removePoint(p);
 
-    m_Scene->removePoint(m_CutPoint0);
-    m_Scene->removePoint(m_CutPoint1);
+    m_Scene->removePoint(m_CutPoint);
 }
 
-bool ControllerCutCircle::handleMouseMoveEvent(QMouseEvent* const event)
+bool ControllerCutLine::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
         return false;
@@ -93,13 +83,16 @@ bool ControllerCutCircle::handleMouseMoveEvent(QMouseEvent* const event)
     m_CurrentPoint->setPosition(new_pos);
 
     if(m_CurrentPointIdx == 0)
-        m_Line->setPoint(0, m_CurrentPoint->getPosition());
+        m_Line0->setPoint(0, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 1)
-        m_Line->setPoint(1, m_CurrentPoint->getPosition());
+        m_Line0->setPoint(1, m_CurrentPoint->getPosition());
 
     if(m_CurrentPointIdx == 2)
-        m_Circle->setPosition(m_CurrentPoint->getPosition());
+        m_Line1->setPoint(0, m_CurrentPoint->getPosition());
+
+    if(m_CurrentPointIdx == 3)
+        m_Line1->setPoint(1, m_CurrentPoint->getPosition());
 
     cut();
 
@@ -108,7 +101,7 @@ bool ControllerCutCircle::handleMouseMoveEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutCircle::handleMousePressEvent(QMouseEvent* const event)
+bool ControllerCutLine::handleMousePressEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -137,10 +130,10 @@ bool ControllerCutCircle::handleMousePressEvent(QMouseEvent* const event)
 
     m_CurrentPoint = getPointAtPos(invTrans(p_f), &m_CurrentPointIdx);
 
-    // if hit nothing and point size < 3 -> add
+    // if hit nothing and point size < 4 -> add
     if(m_CurrentPoint == nullptr)
     {
-        if(m_Points.size() >= 3)
+        if(m_Points.size() >= 4)
         {
             m_MovePoint = false;
 
@@ -156,18 +149,21 @@ bool ControllerCutCircle::handleMousePressEvent(QMouseEvent* const event)
         m_Scene->addPoint(m_CurrentPoint);
 
         if(m_CurrentPointIdx == 0)
-            m_Line->setPoint(0, m_CurrentPoint->getPosition());
+            m_Line0->setPoint(0, m_CurrentPoint->getPosition());
 
         if(m_CurrentPointIdx == 1)
         {
-            m_Line->setPoint(1, m_CurrentPoint->getPosition());
-            m_Line->setVisible(true);
+            m_Line0->setPoint(1, m_CurrentPoint->getPosition());
+            m_Line0->setVisible(true);
         }
 
         if(m_CurrentPointIdx == 2)
+            m_Line1->setPoint(0, m_CurrentPoint->getPosition());
+
+        if(m_CurrentPointIdx == 3)
         {
-            m_Circle->setPosition(m_CurrentPoint->getPosition());
-            m_Circle->setVisible(true);
+            m_Line1->setPoint(1, m_CurrentPoint->getPosition());
+            m_Line1->setVisible(true);
         }
     }
 
@@ -181,7 +177,7 @@ bool ControllerCutCircle::handleMousePressEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutCircle::handleMouseReleaseEvent(QMouseEvent* const event)
+bool ControllerCutLine::handleMouseReleaseEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -197,17 +193,17 @@ bool ControllerCutCircle::handleMouseReleaseEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutCircle::handleResizeEvent(QResizeEvent* const event)
+bool ControllerCutLine::handleResizeEvent(QResizeEvent* const event)
 {
     return false;
 }
 
-bool ControllerCutCircle::handleWheelEvent(QWheelEvent* const event)
+bool ControllerCutLine::handleWheelEvent(QWheelEvent* const event)
 {
     return false;
 }
 
-Point* const ControllerCutCircle::getPointAtPos(const Vec2f& pos, size_t* const idx) const
+Point* const ControllerCutLine::getPointAtPos(const Vec2f& pos, size_t* const idx) const
 {
     if(m_Points.empty())
         return nullptr;
@@ -225,29 +221,19 @@ Point* const ControllerCutCircle::getPointAtPos(const Vec2f& pos, size_t* const 
     return nullptr;
 }
 
-void ControllerCutCircle::cut()
+void ControllerCutLine::cut()
 {
-    if(m_Points.size() != 3)
+    if(m_Points.size() != 4)
         return;
 
     // reset cut point
-    m_CutPoint0->setVisible(false);
-    m_CutPoint1->setVisible(false);
+    m_CutPoint->setVisible(false);
 
-    Vec2fVec cut_points = m_Line->intersect(*m_Circle);
+    Vec2fVec cut_points = m_Line0->intersect(*m_Line1);
 
     if(cut_points.empty())
         return;
 
-    if(cut_points.size() >= 1)
-    {
-        m_CutPoint0->setVisible(true);
-        m_CutPoint0->setPosition(cut_points[0]);
-    }
-
-    if(cut_points.size() >= 2)
-    {
-        m_CutPoint1->setVisible(true);
-        m_CutPoint1->setPosition(cut_points[1]);
-    }
+    m_CutPoint->setVisible(true);
+    m_CutPoint->setPosition(cut_points[0]);
 }

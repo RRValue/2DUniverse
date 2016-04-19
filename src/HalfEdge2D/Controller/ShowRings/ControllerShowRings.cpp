@@ -1,4 +1,4 @@
-#include "HalfEdge2D/Controlling/ControllerShowRings.h"
+#include "HalfEdge2D/Controller/ShowRings/ControllerShowRings.h"
 
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/QPaintTarget.h"

@@ -1,4 +1,4 @@
-#include "HalfEdge2D/Controlling/ControllerBuildMesh.h"
+#include "HalfEdge2D/Controller/BuildMesh/ControllerBuildMesh.h"
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/Renderer.h"

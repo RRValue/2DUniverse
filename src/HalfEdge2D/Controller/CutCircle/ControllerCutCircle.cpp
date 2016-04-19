@@ -1,4 +1,4 @@
-#include "HalfEdge2D/Controlling/ControllerCutCubicBezier.h"
+#include "HalfEdge2D/Controller/CutCircle/ControllerCutCircle.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 
@@ -6,80 +6,75 @@
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
-#include "HalfEdge2D/Renderables/CubicBezier.h"
+#include "HalfEdge2D/Renderables/Circle.h"
 
 #include <QtGui/QMouseEvent>
 
-ControllerCutCubicBezier::ControllerCutCubicBezier()
+ControllerCutCircle::ControllerCutCircle()
 {
     m_Scene = nullptr;
     m_MovePoint = false;
-    m_Name = "ControllerCutCubicBezier";
+    m_Name = "ControllerCutCircle";
     m_CurrentPoint = nullptr;
 
     m_Line = new Line();
-    m_Bezier = new CubicBezier();
+    m_Circle = new Circle();
     m_CutPoint0 = new Point();
     m_CutPoint1 = new Point();
-    m_CutPoint2 = new Point();
 
     m_Line->setVisible(false);
-    m_Bezier->setVisible(false);
+    m_Circle->setVisible(false);
     m_CutPoint0->setVisible(false);
     m_CutPoint1->setVisible(false);
-    m_CutPoint2->setVisible(false);
 
     m_Line->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
-    m_Bezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_Circle->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
     m_CutPoint0->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
     m_CutPoint1->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
-    m_CutPoint2->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
 
     m_CutPoint0->setSize(0.02f);
     m_CutPoint1->setSize(0.02f);
-    m_CutPoint2->setSize(0.02f);
 }
 
-ControllerCutCubicBezier::~ControllerCutCubicBezier()
+ControllerCutCircle::~ControllerCutCircle()
 {
     for(const auto& p : m_Points)
         delete p;
 
     delete m_Line;
-    delete m_Bezier;
+    delete m_Circle;
 
     delete m_CutPoint0;
     delete m_CutPoint1;
-    delete m_CutPoint2;
 }
 
-void ControllerCutCubicBezier::activate()
+void ControllerCutCircle::activate()
 {
     m_Scene->addLine(m_Line);
-    m_Scene->addCubicBeziers(m_Bezier);
+    
+    m_Scene->addCircle(m_Circle);
     
     for(const auto& p : m_Points)
         m_Scene->addPoint(p);
 
     m_Scene->addPoint(m_CutPoint0);
     m_Scene->addPoint(m_CutPoint1);
-    m_Scene->addPoint(m_CutPoint2);
 }
 
-void ControllerCutCubicBezier::deactivate()
+void ControllerCutCircle::deactivate()
 {
     m_Scene->removeLine(m_Line);
-    m_Scene->removeCubicBeziers(m_Bezier);
-
+    
+    m_Scene->removeCircle(m_Circle);
+    
     for(const auto& p : m_Points)
         m_Scene->removePoint(p);
 
     m_Scene->removePoint(m_CutPoint0);
     m_Scene->removePoint(m_CutPoint1);
-    m_Scene->removePoint(m_CutPoint2);
 }
 
-bool ControllerCutCubicBezier::handleMouseMoveEvent(QMouseEvent* const event)
+bool ControllerCutCircle::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
         return false;
@@ -98,22 +93,13 @@ bool ControllerCutCubicBezier::handleMouseMoveEvent(QMouseEvent* const event)
     m_CurrentPoint->setPosition(new_pos);
 
     if(m_CurrentPointIdx == 0)
-        m_Bezier->setPoint(0, m_CurrentPoint->getPosition());
-    
-    if(m_CurrentPointIdx == 1)
-        m_Bezier->setPoint(1, m_CurrentPoint->getPosition());
-    
-    if(m_CurrentPointIdx == 2)
-        m_Bezier->setPoint(2, m_CurrentPoint->getPosition());
-
-    if(m_CurrentPointIdx == 3)
-        m_Bezier->setPoint(3, m_CurrentPoint->getPosition());
-
-    if(m_CurrentPointIdx == 4)
         m_Line->setPoint(0, m_CurrentPoint->getPosition());
 
-    if(m_CurrentPointIdx == 5)
+    if(m_CurrentPointIdx == 1)
         m_Line->setPoint(1, m_CurrentPoint->getPosition());
+
+    if(m_CurrentPointIdx == 2)
+        m_Circle->setPosition(m_CurrentPoint->getPosition());
 
     cut();
 
@@ -122,7 +108,7 @@ bool ControllerCutCubicBezier::handleMouseMoveEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutCubicBezier::handleMousePressEvent(QMouseEvent* const event)
+bool ControllerCutCircle::handleMousePressEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -151,10 +137,10 @@ bool ControllerCutCubicBezier::handleMousePressEvent(QMouseEvent* const event)
 
     m_CurrentPoint = getPointAtPos(invTrans(p_f), &m_CurrentPointIdx);
 
-    // if hit nothing and point size < 6 -> add
+    // if hit nothing and point size < 3 -> add
     if(m_CurrentPoint == nullptr)
     {
-        if(m_Points.size() >= 6)
+        if(m_Points.size() >= 3)
         {
             m_MovePoint = false;
 
@@ -170,27 +156,18 @@ bool ControllerCutCubicBezier::handleMousePressEvent(QMouseEvent* const event)
         m_Scene->addPoint(m_CurrentPoint);
 
         if(m_CurrentPointIdx == 0)
-            m_Bezier->setPoint(0, m_CurrentPoint->getPosition());
-
-        if(m_CurrentPointIdx == 1)
-            m_Bezier->setPoint(1, m_CurrentPoint->getPosition());
-
-        if(m_CurrentPointIdx == 2)
-            m_Bezier->setPoint(2, m_CurrentPoint->getPosition());
-
-        if(m_CurrentPointIdx == 3)
-        {
-            m_Bezier->setPoint(3, m_CurrentPoint->getPosition());
-            m_Bezier->setVisible(true);
-        }
-
-        if(m_CurrentPointIdx == 4)
             m_Line->setPoint(0, m_CurrentPoint->getPosition());
 
-        if(m_CurrentPointIdx == 5)
+        if(m_CurrentPointIdx == 1)
         {
             m_Line->setPoint(1, m_CurrentPoint->getPosition());
             m_Line->setVisible(true);
+        }
+
+        if(m_CurrentPointIdx == 2)
+        {
+            m_Circle->setPosition(m_CurrentPoint->getPosition());
+            m_Circle->setVisible(true);
         }
     }
 
@@ -204,7 +181,7 @@ bool ControllerCutCubicBezier::handleMousePressEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutCubicBezier::handleMouseReleaseEvent(QMouseEvent* const event)
+bool ControllerCutCircle::handleMouseReleaseEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -220,17 +197,17 @@ bool ControllerCutCubicBezier::handleMouseReleaseEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutCubicBezier::handleResizeEvent(QResizeEvent* const event)
+bool ControllerCutCircle::handleResizeEvent(QResizeEvent* const event)
 {
     return false;
 }
 
-bool ControllerCutCubicBezier::handleWheelEvent(QWheelEvent* const event)
+bool ControllerCutCircle::handleWheelEvent(QWheelEvent* const event)
 {
     return false;
 }
 
-Point* const ControllerCutCubicBezier::getPointAtPos(const Vec2f& pos, size_t* const idx) const
+Point* const ControllerCutCircle::getPointAtPos(const Vec2f& pos, size_t* const idx) const
 {
     if(m_Points.empty())
         return nullptr;
@@ -248,33 +225,29 @@ Point* const ControllerCutCubicBezier::getPointAtPos(const Vec2f& pos, size_t* c
     return nullptr;
 }
 
-void ControllerCutCubicBezier::cut()
+void ControllerCutCircle::cut()
 {
-    if(m_Points.size() != 6)
+    if(m_Points.size() != 3)
         return;
 
     // reset cut point
     m_CutPoint0->setVisible(false);
     m_CutPoint1->setVisible(false);
-    m_CutPoint2->setVisible(false);
 
-    Vec2fVec cut_points = m_Line->intersect(*m_Bezier);
+    Vec2fVec cut_points = m_Line->intersect(*m_Circle);
 
     if(cut_points.empty())
         return;
+
     if(cut_points.size() >= 1)
     {
         m_CutPoint0->setVisible(true);
         m_CutPoint0->setPosition(cut_points[0]);
     }
+
     if(cut_points.size() >= 2)
     {
         m_CutPoint1->setVisible(true);
         m_CutPoint1->setPosition(cut_points[1]);
-    }
-    if(cut_points.size() >= 3)
-    {
-        m_CutPoint2->setVisible(true);
-        m_CutPoint2->setPosition(cut_points[2]);
     }
 }

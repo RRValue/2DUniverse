@@ -1,5 +1,5 @@
-#ifndef _CONTROLLING_CONTROLLER_H_
-#define _CONTROLLING_CONTROLLER_H_
+#ifndef _CONTROLLER_CONTROLLER_H_
+#define _CONTROLLER_CONTROLLER_H_
 
 #include "HalfEdge2D/Events/EventInterface.h"
 
@@ -54,4 +54,4 @@ protected:
     Mat3f m_InvTransMat;
 };
 
-#endif //_CONTROLLING_CONTROLLER_H_
+#endif //_CONTROLLER_CONTROLLER_H_

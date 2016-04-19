@@ -2,15 +2,15 @@
 
 #include "HalfEdge2D/Events/EventHandler.h"
 
-#include "HalfEdge2D/Controlling/ControllerBuildMesh.h"
-#include "HalfEdge2D/Controlling/ControllerShowRings.h"
-#include "HalfEdge2D/Controlling/ControllerDelaunay.h"
-#include "HalfEdge2D/Controlling/ControllerQuadraticBezier.h"
-#include "HalfEdge2D/Controlling/ControllerCubicBezier.h"
-#include "HalfEdge2D/Controlling/ControllerCutLine.h"
-#include "HalfEdge2D/Controlling/ControllerCutQuadraticBezier.h"
-#include "HalfEdge2D/Controlling/ControllerCutCubicBezier.h"
-#include "HalfEdge2D/Controlling/ControllerCutCircle.h"
+#include "HalfEdge2D/Controller/BuildMesh/ControllerBuildMesh.h"
+#include "HalfEdge2D/Controller/ShowRings/ControllerShowRings.h"
+#include "HalfEdge2D/Controller/Delaunay/ControllerDelaunay.h"
+#include "HalfEdge2D/Controller/QuadraticBezier/ControllerQuadraticBezier.h"
+#include "HalfEdge2D/Controller/CubicBezier/ControllerCubicBezier.h"
+#include "HalfEdge2D/Controller/CutLine/ControllerCutLine.h"
+#include "HalfEdge2D/Controller/CutQuadraticBezier/ControllerCutQuadraticBezier.h"
+#include "HalfEdge2D/Controller/CutCubicBezier/ControllerCutCubicBezier.h"
+#include "HalfEdge2D/Controller/CutCircle/ControllerCutCircle.h"
 
 #include "HalfEdge2D/Navigation/Navigator.h"
 

@@ -1,7 +1,7 @@
-#ifndef _CONTROLLING_CONTROLLERCUTLINE_H_
-#define _CONTROLLING_CONTROLLERCUTLINE_H_
+#ifndef _CONTROLLER_CONTROLLERCUTCIRCLE_H_
+#define _CONTROLLER_CONTROLLERCUTCIRCLE_H_
 
-#include "HalfEdge2D/Controlling/Controller.h"
+#include "HalfEdge2D/Controller/Controller.h"
 
 #include <HalfEdge2D/Base/Vector.h>
 
@@ -10,12 +10,13 @@
 
 class Point;
 class Line;
+class Circle;
 
-class ControllerCutLine : public Controller
+class ControllerCutCircle : public Controller
 {
 public:
-    ControllerCutLine();
-    virtual ~ControllerCutLine();
+    ControllerCutCircle();
+    virtual ~ControllerCutCircle();
 
 protected:
     virtual void activate() final override;
@@ -39,10 +40,11 @@ private:
     Vec2f m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
-    Line* m_Line0;
-    Line* m_Line1;
+    Line* m_Line;
+    Circle* m_Circle;
 
-    Point* m_CutPoint;
+    Point* m_CutPoint0;
+    Point* m_CutPoint1;
 };
 
-#endif //_CONTROLLING_CONTROLLERCUTLINE_H_
+#endif //_CONTROLLER_CONTROLLERCUTCIRCLE_H_

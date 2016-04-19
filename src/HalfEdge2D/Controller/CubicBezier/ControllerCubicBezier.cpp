@@ -1,4 +1,4 @@
-#include "HalfEdge2D/Controlling/ControllerCubicBezier.h"
+#include "HalfEdge2D/Controller/CubicBezier/ControllerCubicBezier.h"
 
 #include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/Renderer.h"

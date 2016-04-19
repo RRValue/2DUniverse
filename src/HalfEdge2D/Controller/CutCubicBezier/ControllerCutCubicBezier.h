@@ -1,7 +1,7 @@
-#ifndef _CONTROLLING_CONTROLLERQUADRATICBEZIER_H_
-#define _CONTROLLING_CONTROLLERQUADRATICBEZIER_H_
+#ifndef _CONTROLLER_CONTROLLERCUTCUBICBEZIER_H_
+#define _CONTROLLER_CONTROLLERCUTCUBICBEZIER_H_
 
-#include "HalfEdge2D/Controlling/Controller.h"
+#include "HalfEdge2D/Controller/Controller.h"
 
 #include <HalfEdge2D/Base/Vector.h>
 
@@ -9,13 +9,14 @@
 #include <array>
 
 class Point;
-class QuadraticBezier;
+class Line;
+class CubicBezier;
 
-class ControllerQuadraticBezier : public Controller
+class ControllerCutCubicBezier : public Controller
 {
 public:
-    ControllerQuadraticBezier();
-    virtual ~ControllerQuadraticBezier();
+    ControllerCutCubicBezier();
+    virtual ~ControllerCutCubicBezier();
 
 protected:
     virtual void activate() final override;
@@ -29,6 +30,7 @@ protected:
 
 private:
     Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
+    void cut();
 
 private:
     bool m_MovePoint;
@@ -38,7 +40,12 @@ private:
     Vec2f m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
-    QuadraticBezier* m_Bezier;
+    Line* m_Line;
+    CubicBezier* m_Bezier;
+
+    Point* m_CutPoint0;
+    Point* m_CutPoint1;
+    Point* m_CutPoint2;
 };
 
-#endif //_CONTROLLING_CONTROLLERQUADRATICBEZIER_H_
+#endif //_CONTROLLER_CONTROLLERCUTCUBICBEZIER_H_
