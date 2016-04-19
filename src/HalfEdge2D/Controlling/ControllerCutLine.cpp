@@ -26,7 +26,7 @@ ControllerCutLine::ControllerCutLine()
 
     m_Line0->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
     m_Line1->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
-    m_CutPoint->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    m_CutPoint->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
 
     m_CutPoint->setSize(0.02f);
 }

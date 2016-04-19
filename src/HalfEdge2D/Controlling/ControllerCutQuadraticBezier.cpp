@@ -29,8 +29,8 @@ ControllerCutQuadraticBezier::ControllerCutQuadraticBezier()
 
     m_Line->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
     m_Bezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
-    m_CutPoint0->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-    m_CutPoint1->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    m_CutPoint0->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
+    m_CutPoint1->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
 
     m_CutPoint0->setSize(0.02f);
     m_CutPoint1->setSize(0.02f);

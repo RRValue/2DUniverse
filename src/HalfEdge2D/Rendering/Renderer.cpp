@@ -189,11 +189,11 @@ void Renderer::renderCoordinateCross(QPainter* const painter)
 void Renderer::renderScene(QPainter* const painter, Scene* const scene)
 {
     renderMeshes(painter, scene->getMeshes());
-    renderPoints(painter, scene->getPoints());
     renderCircles(painter, scene->getCircles());
     renderLines(painter, scene->getLines());
     renderQuadraticBezier(painter, scene->getQuadraticBeziers());
     renderCubicBezier(painter, scene->getCubicBeziers());
+    renderPoints(painter, scene->getPoints());
 }
 
 void Renderer::renderMeshes(QPainter* const painter, const std::set<Mesh* const>& meshes)
