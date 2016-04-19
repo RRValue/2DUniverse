@@ -35,3 +35,11 @@ void Circle::setPosition(const Vec2f& pos)
 {
     m_Position = pos;
 }
+
+void Circle::transform(const Mat3f& mat)
+{
+    Vec3f c_t = mat * Vec3f(m_Position[0], m_Position[1], 1.0);
+
+    m_Position(0) = c_t(0);
+    m_Position(1) = c_t(1);
+}

@@ -21,6 +21,9 @@ public:
     void setRadius(const float& radius);
     void setPosition(const Vec2f& pos);
 
+    // tooling
+    void transform(const Mat3f& mat);
+
 private:
     float m_Radius;
     Vec2f m_Position;

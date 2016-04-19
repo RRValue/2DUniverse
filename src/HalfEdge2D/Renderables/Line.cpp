@@ -70,6 +70,50 @@ Mat3f Line::getOrthoBaseMatrix() const
     return m_r * m_t;
 }
 
+Vec2fVec Line::intersect(const Circle& circle) const
+{
+    Mat3f trans = getOrthoBaseMatrix();
+    Mat3f trans_inv = trans.inverse();
+
+    Circle t_circle(circle);
+    Line t_line(*this);
+
+    t_circle.transform(trans);
+    t_line.transform(trans);
+
+    const float& r = t_circle.getRadius();
+    const Vec2f& c = t_circle.getPosition();
+    float l = t_line.getLength();
+
+    Vec2fVec result;
+
+    if(r < c.y())
+        return result;
+
+    if(r == c.y())
+        result.push_back(Vec2f(c.x(), 0.0f));
+    else //r > c.y()
+    {
+        float a = std::sqrt(std::pow(r, 2.0f) - std::pow(c.y(), 2.0f));
+
+        std::array<float, 2> cuts_x = {c.x() + a, c.x() - a};
+
+        for(const auto& cut_x : cuts_x)
+            if(cut_x >= 0.0f && cut_x <= l)
+                result.push_back(Vec2f(cut_x, 0.0f));
+    }
+
+    for(auto& r : result)
+    {
+        Vec3f re_t_r = trans_inv * Vec3f(r(0), r(1), 1.0f);
+
+        r(0) = re_t_r(0);
+        r(1) = re_t_r(1);
+    }
+    
+    return result;
+}
+
 Vec2fVec Line::intersect(const Line& other) const
 {
     Mat3f trans = getOrthoBaseMatrix();

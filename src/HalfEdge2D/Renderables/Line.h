@@ -6,6 +6,8 @@
 
 #include "HalfEdge2D/Renderables/RenderableLine.h"
 
+#include "HalfEdge2D/Renderables/Circle.h"
+
 #include "HalfEdge2D/Renderables/QuadraticBezier.h"
 #include "HalfEdge2D/Renderables/CubicBezier.h"
 
@@ -26,6 +28,7 @@ public:
     float getLength() const;
     Vec2f getNormal() const;
     
+    Vec2fVec intersect(const Circle& c) const;
     Vec2fVec intersect(const Line& l) const;
     Vec2fVec intersect(const QuadraticBezier& b) const;
     Vec2fVec intersect(const CubicBezier& b) const;

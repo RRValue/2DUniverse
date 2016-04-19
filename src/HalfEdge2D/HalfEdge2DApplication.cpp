@@ -10,6 +10,7 @@
 #include "HalfEdge2D/Controlling/ControllerCutLine.h"
 #include "HalfEdge2D/Controlling/ControllerCutQuadraticBezier.h"
 #include "HalfEdge2D/Controlling/ControllerCutCubicBezier.h"
+#include "HalfEdge2D/Controlling/ControllerCutCircle.h"
 
 #include "HalfEdge2D/Navigation/Navigator.h"
 
@@ -120,6 +121,7 @@ void HalfEdge2DApplication::createRendering()
     m_ControllerCutLine = new ControllerCutLine();
     m_ControllerCutQuadraticBezier = new ControllerCutQuadraticBezier();
     m_ControllerCutCubicBezier = new ControllerCutCubicBezier();
+    m_ControllerCutCircle = new ControllerCutCircle();
 
     m_ControllerBuildMesh->setScene(m_Scene);
     m_ControllerShowRings->setScene(m_Scene);
@@ -129,6 +131,7 @@ void HalfEdge2DApplication::createRendering()
     m_ControllerCutLine->setScene(m_Scene);
     m_ControllerCutQuadraticBezier->setScene(m_Scene);
     m_ControllerCutCubicBezier->setScene(m_Scene);
+    m_ControllerCutCircle->setScene(m_Scene);
 
     // add controller to combobox
     m_CbController->addItem(m_ControllerBuildMesh->getName().c_str());
@@ -139,6 +142,7 @@ void HalfEdge2DApplication::createRendering()
     m_CbController->addItem(m_ControllerCutLine->getName().c_str());
     m_CbController->addItem(m_ControllerCutQuadraticBezier->getName().c_str());
     m_CbController->addItem(m_ControllerCutCubicBezier->getName().c_str());
+    m_CbController->addItem(m_ControllerCutCircle->getName().c_str());
 
     m_Controller.insert(std::make_pair(m_ControllerBuildMesh->getName(), m_ControllerBuildMesh));
     m_Controller.insert(std::make_pair(m_ControllerShowRings->getName(), m_ControllerShowRings));
@@ -148,6 +152,7 @@ void HalfEdge2DApplication::createRendering()
     m_Controller.insert(std::make_pair(m_ControllerCutLine->getName(), m_ControllerCutLine));
     m_Controller.insert(std::make_pair(m_ControllerCutQuadraticBezier->getName(), m_ControllerCutQuadraticBezier));
     m_Controller.insert(std::make_pair(m_ControllerCutCubicBezier->getName(), m_ControllerCutCubicBezier));
+    m_Controller.insert(std::make_pair(m_ControllerCutCircle->getName(), m_ControllerCutCircle));
 
     // create renderer
     m_Renderer = new Renderer();
@@ -164,6 +169,7 @@ void HalfEdge2DApplication::createRendering()
     m_EventHandler->addController(m_ControllerCutLine);
     m_EventHandler->addController(m_ControllerCutQuadraticBezier);
     m_EventHandler->addController(m_ControllerCutCubicBezier);
+    m_EventHandler->addController(m_ControllerCutCircle);
     m_EventHandler->setRenderer(m_Renderer);
     m_EventHandler->setActiveController(m_ControllerBuildMesh);
 
