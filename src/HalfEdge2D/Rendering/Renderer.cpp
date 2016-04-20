@@ -369,11 +369,21 @@ void Renderer::renderLine(QPainter* const painter, Line* const line)
     // get thickness
     float thickness_px = getPixelSize(line->getThickness());
 
-    // get points
-    const Line::BezierPointsType& points = line->getPoints();
-
     // get colour
     const Vec4f& col = line->getColour();
+
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+
+    renderLine(painter, *(Line2F*)line);
+}
+
+void Renderer::renderLine(QPainter* const painter, const Line2F& line)
+{
+    // get points
+    const Line::BezierPointsType& points = line.getPoints();
 
     // get bb
     std::array<QPointF, 2> pts;
@@ -381,10 +391,6 @@ void Renderer::renderLine(QPainter* const painter, Line* const line)
     for(size_t i = 0; i < 2; i++)
         pts[i] = trans(QPointF(points(0, i), points(1, i)));
 
-    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-    painter->setPen(QPen(paint_color, thickness_px));
-    painter->setBrush(Qt::BrushStyle::NoBrush);
     painter->drawLine(pts[0], pts[1]);
 }
 
@@ -404,12 +410,22 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, QuadraticBezier* c
 
     // get thickness
     float thickness_px = getPixelSize(bezier->getThickness());
-
-    // get points
-    const QuadraticBezier::BezierPointsType& points = bezier->getPoints();
-
     // get colour
     const Vec4f& col = bezier->getColour();
+    
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    // set paint color
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+
+    renderQuadraticBezier(painter, *(QBezier2F*)bezier);
+}
+
+void Renderer::renderQuadraticBezier(QPainter* const painter, const QBezier2F& bezier)
+{
+    // get points
+    const QuadraticBezier::BezierPointsType& points = bezier.getPoints();
 
     // get bb
     std::array<QPointF, 3> bb_points;
@@ -452,8 +468,8 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, QuadraticBezier* c
 
     for(unsigned int i = 0; i < num_lines; i++)
     {
-        Vec2f bp0 = bezier->pointAt(alpha);
-        Vec2f bp1 = bezier->pointAt(alpha + alpha_step);
+        Vec2f bp0 = bezier.pointAt(alpha);
+        Vec2f bp1 = bezier.pointAt(alpha + alpha_step);
 
         lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
 
@@ -461,10 +477,6 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, QuadraticBezier* c
     }
 
     // paint bezier
-    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-    painter->setPen(QPen(paint_color, thickness_px));
-    painter->setBrush(Qt::BrushStyle::NoBrush);
     painter->drawLines(lines);
 }
 
@@ -485,11 +497,21 @@ void Renderer::renderCubicBezier(QPainter* const painter, CubicBezier* const bez
     // get thickness
     float thickness_px = getPixelSize(bezier->getThickness());
 
-    // get points
-    const CubicBezier::BezierPointsType& points = bezier->getPoints();
-
     // get colour
     const Vec4f& col = bezier->getColour();
+
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+
+    renderCubicBezier(painter, *(CBezier2F*)bezier);
+}
+
+void Renderer::renderCubicBezier(QPainter* const painter, const CBezier2F& bezier)
+{
+    // get points
+    const CubicBezier::BezierPointsType& points = bezier.getPoints();
 
     // get bb
     std::array<QPointF, 4> bb_points;
@@ -532,8 +554,8 @@ void Renderer::renderCubicBezier(QPainter* const painter, CubicBezier* const bez
 
     for(unsigned int i = 0; i < num_lines; i++)
     {
-        Vec2f bp0 = bezier->pointAt(alpha);
-        Vec2f bp1 = bezier->pointAt(alpha + alpha_step);
+        Vec2f bp0 = bezier.pointAt(alpha);
+        Vec2f bp1 = bezier.pointAt(alpha + alpha_step);
 
         lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
 
@@ -541,10 +563,6 @@ void Renderer::renderCubicBezier(QPainter* const painter, CubicBezier* const bez
     }
 
     // paint bezier
-    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-    painter->setPen(QPen(paint_color, thickness_px));
-    painter->setBrush(Qt::BrushStyle::NoBrush);
     painter->drawLines(lines);
 }
 
@@ -563,7 +581,7 @@ void Renderer::renderSpline(QPainter* const painter, Spline* const spline)
         return;
 
     for(auto s : spline->getSegements())
-        renderCubicBezier(painter, &s);
+        renderCubicBezier(painter, s.m_Bezier);
 }
 
 void Renderer::updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp)
