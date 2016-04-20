@@ -184,10 +184,15 @@ void Spline::updateTangentFactors()
     m_TangentFactors(3) = (1.0f - m_Tension) * (1.0f - m_Continuity) * (1.0f - m_Bias);
 
     m_TangentFactors /= 2.0f;
+
+    update();
 }
 
 void Spline::update()
 {
+    if(m_Segments.empty())
+        return;
+
     const size_t& num_seg = m_Segments.size();
 
     // activate segments
@@ -195,8 +200,7 @@ void Spline::update()
         for(size_t i = 0; i < num_seg - 1; i++)
             m_Segments[i].setVisible(true);
 
-    if(m_Closed)
-        m_Segments[num_seg - 1].setVisible(true);
+    m_Segments[num_seg - 1].setVisible(m_Closed);
 
     // if num_seg <= 1 -> no spline is defined
     if(num_seg <= 1)

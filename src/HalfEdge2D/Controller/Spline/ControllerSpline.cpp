@@ -16,7 +16,10 @@
 
 #include <QtGui/QMouseEvent>
 
-ControllerSpline::ControllerSpline()
+ControllerSpline::ControllerSpline() :
+    m_CMin(-1.0f), m_CMax(1.0f),
+    m_TMin(-1.0f), m_TMax(1.0f),
+    m_BMin(-1.0f), m_BMax(1.0f)
 {
     m_Scene = nullptr;
     m_MovePoint = false;
@@ -25,6 +28,28 @@ ControllerSpline::ControllerSpline()
     m_Spline = new Spline();
     m_Spline->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
     m_Spline->setVisible(false);
+
+    // create option widget
+    m_OptionWidget = new QWidget();
+    m_OptionWidgetSetUp.setupUi(m_OptionWidget);
+
+    m_OptionWidgetSetUp.m_CLbl->setText(tr("C: %0 ... %1").arg(QString::number(m_CMin, 'f', 0)).arg(QString::number(m_CMax, 'f', 0)));
+    m_OptionWidgetSetUp.m_TLbl->setText(tr("T: %0 ... %1").arg(QString::number(m_TMin, 'f', 0)).arg(QString::number(m_TMax, 'f', 0)));
+    m_OptionWidgetSetUp.m_BLbl->setText(tr("B: %0 ... %1").arg(QString::number(m_BMin, 'f', 0)).arg(QString::number(m_BMax, 'f', 0)));
+
+    m_CSlider = m_OptionWidgetSetUp.m_CSld;
+    m_TSlider = m_OptionWidgetSetUp.m_TSld;
+    m_BSlider = m_OptionWidgetSetUp.m_BSld;
+    m_ClosedCkb = m_OptionWidgetSetUp.m_CloseCkb;
+
+    setSliderC(0.0f);
+    setSliderT(0.0f);
+    setSliderB(0.0f);
+
+    connect(m_CSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
+    connect(m_TSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
+    connect(m_BSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
+    connect(m_ClosedCkb, &QCheckBox::stateChanged, this, &ControllerSpline::onClosedChanged);
 }
 
 ControllerSpline::~ControllerSpline()
@@ -168,7 +193,6 @@ Point* const ControllerSpline::getPointAtPos(const Vec2f& pos, size_t* const idx
     if(m_Points.empty())
         return nullptr;
 
-    // TODO point size from renderable point
     for(size_t i = 0; i < m_Points.size(); i++)
     {
         if((m_Points[i]->getPosition() - pos).norm() >= m_Points[i]->getSize())
@@ -180,4 +204,101 @@ Point* const ControllerSpline::getPointAtPos(const Vec2f& pos, size_t* const idx
     }
 
     return nullptr;
+}
+
+void ControllerSpline::onSliderMoved(int value)
+{
+    QObject* sendet_from = sender();
+
+    if(sendet_from == m_CSlider)
+        m_Spline->setContinuity(sliderValueToValue(value, m_CSlider->minimum(), m_CSlider->maximum(), m_CMin, m_CMax));
+    else if(sendet_from == m_TSlider)
+        m_Spline->setTension(sliderValueToValue(value, m_TSlider->minimum(), m_TSlider->maximum(), m_TMin, m_TMax));
+    else if(sendet_from == m_BSlider)
+        m_Spline->setBias(sliderValueToValue(value, m_BSlider->minimum(), m_BSlider->maximum(), m_BMin, m_BMax));
+
+    m_Renderer->render();
+}
+
+void ControllerSpline::onClosedChanged(int state)
+{
+    QObject* sendet_from = sender();
+
+    if(sendet_from == nullptr)
+        return;
+
+    if(state != Qt::Checked && state != Qt::Unchecked)
+        return;
+
+    bool close = state == Qt::Checked;
+
+    if(m_Spline->isClosed() == close)
+        return;
+
+    m_Spline->setClosed(close);
+
+    m_Renderer->render();
+}
+
+void ControllerSpline::setSliderC(const float& c)
+{
+    m_CSlider->blockSignals(true);
+    m_CSlider->setValue(valueToSliderValue(c, m_CSlider->minimum(), m_CSlider->maximum(), m_CMin, m_CMax));
+    m_CSlider->blockSignals(false);
+}
+
+void ControllerSpline::setSliderT(const float& t)
+{
+    m_TSlider->blockSignals(true);
+    m_TSlider->setValue(valueToSliderValue(t, m_TSlider->minimum(), m_TSlider->maximum(), m_TMin, m_TMax));
+    m_TSlider->blockSignals(false);
+}
+
+void ControllerSpline::setSliderB(const float& b)
+{
+    m_BSlider->blockSignals(true);
+    m_BSlider->setValue(valueToSliderValue(b, m_BSlider->minimum(), m_BSlider->maximum(), m_BMin, m_BMax));
+    m_BSlider->blockSignals(false);
+}
+
+float ControllerSpline::sliderValueToValue(const int& value, const int& sliderMin, const int& sliderMax, const float& min, const float& max)
+{
+    // slider properties
+    float sld_min = (float)sliderMin;
+    float sld_max = (float)sliderMax;
+    float range = sld_max - sld_min;
+
+    // radius
+    float r = (float)value;
+
+    // to 0 .. 1 range
+    r -= sld_min;
+    r /= range;
+
+    // to m_RadusMin ... m_RadusMax range
+    r *= max - min;
+    r += min;
+
+    return r;
+}
+
+float ControllerSpline::valueToSliderValue(const float& value, const int& sliderMin, const int& sliderMax, const float& min, const float& max)
+{
+    // slider properties
+    float sld_min = (float)sliderMin;
+    float sld_max = (float)sliderMax;
+    float range = sld_max - sld_min;
+
+    // radius
+    float v = (float)value;
+
+    // to 0 .. 1 range
+    v -= min;
+    v /= max - min;
+
+    // to sld_min ... sld_max range
+    v *= range;
+    v += sld_min;
+
+    return v;
 }

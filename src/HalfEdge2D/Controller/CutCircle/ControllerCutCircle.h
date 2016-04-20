@@ -3,6 +3,8 @@
 
 #include "HalfEdge2D/Controller/Controller.h"
 
+#include "HalfEdge2D/Controller/CutCircle/CutCircleOption_uic.h"
+
 #include <HalfEdge2D/Base/Vector.h>
 
 #include <QtCore/QObject>
@@ -55,6 +57,7 @@ private:
     Line* m_Line;
     Circle* m_Circle;
 
+    Ui_ControllerCutCircleOptionsWidget m_OptionWidgetSetUp;
     QSlider* m_RadiusSlider;
 
     const float m_RadusMin;

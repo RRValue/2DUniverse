@@ -1,7 +1,5 @@
 #include "HalfEdge2D/Controller/CutCircle/ControllerCutCircle.h"
 
-#include "HalfEdge2D/Controller/CutCircle/CutCircleOption_uic.h"
-
 #include "HalfEdge2D/Scene/Scene.h"
 
 #include "HalfEdge2D/Rendering/Renderer.h"
@@ -39,8 +37,6 @@ ControllerCutCircle::ControllerCutCircle() : m_RadusMin(0.001f), m_RadusMax(1.0f
 
     // create option widget
     m_OptionWidget = new QWidget();
-
-    Ui_m_Widget m_OptionWidgetSetUp;
     m_OptionWidgetSetUp.setupUi(m_OptionWidget);
 
     m_OptionWidgetSetUp.m_RadiusLbl->setText(tr("Radius: %0 ... %1").arg(QString::number(m_RadusMin, 'f', 3)).arg(QString::number(m_RadusMax, 'f', 3)));
