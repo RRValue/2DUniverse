@@ -178,11 +178,11 @@ public:
             return SplinePointType();
 
         unsigned int s = 0;
-        float a = alpha;
+        T a = alpha;
 
         getSegmentAndFraction(s, a);
 
-        m_Segments[s].m_Bezier.pointAt(a);
+        return m_Segments[s].m_Bezier.pointAt(a);
     }
 
     SplinePointType tangentAt(const T& alpha) const
@@ -195,7 +195,7 @@ public:
 
         getSegmentAndFraction(s, a);
 
-        m_Segments[s].m_Bezier.tangentAt(a);
+        return m_Segments[s].m_Bezier.tangentAt(a);
     }
 
     SplinePointType normalAt(const T& alpha) const
@@ -208,7 +208,7 @@ public:
 
         getSegmentAndFraction(s, a);
 
-        m_Segments[s].m_Bezier.normalAt(a);
+        return m_Segments[s].m_Bezier.normalAt(a);
     }
 
     SplinePointType biNormalAt(const T& alpha) const
@@ -221,7 +221,7 @@ public:
 
         getSegmentAndFraction(s, a);
 
-        m_Segments[s].m_Bezier.biNormalAt(a);
+        return m_Segments[s].m_Bezier.biNormalAt(a);
     }
 
     T curvationAt(const T& alpha) const
@@ -234,7 +234,7 @@ public:
 
         getSegmentAndFraction(s, a);
 
-        m_Segments[s].m_Bezier.curvationAt(a);
+        return m_Segments[s].m_Bezier.curvationAt(a);
     }
 
     void transform(const TransformType& m)
@@ -268,17 +268,20 @@ private:
 
         update();
     }
-    void getSegmentAndFraction(unsigned int& seg, T& alpha)
+    void getSegmentAndFraction(unsigned int& seg, T& alpha) const
     {
         if(m_Closed)
             alpha *= (float)m_Segments.size();
         else
             alpha *= (float)(m_Segments.size() - 1);
 
-        T c = std::ceil(alpha);
+        T c = std::floor(alpha);
         
         alpha -= c;
         seg = (unsigned int)c;
+
+        if(m_Closed && seg == m_Segments.size())
+            seg = 0;
     }
     void update()
     {

@@ -18,6 +18,7 @@ class ControllerDelaunay;
 class ControllerQuadraticBezier;
 class ControllerCubicBezier;
 class ControllerSpline;
+class ControllerSplineAt;
 class ControllerCutLine;
 class ControllerCutQuadraticBezier;
 class ControllerCutCubicBezier;
@@ -105,6 +106,7 @@ private:
     ControllerQuadraticBezier* m_ControllerQuadraticBezier;
     ControllerCubicBezier* m_ControllerCubicBezier;
     ControllerSpline* m_ControllerSpline;
+    ControllerSplineAt* m_ControllerSplineAt;
     ControllerCutLine* m_ControllerCutLine;
     ControllerCutQuadraticBezier* m_ControllerCutQuadraticBezier;
     ControllerCutCubicBezier* m_ControllerCutCubicBezier;

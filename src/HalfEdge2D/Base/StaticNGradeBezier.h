@@ -84,7 +84,7 @@ public:
         BezierPointType der1 = derived<1>(alpha);
         BezierPointType der2 = derived<2>(alpha);
 
-        return der1.cross(der1.cross(der2)).normalized();
+        return der1.cross(der2).cross(der1).normalized();
     }
 
     template<unsigned int Dim = D>

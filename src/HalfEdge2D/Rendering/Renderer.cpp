@@ -580,8 +580,20 @@ void Renderer::renderSpline(QPainter* const painter, Spline* const spline)
     if(!spline->isVisible())
         return;
 
-    for(auto s : spline->getSegements())
-        renderCubicBezier(painter, s.m_Bezier);
+    // get thickness
+    float thickness_px = getPixelSize(spline->getThickness());
+
+    // get colour
+    const Vec4f& col = spline->getColour();
+
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+
+    for(const auto& s : spline->getSegements())
+        if(s.m_Active)
+            renderCubicBezier(painter, s.m_Bezier);
 }
 
 void Renderer::updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp)
