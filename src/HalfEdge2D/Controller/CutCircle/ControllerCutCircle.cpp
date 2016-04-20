@@ -46,6 +46,8 @@ ControllerCutCircle::ControllerCutCircle() : m_RadusMin(0.001f), m_RadusMax(1.0f
     m_OptionWidgetSetUp.m_RadiusLbl->setText(tr("Radius: %0 ... %1").arg(QString::number(m_RadusMin, 'f', 3)).arg(QString::number(m_RadusMax, 'f', 3)));
 
     m_RadiusSlider = m_OptionWidgetSetUp.m_RadiusSld;
+    
+    setSliderRadius(m_Circle->getRadius());
 
     connect(m_RadiusSlider, &QSlider::sliderMoved, this, &ControllerCutCircle::onRadiusSliderMoved);
 }
@@ -266,9 +268,26 @@ void ControllerCutCircle::cut()
     }
 }
 
-#include <qdebug.h>
-
 void ControllerCutCircle::onRadiusSliderMoved(int value)
+{
+    // set to circle
+    m_Circle->setRadius(sliderValueToRadius(value));
+
+    // cut
+    cut();
+
+    // render
+    m_Renderer->render();
+}
+
+void ControllerCutCircle::setSliderRadius(const float& radius)
+{
+    m_RadiusSlider->blockSignals(true);
+    m_RadiusSlider->setValue(radiusToSliderValue(radius));
+    m_RadiusSlider->blockSignals(false);
+}
+
+float ControllerCutCircle::sliderValueToRadius(const int& value)
 {
     // slider properties
     float sld_min = (float)m_RadiusSlider->minimum();
@@ -286,12 +305,26 @@ void ControllerCutCircle::onRadiusSliderMoved(int value)
     r *= m_RadusMax - m_RadusMin;
     r += m_RadusMin;
 
-    // set to circle
-    m_Circle->setRadius(r);
+    return r;
+}
 
-    // cut
-    cut();
+int ControllerCutCircle::radiusToSliderValue(const float& radius)
+{
+    // slider properties
+    float sld_min = (float)m_RadiusSlider->minimum();
+    float sld_max = (float)m_RadiusSlider->maximum();
+    float range = sld_max - sld_min;
 
-    // render
-    m_Renderer->render();
+    // radius
+    float v = (float)radius;
+
+    // to 0 .. 1 range
+    v -= m_RadusMin;
+    v /= m_RadusMax - m_RadusMin;
+
+    // to sld_min ... sld_max range
+    v *= range;
+    v += sld_min;
+
+    return v;
 }

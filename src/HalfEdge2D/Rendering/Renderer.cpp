@@ -17,6 +17,7 @@
 #include "HalfEdge2D/Renderables/Line.h"
 #include "HalfEdge2D/Renderables/QuadraticBezier.h"
 #include "HalfEdge2D/Renderables/CubicBezier.h"
+#include "HalfEdge2D/Renderables/Spline.h"
 
 #include <QtGui/QPainter>
 
@@ -191,255 +192,33 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
     renderMeshes(painter, scene->getMeshes());
     renderCircles(painter, scene->getCircles());
     renderLines(painter, scene->getLines());
-    renderQuadraticBezier(painter, scene->getQuadraticBeziers());
-    renderCubicBezier(painter, scene->getCubicBeziers());
+    renderQuadraticBeziers(painter, scene->getQuadraticBeziers());
+    renderCubicBeziers(painter, scene->getCubicBeziers());
+    renderSplines(painter, scene->getSplines());
     renderPoints(painter, scene->getPoints());
 }
 
 void Renderer::renderMeshes(QPainter* const painter, const std::set<Mesh* const>& meshes)
 {
     for(const auto& m : meshes)
-    {
-        if(!m->isVisible())
-            continue;
-
         renderMesh(painter, m);
-    }
-}
-
-void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const>& points)
-{
-    for(const auto& p : points)
-    {
-        if(!p->isVisible())
-            continue;
-
-        QPointF ref = trans(QPointF(0.0f, 0.0f));
-        QPointF tar = trans(QPointF(p->getSize(), 0.0f));
-        QPointF val = tar - ref;
-
-        float point_size_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
-        
-        const Vec2f& pos = p->getPosition();
-        const Vec4f& col = p->getColour();
-
-        QPointF vert_pos(pos[0], pos[1]);
-
-        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(QBrush(paint_color));
-        painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
-    }
-}
-
-void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* const>& circles)
-{
-    for(const auto& c : circles)
-    {
-        if(!c->isVisible())
-            continue;
-        
-        float radius_px = getPixelSize(c->getRadius());
-        float thickness_px = getPixelSize(c->getThickness());
-
-        const Vec2f& pos = c->getPosition();
-        const Vec4f& col = c->getColour();
-
-        QPointF circle_pos(pos[0], pos[1]);
-
-        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-        painter->setPen(QPen(paint_color, thickness_px));
-        painter->setBrush(Qt::BrushStyle::NoBrush);
-        painter->drawEllipse(trans(circle_pos), radius_px, radius_px);
-    }
-}
-
-void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>& lines)
-{
-    for(const auto& l : lines)
-    {
-        if(!l->isVisible())
-            continue;
-
-        float thickness_px = getPixelSize(l->getThickness());
-
-        // get points
-        const Line::BezierPointsType& points = l->getPoints();
-
-        // get colour
-        const Vec4f& col = l->getColour();
-
-        // get bb
-        std::array<QPointF, 2> pts;
-
-        for(size_t i = 0; i < 2; i++)
-            pts[i] = trans(QPointF(points(0, i), points(1, i)));
-
-        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-        painter->setPen(QPen(paint_color, thickness_px));
-        painter->setBrush(Qt::BrushStyle::NoBrush);
-        painter->drawLine(pts[0], pts[1]);
-    }
-}
-
-void Renderer::renderQuadraticBezier(QPainter* const painter, const std::set<QuadraticBezier* const>& beziers)
-{
-    for(const auto& b : beziers)
-    {
-        if(!b->isVisible())
-            continue;
-
-        float thickness_px = getPixelSize(b->getThickness());
-
-        // get points
-        const QuadraticBezier::BezierPointsType& points = b->getPoints();
-
-        // get colour
-        const Vec4f& col = b->getColour();
-
-        // get bb
-        std::array<QPointF, 3> bb_points;
-
-        for(size_t i = 0; i < 3; i++)
-            bb_points[i] = trans(QPointF(points(0, i), points(1, i)));
-
-        float pos_inf = std::numeric_limits<float>::infinity();
-        float neg_inf = -pos_inf;
-
-        QPointF min(pos_inf, pos_inf);
-        QPointF max(neg_inf, neg_inf);
-
-        for(const auto& bb_p : bb_points)
-        {
-            if(bb_p.x() < min.x()) min.setX(bb_p.x());
-            if(bb_p.y() < min.y()) min.setY(bb_p.y());
-
-            if(bb_p.x() > max.x()) max.setX(bb_p.x());
-            if(bb_p.y() > max.y()) max.setY(bb_p.y());
-        }
-
-        // get alpha steps
-        QPointF diag = max - min;
-        float bb_diag_length = std::sqrt((diag.x() * diag.x()) + (diag.y() * diag.y()));
-        float max_bezier_length = 1.5f * bb_diag_length;
-
-        // defines num lines when bezier length is 1000 px
-        int max_ration = 100;
-        float coef_a = (-1.0f + (float)max_ration) / 999.0f;
-        float coef_b = (1000.0f - (float)max_ration) / 999.0f;
-
-        unsigned int num_lines = (unsigned int)(((coef_a * max_bezier_length) + coef_b) + 0.5f);
-        float alpha_step = 1.0f / (float)num_lines;
-
-        // build lines
-        QVector<QLineF> lines;
-
-        float alpha = 0.0;
-
-        for(unsigned int i = 0; i < num_lines; i++)
-        {
-            Vec2f bp0 = b->pointAt(alpha);
-            Vec2f bp1 = b->pointAt(alpha + alpha_step);
-
-            lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
-
-            alpha += alpha_step;
-        }
-
-        // paint bezier
-        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-        painter->setPen(QPen(paint_color, thickness_px));
-        painter->setBrush(Qt::BrushStyle::NoBrush);
-        painter->drawLines(lines);
-    }
-}
-
-void Renderer::renderCubicBezier(QPainter* const painter, const std::set<CubicBezier* const>& beziers)
-{
-    for(const auto& b : beziers)
-    {
-        if(!b->isVisible())
-            continue;
-
-        float thickness_px = getPixelSize(b->getThickness());
-        
-        // get points
-        const CubicBezier::BezierPointsType& points = b->getPoints();
-
-        // get colour
-        const Vec4f& col = b->getColour();
-
-        // get bb
-        std::array<QPointF, 4> bb_points;
-
-        for(size_t i = 0; i < 4; i++)
-            bb_points[i] = trans(QPointF(points(0, i), points(1, i)));
-
-        float pos_inf = std::numeric_limits<float>::infinity();
-        float neg_inf = -pos_inf;
-
-        QPointF min(pos_inf, pos_inf);
-        QPointF max(neg_inf, neg_inf);
-
-        for(const auto& bb_p : bb_points)
-        {
-            if(bb_p.x() < min.x()) min.setX(bb_p.x());
-            if(bb_p.y() < min.y()) min.setY(bb_p.y());
-
-            if(bb_p.x() > max.x()) max.setX(bb_p.x());
-            if(bb_p.y() > max.y()) max.setY(bb_p.y());
-        }
-
-        // get alpha steps
-        QPointF diag = max - min;
-        float bb_diag_length = std::sqrt((diag.x() * diag.x()) + (diag.y() * diag.y()));
-        float max_bezier_length = 2.5f * bb_diag_length;
-
-        // defines num lines when bezier length is 1000 px
-        int max_ration = 100;
-        float coef_a = (-1.0f + (float)max_ration) / 999.0f;
-        float coef_b = (1000.0f - (float)max_ration) / 999.0f;
-
-        unsigned int num_lines = (unsigned int)(((coef_a * max_bezier_length) + coef_b) + 0.5f);
-        float alpha_step = 1.0f / (float)num_lines;
-
-        // build lines
-        QVector<QLineF> lines;
-
-        float alpha = 0.0;
-
-        for(unsigned int i = 0; i < num_lines; i++)
-        {
-            Vec2f bp0 = b->pointAt(alpha);
-            Vec2f bp1 = b->pointAt(alpha + alpha_step);
-
-            lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
-
-            alpha += alpha_step;
-        }
-
-        // paint bezier
-        QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
-
-        painter->setPen(QPen(paint_color, thickness_px));
-        painter->setBrush(Qt::BrushStyle::NoBrush);
-        painter->drawLines(lines);
-    }
 }
 
 void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
 {
+    if(mesh == nullptr)
+        return;
+
+    if(!mesh->isVisible())
+        return;
+
     // get point point size to paint
     QPointF ref = trans(QPointF(0.0f, 0.0f));
     QPointF tar = trans(QPointF(m_PointSize, 0.0f));
     QPointF val = tar - ref;
 
     float point_size_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
-    
+
     const std::vector<Vertex*>& vertices = mesh->getVertices();
     const std::vector<Face*>& faces = mesh->getFaces();
 
@@ -510,6 +289,281 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
             painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
         }
     }
+}
+
+void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const>& points)
+{
+    for(const auto& p : points)
+        renderPoint(painter, p);
+}
+
+void Renderer::renderPoint(QPainter* const painter, Point* point)
+{
+    if(point == nullptr)
+        return;
+
+    if(!point->isVisible())
+        return;
+
+    QPointF ref = trans(QPointF(0.0f, 0.0f));
+    QPointF tar = trans(QPointF(point->getSize(), 0.0f));
+    QPointF val = tar - ref;
+
+    float point_size_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
+
+    const Vec2f& pos = point->getPosition();
+    const Vec4f& col = point->getColour();
+
+    QPointF vert_pos(pos[0], pos[1]);
+
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QBrush(paint_color));
+    painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
+}
+
+void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* const>& circles)
+{
+    for(const auto& c : circles)
+        renderCircle(painter, c);
+}
+
+void Renderer::renderCircle(QPainter* const painter, Circle* const circle)
+{
+    if(circle == nullptr)
+        return;
+
+    if(!circle->isVisible())
+        return;
+
+    float radius_px = getPixelSize(circle->getRadius());
+    float thickness_px = getPixelSize(circle->getThickness());
+
+    const Vec2f& pos = circle->getPosition();
+    const Vec4f& col = circle->getColour();
+
+    QPointF circle_pos(pos[0], pos[1]);
+
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+    painter->drawEllipse(trans(circle_pos), radius_px, radius_px);
+}
+
+void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>& lines)
+{
+    for(const auto& l : lines)
+        renderLine(painter, l);
+}
+
+void Renderer::renderLine(QPainter* const painter, Line* const line)
+{
+    if(line == nullptr)
+        return;
+
+    if(!line->isVisible())
+        return;
+
+    // get thickness
+    float thickness_px = getPixelSize(line->getThickness());
+
+    // get points
+    const Line::BezierPointsType& points = line->getPoints();
+
+    // get colour
+    const Vec4f& col = line->getColour();
+
+    // get bb
+    std::array<QPointF, 2> pts;
+
+    for(size_t i = 0; i < 2; i++)
+        pts[i] = trans(QPointF(points(0, i), points(1, i)));
+
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+    painter->drawLine(pts[0], pts[1]);
+}
+
+void Renderer::renderQuadraticBeziers(QPainter* const painter, const std::set<QuadraticBezier* const>& beziers)
+{
+    for(const auto& b : beziers)
+        renderQuadraticBezier(painter, b);
+}
+
+void Renderer::renderQuadraticBezier(QPainter* const painter, QuadraticBezier* const bezier)
+{
+    if(bezier == nullptr)
+        return;
+
+    if(!bezier->isVisible())
+        return;
+
+    // get thickness
+    float thickness_px = getPixelSize(bezier->getThickness());
+
+    // get points
+    const QuadraticBezier::BezierPointsType& points = bezier->getPoints();
+
+    // get colour
+    const Vec4f& col = bezier->getColour();
+
+    // get bb
+    std::array<QPointF, 3> bb_points;
+
+    for(size_t i = 0; i < 3; i++)
+        bb_points[i] = trans(QPointF(points(0, i), points(1, i)));
+
+    float pos_inf = std::numeric_limits<float>::infinity();
+    float neg_inf = -pos_inf;
+
+    QPointF min(pos_inf, pos_inf);
+    QPointF max(neg_inf, neg_inf);
+
+    for(const auto& bb_p : bb_points)
+    {
+        if(bb_p.x() < min.x()) min.setX(bb_p.x());
+        if(bb_p.y() < min.y()) min.setY(bb_p.y());
+
+        if(bb_p.x() > max.x()) max.setX(bb_p.x());
+        if(bb_p.y() > max.y()) max.setY(bb_p.y());
+    }
+
+    // get alpha steps
+    QPointF diag = max - min;
+    float bb_diag_length = std::sqrt((diag.x() * diag.x()) + (diag.y() * diag.y()));
+    float max_bezier_length = 1.5f * bb_diag_length;
+
+    // defines num lines when bezier length is 1000 px
+    int max_ration = 100;
+    float coef_a = (-1.0f + (float)max_ration) / 999.0f;
+    float coef_b = (1000.0f - (float)max_ration) / 999.0f;
+
+    unsigned int num_lines = (unsigned int)(((coef_a * max_bezier_length) + coef_b) + 0.5f);
+    float alpha_step = 1.0f / (float)num_lines;
+
+    // build lines
+    QVector<QLineF> lines;
+
+    float alpha = 0.0;
+
+    for(unsigned int i = 0; i < num_lines; i++)
+    {
+        Vec2f bp0 = bezier->pointAt(alpha);
+        Vec2f bp1 = bezier->pointAt(alpha + alpha_step);
+
+        lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
+
+        alpha += alpha_step;
+    }
+
+    // paint bezier
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+    painter->drawLines(lines);
+}
+
+void Renderer::renderCubicBeziers(QPainter* const painter, const std::set<CubicBezier* const>& beziers)
+{
+    for(const auto& b : beziers)
+        renderCubicBezier(painter, b);
+}
+
+void Renderer::renderCubicBezier(QPainter* const painter, CubicBezier* const bezier)
+{
+    if(bezier == nullptr)
+        return;
+
+    if(!bezier->isVisible())
+        return;
+
+    // get thickness
+    float thickness_px = getPixelSize(bezier->getThickness());
+
+    // get points
+    const CubicBezier::BezierPointsType& points = bezier->getPoints();
+
+    // get colour
+    const Vec4f& col = bezier->getColour();
+
+    // get bb
+    std::array<QPointF, 4> bb_points;
+
+    for(size_t i = 0; i < 4; i++)
+        bb_points[i] = trans(QPointF(points(0, i), points(1, i)));
+
+    float pos_inf = std::numeric_limits<float>::infinity();
+    float neg_inf = -pos_inf;
+
+    QPointF min(pos_inf, pos_inf);
+    QPointF max(neg_inf, neg_inf);
+
+    for(const auto& bb_p : bb_points)
+    {
+        if(bb_p.x() < min.x()) min.setX(bb_p.x());
+        if(bb_p.y() < min.y()) min.setY(bb_p.y());
+
+        if(bb_p.x() > max.x()) max.setX(bb_p.x());
+        if(bb_p.y() > max.y()) max.setY(bb_p.y());
+    }
+
+    // get alpha steps
+    QPointF diag = max - min;
+    float bb_diag_length = std::sqrt((diag.x() * diag.x()) + (diag.y() * diag.y()));
+    float max_bezier_length = 2.5f * bb_diag_length;
+
+    // defines num lines when bezier length is 1000 px
+    int max_ration = 100;
+    float coef_a = (-1.0f + (float)max_ration) / 999.0f;
+    float coef_b = (1000.0f - (float)max_ration) / 999.0f;
+
+    unsigned int num_lines = (unsigned int)(((coef_a * max_bezier_length) + coef_b) + 0.5f);
+    float alpha_step = 1.0f / (float)num_lines;
+
+    // build lines
+    QVector<QLineF> lines;
+
+    float alpha = 0.0;
+
+    for(unsigned int i = 0; i < num_lines; i++)
+    {
+        Vec2f bp0 = bezier->pointAt(alpha);
+        Vec2f bp1 = bezier->pointAt(alpha + alpha_step);
+
+        lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
+
+        alpha += alpha_step;
+    }
+
+    // paint bezier
+    QColor paint_color = QColor::fromRgbF(col[0], col[1], col[2], col[3]);
+
+    painter->setPen(QPen(paint_color, thickness_px));
+    painter->setBrush(Qt::BrushStyle::NoBrush);
+    painter->drawLines(lines);
+}
+
+void Renderer::renderSplines(QPainter* const painter, const std::set<Spline* const>& splines)
+{
+    for(const auto& s : splines)
+        renderSpline(painter, s);
+}
+
+void Renderer::renderSpline(QPainter* const painter, Spline* const spline)
+{
+    if(spline == nullptr)
+        return;
+
+    if(!spline->isVisible())
+        return;
+
+    for(auto s : spline->getSegements())
+        renderCubicBezier(painter, &s);
 }
 
 void Renderer::updateMatrices(RenderTarget* const renderTarget, ViewPort* const vp)

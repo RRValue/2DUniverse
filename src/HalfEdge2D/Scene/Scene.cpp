@@ -1,15 +1,8 @@
 #include "HalfEdge2D/Scene/Scene.h"
 
-#include "HalfEdge2D/Mesh/Mesh.h"
-
-#include "HalfEdge2D/Renderables/Point.h"
-#include "HalfEdge2D/Renderables/Circle.h"
-#include "HalfEdge2D/Renderables/Line.h"
-#include "HalfEdge2D/Renderables/CubicBezier.h"
-
 Scene::Scene()
 {
-    m_PointSize = 0.05f;
+
 }
 
 Scene::~Scene()
@@ -24,6 +17,7 @@ void Scene::clear()
     m_Circles.clear();
     m_Lines.clear();
     m_CubicBeziers.clear();
+    m_Splines.clear();
 }
 
 const std::set<Mesh* const>& Scene::getMeshes() const
@@ -56,6 +50,11 @@ const std::set<CubicBezier* const>& Scene::getCubicBeziers() const
     return m_CubicBeziers;
 }
 
+const std::set<Spline* const>& Scene::getSplines() const
+{
+    return m_Splines;
+}
+
 void Scene::setMeshes(const std::set<Mesh* const>& meshes)
 {
     m_Meshes = meshes;
@@ -63,20 +62,17 @@ void Scene::setMeshes(const std::set<Mesh* const>& meshes)
 
 void Scene::setPoints(const std::set<Point* const>& points)
 {
-    for(const auto& p : points)
-        addPoint(p);
+    m_Points = points;
 }
 
 void Scene::setCircles(const std::set<Circle* const>& circles)
 {
-    for(const auto& c : circles)
-        addCircle(c);
+    m_Circles = circles;
 }
 
 void Scene::setLines(const std::set<Line* const>& lines)
 {
-    for(const auto& l : lines)
-        addLine(l);
+    m_Lines = lines;
 }
 
 void Scene::setQuadraticBeziers(const std::set<QuadraticBezier* const>& beziers)
@@ -87,6 +83,11 @@ void Scene::setQuadraticBeziers(const std::set<QuadraticBezier* const>& beziers)
 void Scene::setCubicBeziers(const std::set<CubicBezier* const>& beziers)
 {
     m_CubicBeziers = beziers;
+}
+
+void Scene::setSplines(const std::set<Spline* const>& splines)
+{
+    m_Splines = splines;
 }
 
 void Scene::addMesh(Mesh* const mesh)
@@ -167,6 +168,19 @@ void Scene::addCubicBeziers(CubicBezier* const bezier)
     m_CubicBeziers.insert(bezier);
 }
 
+void Scene::addSpline(Spline* const spline)
+{
+    if(spline == nullptr)
+        return;
+
+    const auto& find_iter = m_Splines.find(spline);
+
+    if(find_iter != m_Splines.end())
+        return;
+
+    m_Splines.insert(spline);
+}
+
 void Scene::removeMesh(Mesh* const mesh)
 {
     if(mesh == nullptr)
@@ -243,4 +257,17 @@ void Scene::removeCubicBeziers(CubicBezier* const bezier)
         return;
 
     m_CubicBeziers.erase(find_iter);
+}
+
+void Scene::removeSpline(Spline* const spline)
+{
+    if(spline == nullptr)
+        return;
+
+    const auto& find_iter = m_Splines.find(spline);
+
+    if(find_iter == m_Splines.end())
+        return;
+
+    m_Splines.erase(find_iter);
 }

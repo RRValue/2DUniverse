@@ -21,6 +21,7 @@ class Circle;
 class Line;
 class QuadraticBezier;
 class CubicBezier;
+class Spline;
 class RenderTarget;
 class ViewPort;
 class Mesh;
@@ -59,13 +60,28 @@ private:
 
 private:
     void renderScene(QPainter* const painter, Scene* const scene);
+    
     void renderMeshes(QPainter* const painter, const std::set<Mesh* const>& meshes);
+    void renderMesh(QPainter* const painter, Mesh* const meshes);
+    
     void renderPoints(QPainter* const painter, const std::set<Point* const>& points);
+    void renderPoint(QPainter* const painter, Point* point);
+
     void renderCircles(QPainter* const painter, const std::set<Circle* const>& circles);
+    void renderCircle(QPainter* const painter, Circle* const circle);
+
     void renderLines(QPainter* const painter, const std::set<Line* const>& lines);
-    void renderQuadraticBezier(QPainter* const painter, const std::set<QuadraticBezier* const>& beziers);
-    void renderCubicBezier(QPainter* const painter, const std::set<CubicBezier* const>& beziers);
-    void renderMesh(QPainter* const painter, Mesh* const mesh);
+    void renderLine(QPainter* const painter, Line* const line);
+    
+    void renderQuadraticBeziers(QPainter* const painter, const std::set<QuadraticBezier* const>& beziers);
+    void renderQuadraticBezier(QPainter* const painter, QuadraticBezier* const bezier);
+
+    void renderCubicBeziers(QPainter* const painter, const std::set<CubicBezier* const>& beziers);
+    void renderCubicBezier(QPainter* const painter, CubicBezier* const bezier);
+
+    void renderSplines(QPainter* const painter, const std::set<Spline* const>& splines);
+    void renderSpline(QPainter* const painter, Spline* const spline);
+
     void renderViewport(QPainter* const painter, const QRectF& vp);
     void renderCoordinateCross(QPainter* const painter);
 

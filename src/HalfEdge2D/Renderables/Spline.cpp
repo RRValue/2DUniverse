@@ -7,7 +7,7 @@ Spline::Spline()
     m_Tension = 0.0f;
     m_Continuity = 0.0f;
     m_Bias = 0.0f;
-    m_TangentFactors = Vec4f(1.0f, 1.0f, 1.0f, 1.0f);
+    m_TangentFactors = Vec4f(0.5f, 0.5f, 0.5f, 0.5f);
     m_Closed = false;
 }
 
@@ -45,7 +45,7 @@ std::vector<Vec2f> Spline::getPoints() const
     std::vector<Vec2f> result;
 
     for(const auto& seg : m_Segments)
-        result.push_back(seg.m_Bezier.getPoint(0));
+        result.push_back(seg.getPoint(0));
 
     return result;
 }
@@ -54,7 +54,7 @@ const Vec2f& Spline::getPoint(const size_t& idx) const
 {
     assert(idx >= 0 && idx < m_Segments.size() && "Spline::getPoint: idx out of range");
 
-    return m_Segments[idx].m_Bezier.getPoint(0);
+    return m_Segments[idx].getPoint(0);
 }
 
 const bool& Spline::isClosed() const
@@ -122,7 +122,7 @@ void Spline::setPoints(const std::vector<Vec2f>& points)
     for(const auto& p : points)
     {
         m_Segments.push_back(SplineSegment());
-        m_Segments.back().m_Bezier.setPoint(0, p);
+        m_Segments.back().setPoint(0, p);
     }
 
     update();
@@ -132,7 +132,7 @@ void Spline::setPoint(const size_t& idx, const Vec2f& point)
 {
     assert(idx >= 0 && idx < m_Segments.size() && "Spline::setPoint: idx out of range");
 
-    m_Segments[idx].m_Bezier.setPoint(0, point);
+    m_Segments[idx].setPoint(0, point);
 
     update();
 }
@@ -140,7 +140,8 @@ void Spline::setPoint(const size_t& idx, const Vec2f& point)
 void Spline::addPoint(const Vec2f& point)
 {
     m_Segments.push_back(SplineSegment());
-    m_Segments.back().m_Bezier.setPoint(0, point);
+    m_Segments.back().setPoint(0, point);
+    m_Segments.back().setVisible(false);
 
     update();
 }
@@ -192,10 +193,10 @@ void Spline::update()
     // activate segments
     if(num_seg > 1)
         for(size_t i = 0; i < num_seg - 1; i++)
-            m_Segments[i].m_Active = true;
+            m_Segments[i].setVisible(true);
 
     if(m_Closed)
-        m_Segments[num_seg - 1].m_Active = true;
+        m_Segments[num_seg - 1].setVisible(true);
 
     // if num_seg <= 1 -> no spline is defined
     if(num_seg <= 1)
@@ -204,44 +205,58 @@ void Spline::update()
     // set endpoints
     for(size_t i = 0; i < num_seg; i++)
         if(i < num_seg || m_Closed)
-            m_Segments[i].m_Bezier.setPoint(3, m_Segments[(i + 1) % num_seg].m_Bezier.getPoint(0));
+            m_Segments[i].setPoint(3, m_Segments[(i + 1) % num_seg].getPoint(0));
 
     // calculate tangents
-    size_t idxp, idxn;
-    Vec2f p0, p1, p2, p3;
+    size_t idx0, idx1, idx2;
+    Vec2f p0, p1, p2;
+    Vec2f seg_p0, seg_p3;
     Vec2f pp0, pp1;
-    Vec2f t0, t1;
+    Vec2f t;
 
     for(size_t i = 0; i < num_seg; i++)
     {
-        idxp = (i == 0) ? (num_seg - 1) : ( i - 1);
-        idxn = (i == num_seg - 1) ? (0) : ( i + 1);
+        idx0 = (i == 0) ? (num_seg - 1) : (i - 1);
+        idx1  = i;
+        idx2 = (i == num_seg - 1) ? (0) : (i + 1);
 
-        p0 = m_Segments[idxp].m_Bezier.getPoint(0);
-        p1 = m_Segments[i   ].m_Bezier.getPoint(0);
-        p2 = m_Segments[idxn].m_Bezier.getPoint(0);
-        p3 = m_Segments[i   ].m_Bezier.getPoint(3);
+        seg_p0 = m_Segments[i].getPoint(0);
+        seg_p3 = m_Segments[i].getPoint(3);
 
-        if(i == 0 && !m_Closed)
+        for(size_t j = 0; j < 2; j++)
         {
-            pp0 = p1;
-            pp1 = p2 - p1;
-        }
-        else if(i == num_seg - 1 && !m_Closed)
-        {
-            pp0 = p1 - p0;
-            pp1 = -p1;
-        }
-        else
-        {
-            pp0 = p1 - p0;
-            pp1 = p2 - p1;
-        }
+            idx0 = (idx0 + j) % num_seg;
+            idx1 = (idx1 + j) % num_seg;
+            idx2 = (idx2 + j) % num_seg;
+            
+            p0 = m_Segments[idx0].getPoint(0);
+            p1 = m_Segments[idx1].getPoint(0);
+            p2 = m_Segments[idx2].getPoint(0);
 
-        t0 = (m_TangentFactors[0] * pp0) + (m_TangentFactors[1] * pp1);
-        t1 = (m_TangentFactors[2] * pp0) + (m_TangentFactors[3] * pp1);
+            if(idx1 == 0 && !m_Closed)
+            {
+                pp0 = p1;
+                pp1 = p2 - p1;
+            }
+            else if(idx1 == num_seg - 1 && !m_Closed)
+            {
+                pp0 = p1 - p0;
+                pp1 = -p1;
+            }
+            else
+            {
+                pp0 = p1 - p0;
+                pp1 = p2 - p1;
+            }
 
-        m_Segments[i].m_Bezier.setPoint(1, p1 + (t0 / 3.0f));
-        m_Segments[i].m_Bezier.setPoint(2, p3 - (t1 / 3.0f));
+            t = (m_TangentFactors[(j * 2) + 0] * pp0) + (m_TangentFactors[(j * 2) + 1] * pp1);
+
+            if(j == 0)
+                t = seg_p0 + (t / 3.0f);
+            else
+                t = seg_p3 - (t / 3.0f);
+
+            m_Segments[i].setPoint(j + 1, t);
+        }
     }
 }

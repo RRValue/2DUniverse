@@ -4,19 +4,9 @@
 #include "HalfEdge2D/Base/StaticNGradeBezier.h"
 
 #include "HalfEdge2D/Renderables/RenderableLine.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
 
-struct SplineSegment
-{
-    SplineSegment()
-    {
-        m_Active = false;
-    }
-
-    CBezier2F m_Bezier;
-
-    bool m_Active;
-};
-
+typedef CubicBezier SplineSegment;
 typedef std::vector<SplineSegment, Eigen::aligned_allocator<SplineSegment>> SplineSegmentVector;
 
 class Spline : public RenderableLine
