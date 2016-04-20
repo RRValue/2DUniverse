@@ -1,6 +1,6 @@
 #include "HalfEdge2D/HalfEdge2DApplication.h"
 
-#include <QtCore/QTimer
+#include <QtCore/QTimer>
 
 int main(int argc, char** argv)
 {
