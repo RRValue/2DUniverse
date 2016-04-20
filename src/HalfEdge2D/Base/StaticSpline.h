@@ -27,6 +27,9 @@ private:
     
     typedef Eigen::Matrix<T, 4, 1> TangentFactorsType;
 
+    typedef Eigen::Matrix<T, D + 1, 1> TransformPointType;
+    typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
+
 public:
     StaticSpline()
     {
@@ -168,6 +171,90 @@ public:
 
         update();
     }
+    
+    SplinePointType pointAt(const T& alpha) const
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        float a = alpha;
+
+        getSegmentAndFraction(s, a);
+
+        m_Segments[s].m_Bezier.pointAt(a);
+    }
+
+    SplinePointType tangentAt(const T& alpha) const
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        float a = alpha;
+
+        getSegmentAndFraction(s, a);
+
+        m_Segments[s].m_Bezier.tangentAt(a);
+    }
+
+    SplinePointType normalAt(const T& alpha) const
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        float a = alpha;
+
+        getSegmentAndFraction(s, a);
+
+        m_Segments[s].m_Bezier.normalAt(a);
+    }
+
+    SplinePointType biNormalAt(const T& alpha) const
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        float a = alpha;
+
+        getSegmentAndFraction(s, a);
+
+        m_Segments[s].m_Bezier.biNormalAt(a);
+    }
+
+    T curvationAt(const T& alpha) const
+    {
+        if(m_Segments.empty())
+            return T(0);
+
+        unsigned int s = 0;
+        float a = alpha;
+
+        getSegmentAndFraction(s, a);
+
+        m_Segments[s].m_Bezier.curvationAt(a);
+    }
+
+    void transform(const TransformType& m)
+    {
+        for(const auto& s : m_Segments)
+        {
+            SplinePointType p = s.getPoint(0);
+            TransformPointType t_p;
+
+            for(size_t i = 0; i < D; i++)
+                t_p(i) = p(i);
+
+            p(D) = StaticIdentities.identityMult<T>();
+
+            p = m * p;
+
+            for(size_t i = 0; i < D; i++)
+                p(i) = t_p(j);
+        }
+    }
 
 private:
     void updateTangentFactors()
@@ -180,6 +267,18 @@ private:
         m_TangentFactors /= T(2);
 
         update();
+    }
+    void getSegmentAndFraction(unsigned int& seg, T& alpha)
+    {
+        if(m_Closed)
+            alpha *= (float)m_Segments.size();
+        else
+            alpha *= (float)(m_Segments.size() - 1);
+
+        T c = std::ceil(alpha);
+        
+        alpha -= c;
+        seg = (unsigned int)c;
     }
     void update()
     {
