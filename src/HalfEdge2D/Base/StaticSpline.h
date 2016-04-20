@@ -13,7 +13,10 @@ public:
         {
             m_Active = false;
         }
-        Segment(const Segment& other) : m_Active(other.m_Active), m_Bezier(other.m_Bezier) {}
+        Segment(const Segment& other) : m_Active(other.m_Active), m_Bezier(other.m_Bezier)
+        {
+
+        }
 
         StaticNGradeBezier<T, 3, D> m_Bezier;
         bool m_Active;
@@ -53,7 +56,7 @@ public:
     const T& getTension() const { return m_Tension; }
     const T& getContinuity() const { return m_Continuity; }
     const T& getBias() const { return m_Bias; }
-    const SegmentVector& getSegements() { return m_Segments; }
+    const SegmentVector& getSegements() const { return m_Segments; }
     const bool& isClosed() const { return m_Closed; }
     size_t getNumControllPoints() const { return m_Segments.size(); }
 
@@ -239,21 +242,8 @@ public:
 
     void transform(const TransformType& m)
     {
-        for(const auto& s : m_Segments)
-        {
-            SplinePointType p = s.getPoint(0);
-            TransformPointType t_p;
-
-            for(size_t i = 0; i < D; i++)
-                t_p(i) = p(i);
-
-            p(D) = StaticIdentities.identityMult<T>();
-
-            p = m * p;
-
-            for(size_t i = 0; i < D; i++)
-                p(i) = t_p(j);
-        }
+        for(auto& s : m_Segments)
+            s.m_Bezier.transform(m);
     }
 
 private:

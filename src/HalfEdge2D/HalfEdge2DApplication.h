@@ -23,6 +23,7 @@ class ControllerCutLine;
 class ControllerCutQuadraticBezier;
 class ControllerCutCubicBezier;
 class ControllerCutCircle;
+class ControllerCutSpline;
 class EventHandler;
 class Scene;
 class DefaultOptionWidget;
@@ -111,6 +112,7 @@ private:
     ControllerCutQuadraticBezier* m_ControllerCutQuadraticBezier;
     ControllerCutCubicBezier* m_ControllerCutCubicBezier;
     ControllerCutCircle* m_ControllerCutCircle;
+    ControllerCutSpline* m_ControllerCutSpline;
 
     std::map<std::string, Controller* const> m_Controller;
 

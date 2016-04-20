@@ -216,3 +216,47 @@ Vec2fVec Line::intersect(const CubicBezier& b) const
 
     return results;
 }
+
+Vec2fVec Line::intersect(const Spline& s) const
+{
+    Mat3f trans = getOrthoBaseMatrix();
+    Mat3f trans_inv = trans.inverse();
+
+    Spline t_spline(s);
+    t_spline.transform(trans);
+
+    Vec2fVec results;
+    const Spline::SegmentVector& segements = s.getSegements();
+    const Spline::SegmentVector& t_segements = t_spline.getSegements();
+
+    for(size_t i = 0; i < t_spline.getNumControllPoints(); i++)
+    {
+        if(!segements[i].m_Active)
+            continue;
+
+        // find root y compontent (cuts with x axis)
+        CubicBezier::Roots seg_roots = t_segements[i].m_Bezier.componentRoots(1);
+
+        if(seg_roots.empty())
+            continue;
+
+        for(unsigned int j = 0; j < seg_roots.m_Solutions; j++)
+        {
+            float alpha = seg_roots[j];
+
+            // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
+            if(alpha < 0.0f || alpha > 1.0f)
+                continue;
+
+            Vec2f cut_pos = t_segements[i].m_Bezier.pointAt(alpha);
+
+            // cut_pos.x must be between 0.0 and lenght of source line
+            if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
+                continue;
+
+            results.push_back(segements[i].m_Bezier.pointAt(alpha));
+        }
+    }
+
+    return results;
+}

@@ -37,6 +37,14 @@ public:
         m_DerivedParams[2].setZero();
     }
 
+    StaticNGradeBezier(const StaticNGradeBezier& other)
+    {
+        m_Params = other.m_Params;
+        m_DerivedParams[0] = other.m_DerivedParams[0];
+        m_DerivedParams[1] = other.m_DerivedParams[1];
+        m_DerivedParams[2] = other.m_DerivedParams[2];
+    }
+
     BezierPointType getPoint(const size_t& idx) const
     {
         return m_Params.col(idx);

@@ -10,6 +10,7 @@
 
 #include "HalfEdge2D/Renderables/QuadraticBezier.h"
 #include "HalfEdge2D/Renderables/CubicBezier.h"
+#include "HalfEdge2D/Renderables/Spline.h"
 
 #include <vector>
 
@@ -30,6 +31,7 @@ public:
     Vec2fVec intersect(const Line& l) const;
     Vec2fVec intersect(const QuadraticBezier& b) const;
     Vec2fVec intersect(const CubicBezier& b) const;
+    Vec2fVec intersect(const Spline& s) const;
 
 private:
     Mat3f getOrthoBaseMatrix() const;
