@@ -32,6 +32,7 @@ Renderer::Renderer() : m_PointSize(0.005f)
     m_RenderViewport = true;
     m_SmoothRendering = true;
     m_ClearColor = Vec4f(1.0f, 1.0f, 1.0f, 1.0f);
+    m_Scene = nullptr;
 }
 
 Renderer::~Renderer()

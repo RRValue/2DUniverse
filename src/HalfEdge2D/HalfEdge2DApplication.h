@@ -42,6 +42,7 @@ private:
     void createGui();
     void createRendering();
     void createViewPorts();
+    void createController();
 
     void setUpMultiView();
     void updateViwePortPartions();

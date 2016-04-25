@@ -50,6 +50,7 @@ void HalfEdge2DApplication::init()
     createGui();
     createViewPorts();
     createRendering();
+    createController();
 
     setUpMultiView();
 
@@ -112,7 +113,22 @@ void HalfEdge2DApplication::createRendering()
     // allocate event handler and add controller and navigator
     m_Navigator = new Navigator();
 
-    // create controller
+    // create renderer
+    m_Renderer = new Renderer();
+
+    // create event handler
+    m_EventHandler = new EventHandler(m_RenderTarget);
+    m_EventHandler->setNavigator(m_Navigator);
+
+    // set render in event handler
+    m_EventHandler->setRenderer(m_Renderer);
+
+    // set event handler in render target
+    m_RenderTarget->setEventHandler(m_EventHandler);
+}
+
+void HalfEdge2DApplication::createController()
+{
     std::vector<Controller*> controller_to_add =
     {
         new ControllerBuildMesh(),
@@ -134,33 +150,19 @@ void HalfEdge2DApplication::createRendering()
 
     // add controller to combobox
     m_CbController->blockSignals(true);
-    
+
     for(const auto& c : controller_to_add)
         m_CbController->addItem(c->getName().c_str());
 
     m_CbController->blockSignals(false);
 
-    // create renderer
-    m_Renderer = new Renderer();
-
-    // create event handler
-    m_EventHandler = new EventHandler(m_RenderTarget);
-    m_EventHandler->setNavigator(m_Navigator);
-
     // add controller to event handler
     for(const auto& c : controller_to_add)
         m_EventHandler->addController(c);
 
-    // set render in event handler
-    m_EventHandler->setRenderer(m_Renderer);
-
+    // init controller
     for(const auto& c : controller_to_add)
         c->init();
-
-    // activate via cb
-    m_CbController->setCurrentIndex(0);
-
-    m_RenderTarget->setEventHandler(m_EventHandler);
 }
 
 void HalfEdge2DApplication::onMultiViewChanged(int state)
@@ -236,7 +238,10 @@ void HalfEdge2DApplication::onControllerSelectionChanged(const QString& text)
 
     m_ActiveController = find_controller->second;
 
+    // set active controller in event handler
     m_EventHandler->setActiveController(m_ActiveController);
+
+    // set scene from active controller
     m_Renderer->setScene(m_ActiveController->getScene());
 
     // add controller widget
