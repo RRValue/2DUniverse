@@ -21,9 +21,20 @@ ControllerSpline::ControllerSpline() :
     m_TMin(-1.0f), m_TMax(1.0f),
     m_BMin(-1.0f), m_BMax(1.0f)
 {
-    m_Scene = nullptr;
-    m_MovePoint = false;
     m_Name = "ControllerSpline";
+}
+
+ControllerSpline::~ControllerSpline()
+{
+    for(const auto& p : m_Points)
+        delete p;
+
+    delete m_Spline;
+}
+
+void ControllerSpline::init()
+{
+    m_MovePoint = false;
     m_CurrentPoint = nullptr;
     m_Spline = new Spline();
     m_Spline->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
@@ -50,30 +61,19 @@ ControllerSpline::ControllerSpline() :
     connect(m_TSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
     connect(m_BSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
     connect(m_ClosedCkb, &QCheckBox::stateChanged, this, &ControllerSpline::onClosedChanged);
-}
 
-ControllerSpline::~ControllerSpline()
-{
-    for(const auto& p : m_Points)
-        delete p;
-
-    delete m_Spline;
+    // add to scene
+    m_Scene->addSpline(m_Spline);
 }
 
 void ControllerSpline::activate()
 {
-    m_Scene->addSpline(m_Spline);
 
-    for(const auto& p : m_Points)
-        m_Scene->addPoint(p);
 }
 
 void ControllerSpline::deactivate()
 {
-    m_Scene->removeSpline(m_Spline);
 
-    for(const auto& p : m_Points)
-        m_Scene->removePoint(p);
 }
 
 bool ControllerSpline::handleMouseMoveEvent(QMouseEvent* const event)

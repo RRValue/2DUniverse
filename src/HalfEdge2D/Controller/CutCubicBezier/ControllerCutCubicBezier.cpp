@@ -12,9 +12,25 @@
 
 ControllerCutCubicBezier::ControllerCutCubicBezier()
 {
-    m_Scene = nullptr;
-    m_MovePoint = false;
     m_Name = "ControllerCutCubicBezier";
+}
+
+ControllerCutCubicBezier::~ControllerCutCubicBezier()
+{
+    for(const auto& p : m_Points)
+        delete p;
+
+    delete m_Line;
+    delete m_Bezier;
+
+    delete m_CutPoint0;
+    delete m_CutPoint1;
+    delete m_CutPoint2;
+}
+
+void ControllerCutCubicBezier::init()
+{
+    m_MovePoint = false;
     m_CurrentPoint = nullptr;
 
     m_Line = new Line();
@@ -38,45 +54,23 @@ ControllerCutCubicBezier::ControllerCutCubicBezier()
     m_CutPoint0->setSize(0.02f);
     m_CutPoint1->setSize(0.02f);
     m_CutPoint2->setSize(0.02f);
-}
 
-ControllerCutCubicBezier::~ControllerCutCubicBezier()
-{
-    for(const auto& p : m_Points)
-        delete p;
-
-    delete m_Line;
-    delete m_Bezier;
-
-    delete m_CutPoint0;
-    delete m_CutPoint1;
-    delete m_CutPoint2;
-}
-
-void ControllerCutCubicBezier::activate()
-{
+    // add to scene
     m_Scene->addLine(m_Line);
     m_Scene->addCubicBeziers(m_Bezier);
-    
-    for(const auto& p : m_Points)
-        m_Scene->addPoint(p);
-
     m_Scene->addPoint(m_CutPoint0);
     m_Scene->addPoint(m_CutPoint1);
     m_Scene->addPoint(m_CutPoint2);
 }
 
+void ControllerCutCubicBezier::activate()
+{
+
+}
+
 void ControllerCutCubicBezier::deactivate()
 {
-    m_Scene->removeLine(m_Line);
-    m_Scene->removeCubicBeziers(m_Bezier);
 
-    for(const auto& p : m_Points)
-        m_Scene->removePoint(p);
-
-    m_Scene->removePoint(m_CutPoint0);
-    m_Scene->removePoint(m_CutPoint1);
-    m_Scene->removePoint(m_CutPoint2);
 }
 
 bool ControllerCutCubicBezier::handleMouseMoveEvent(QMouseEvent* const event)

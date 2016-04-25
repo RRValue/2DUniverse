@@ -1,5 +1,7 @@
 #include "HalfEdge2D/Controller/ShowRings/ControllerShowRings.h"
 
+#include "HalfEdge2D/Controller/ShowRings/ShowRingsOptions_uic.h"
+
 #include "HalfEdge2D/Rendering/Renderer.h"
 #include "HalfEdge2D/Rendering/QPaintTarget.h"
 
@@ -7,12 +9,17 @@
 #include "HalfEdge2D/HalfEdge/HESFace.h"
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESVertex.h"
+#include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 #include "HalfEdge2D/Scene/ViewPort.h"
 
 #include "HalfEdge2D/Mesh/Vertex.h"
 #include "HalfEdge2D/Mesh/Face.h"
+
+#include "HalfEdge2D/Mesh/TestMesh01.h"
+#include "HalfEdge2D/Mesh/TestMesh02.h"
+#include "HalfEdge2D/Mesh/TestMesh03.h"
 
 #include <math.h>
 
@@ -27,9 +34,18 @@ m_MaxId(m_ChannelBitRange * m_ChannelBitRange * m_ChannelBitRange),
 m_NumRings(1)
 {
     m_Name = "ControllerShowRings";
+}
 
+ControllerShowRings::~ControllerShowRings()
+{
+    delete m_Mesh;
+}
+
+void ControllerShowRings::init()
+{
     m_IdScene = new Scene();
-    m_Scene = nullptr;
+
+    m_Mesh = new HESMesh();
 
     m_IdRenderer = new Renderer();
     m_IdTarget = new QPaintTarget(100, 100);
@@ -44,11 +60,22 @@ m_NumRings(1)
     m_IdRenderer->setRenderTriangles(true);
     m_IdRenderer->setRenderTrianglesEdges(false);
     m_IdRenderer->setSmoothRendering(false);
-}
 
-ControllerShowRings::~ControllerShowRings()
-{
+    // init gui
+    m_OptionWidget = new QWidget();
 
+    Ui_ControllerShowRingsOptionsWidget ui_options;
+    ui_options.setupUi(m_OptionWidget);
+
+    m_CbMeshSelector = ui_options.m_CbMeshSelector;
+    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Clear");
+
+    connect(m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
+
+    onMeshSelectionChanged(m_CbMeshSelector->currentIndex());
+
+    // add to scene
+    m_Scene->addMesh(m_Mesh);
 }
 
 void ControllerShowRings::activate()
@@ -312,4 +339,48 @@ unsigned int ControllerShowRings::colourToId(const Vec4f& colour)
         (((unsigned int)((colour[0] / m_ChannelFFactor) + 0.5f)) << (0 * m_ChannelBitRange)) +
         (((unsigned int)((colour[1] / m_ChannelFFactor) + 0.5f)) << (1 * m_ChannelBitRange)) +
         (((unsigned int)((colour[2] / m_ChannelFFactor) + 0.5f)) << (2 * m_ChannelBitRange));
+}
+
+void ControllerShowRings::onMeshSelectionChanged(int value)
+{
+    m_Mesh->clear();
+
+    if(value < 0 || value >= 3)
+    {
+        m_Renderer->render();
+
+        return;
+    }
+
+    std::vector<float> float_array;
+    std::vector<size_t> idx_array;
+
+    if(value == 0)
+    {
+        float_array = testVertices01;
+        idx_array = testTriangles01;
+    }
+
+    if(value == 1)
+    {
+        float_array = testVertices02;
+        idx_array = testTriangles02;
+    }
+
+    if(value == 2)
+    {
+        float_array = testVertices03;
+        idx_array = testTriangles03;
+    }
+
+    for(size_t i = 0; i < float_array.size(); i += 2)
+        m_Mesh->addVertex(Vec2f(float_array[i], float_array[i + 1]));
+
+    for(size_t i = 0; i < idx_array.size(); i += 3)
+        m_Mesh->addFace({idx_array[i], idx_array[i + 1], idx_array[i + 2]});
+
+    HESBuilder builder(m_Mesh);
+    builder.build();
+
+    m_Renderer->render();
 }

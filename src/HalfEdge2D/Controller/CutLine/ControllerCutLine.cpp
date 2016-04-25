@@ -11,9 +11,23 @@
 
 ControllerCutLine::ControllerCutLine()
 {
-    m_Scene = nullptr;
-    m_MovePoint = false;
     m_Name = "ControllerCutLine";
+}
+
+ControllerCutLine::~ControllerCutLine()
+{
+    for(const auto& p : m_Points)
+        delete p;
+
+    delete m_Line0;
+    delete m_Line1;
+
+    delete m_CutPoint;
+}
+
+void ControllerCutLine::init()
+{
+    m_MovePoint = false;
     m_CurrentPoint = nullptr;
 
     m_Line0 = new Line();
@@ -29,39 +43,21 @@ ControllerCutLine::ControllerCutLine()
     m_CutPoint->setColour(Vec4f(1.0f, 0.0f, 0.0f, 0.5f));
 
     m_CutPoint->setSize(0.02f);
-}
 
-ControllerCutLine::~ControllerCutLine()
-{
-    for(const auto& p : m_Points)
-        delete p;
-
-    delete m_Line0;
-    delete m_Line1;
-
-    delete m_CutPoint;
+    // add to scene
+    m_Scene->addLine(m_Line0);
+    m_Scene->addLine(m_Line1);
+    m_Scene->addPoint(m_CutPoint);
 }
 
 void ControllerCutLine::activate()
 {
-    m_Scene->addLine(m_Line0);
-    m_Scene->addLine(m_Line1);
-    
-    for(const auto& p : m_Points)
-        m_Scene->addPoint(p);
 
-    m_Scene->addPoint(m_CutPoint);
 }
 
 void ControllerCutLine::deactivate()
 {
-    m_Scene->removeLine(m_Line0);
-    m_Scene->removeLine(m_Line1);
-    
-    for(const auto& p : m_Points)
-        m_Scene->removePoint(p);
 
-    m_Scene->removePoint(m_CutPoint);
 }
 
 bool ControllerCutLine::handleMouseMoveEvent(QMouseEvent* const event)

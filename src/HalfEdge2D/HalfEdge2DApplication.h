@@ -9,23 +9,9 @@ class QWidgetTarget;
 class ViewPort;
 class Camera;
 class Renderer;
-class HESMesh;
 class Navigator;
 class Controller;
-class ControllerBuildMesh;
-class ControllerShowRings;
-class ControllerDelaunay;
-class ControllerQuadraticBezier;
-class ControllerCubicBezier;
-class ControllerSpline;
-class ControllerSplineAt;
-class ControllerCutLine;
-class ControllerCutQuadraticBezier;
-class ControllerCutCubicBezier;
-class ControllerCutCircle;
-class ControllerCutSpline;
 class EventHandler;
-class Scene;
 class DefaultOptionWidget;
 
 class QComboBox;
@@ -48,7 +34,6 @@ private slots:
     void onMultiViewChanged(int state);
     void onHSliderChanged(int value);
     void onVSliderChanged(int value);
-    void onMeshSelectionChanged(int value);
     void onControllerSelectionChanged(const QString& text);
 
 private:
@@ -84,8 +69,6 @@ private:
 
     bool m_MultiView;
 
-    Scene* m_Scene;
-
     ViewPort* m_ViewPort0;
     ViewPort* m_ViewPort1;
     ViewPort* m_ViewPort2;
@@ -101,26 +84,11 @@ private:
     Navigator* m_Navigator;
     
     Controller* m_ActiveController;
-    ControllerBuildMesh* m_ControllerBuildMesh;
-    ControllerShowRings* m_ControllerShowRings;
-    ControllerDelaunay* m_ControllerDelaunay;
-    ControllerQuadraticBezier* m_ControllerQuadraticBezier;
-    ControllerCubicBezier* m_ControllerCubicBezier;
-    ControllerSpline* m_ControllerSpline;
-    ControllerSplineAt* m_ControllerSplineAt;
-    ControllerCutLine* m_ControllerCutLine;
-    ControllerCutQuadraticBezier* m_ControllerCutQuadraticBezier;
-    ControllerCutCubicBezier* m_ControllerCutCubicBezier;
-    ControllerCutCircle* m_ControllerCutCircle;
-    ControllerCutSpline* m_ControllerCutSpline;
 
     std::map<std::string, Controller* const> m_Controller;
 
     float m_HPartition;
     float m_VPartition;
-
-    // scene
-    HESMesh* m_Mesh;
 };
 
 #endif //_HALFEDGE_APPLICATION_H_

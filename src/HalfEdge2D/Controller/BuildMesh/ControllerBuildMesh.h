@@ -3,6 +3,8 @@
 
 #include "HalfEdge2D/Controller/Controller.h"
 
+class HESMesh;
+
 class ControllerBuildMesh : public Controller
 {
 public:
@@ -10,6 +12,7 @@ public:
     virtual ~ControllerBuildMesh();
 
 protected:
+    virtual void init() final override;
     virtual void activate() final override;
     virtual void deactivate() final override;
 
@@ -27,6 +30,8 @@ private:
     
     int m_CurrentIdx;
     Vec2f m_CurrentHitDistance;
+
+    HESMesh* m_Mesh;
 };
 
 #endif //_CONTROLLER_CONTROLLERBUILDMESH_H_

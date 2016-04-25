@@ -3,6 +3,8 @@
 
 #include "HalfEdge2D/Controller/Controller.h"
 
+#include <QtCore/QObject>
+
 #include <vector>
 
 class Scene;
@@ -10,7 +12,10 @@ class Renderer;
 class ViewPort;
 class QPaintTarget;
 class Face;
+class HESMesh;
 class HESFace;
+
+class QComboBox;
 
 typedef std::vector<HESFace* const> FaceVector;
 typedef std::vector<FaceVector> RingFacesVector;
@@ -26,14 +31,17 @@ public:
 
 typedef std::vector<LastFaceColour, Eigen::aligned_allocator<LastFaceColour>> LastColourVector;
 
-class ControllerShowRings : public Controller
+class ControllerShowRings : public QObject, public Controller
 {
+    Q_OBJECT;
+
 public:
     ControllerShowRings();
     virtual ~ControllerShowRings();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 protected:
+    virtual void init() final override;
     virtual void activate() final override;
     virtual void deactivate() final override;
 
@@ -58,6 +66,9 @@ private:
     RingFacesVector findRingOrder(HESFace* const face, const size_t& order);
     void colourRingFaces(const RingFacesVector& ringFaces);
 
+private slots:
+    void onMeshSelectionChanged(int value);
+
 private:
     const size_t m_ChannelBitRange;
     const size_t m_ChannelRange;
@@ -79,6 +90,10 @@ private:
 
     size_t m_LastHitId;
     LastColourVector m_LastColourVector;
+
+    QComboBox* m_CbMeshSelector;
+
+    HESMesh* m_Mesh;
 };
 
 #endif //_CONTROLLER_CONTROLLERSHOWRINGS_H_

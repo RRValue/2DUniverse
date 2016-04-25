@@ -27,6 +27,7 @@ public:
     virtual ~ControllerCutSpline();
 
 protected:
+    virtual void init() final override;
     virtual void activate() final override;
     virtual void deactivate() final override;
 

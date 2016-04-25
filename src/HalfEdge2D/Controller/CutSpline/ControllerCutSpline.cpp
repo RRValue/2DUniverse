@@ -22,9 +22,24 @@ ControllerCutSpline::ControllerCutSpline() :
     m_TMin(-1.0f), m_TMax(1.0f),
     m_BMin(-1.0f), m_BMax(1.0f)
 {
-    m_Scene = nullptr;
-    m_MovePoint = false;
     m_Name = "ControllerCutSpline";
+}
+
+ControllerCutSpline::~ControllerCutSpline()
+{
+    for(const auto& p : m_Points)
+        delete p;
+
+    for(const auto& p : m_CutPoints)
+        delete p;
+
+    delete m_Spline;
+    delete m_Line;
+}
+
+void ControllerCutSpline::init()
+{
+    m_MovePoint = false;
     m_CurrentPoint = nullptr;
 
     m_Spline = new Spline();
@@ -56,42 +71,20 @@ ControllerCutSpline::ControllerCutSpline() :
     connect(m_TSlider, &QSlider::sliderMoved, this, &ControllerCutSpline::onSliderMoved);
     connect(m_BSlider, &QSlider::sliderMoved, this, &ControllerCutSpline::onSliderMoved);
     connect(m_ClosedCkb, &QCheckBox::stateChanged, this, &ControllerCutSpline::onClosedChanged);
-}
 
-ControllerCutSpline::~ControllerCutSpline()
-{
-    for(const auto& p : m_Points)
-        delete p;
-
-    for(const auto& p : m_CutPoints)
-        delete p;
-
-    delete m_Spline;
-    delete m_Line;
+    // add to scene
+    m_Scene->addSpline(m_Spline);
+    m_Scene->addLine(m_Line);
 }
 
 void ControllerCutSpline::activate()
 {
-    m_Scene->addSpline(m_Spline);
-    m_Scene->addLine(m_Line);
 
-    for(const auto& p : m_Points)
-        m_Scene->addPoint(p);
-
-    for(const auto& p : m_CutPoints)
-        m_Scene->addPoint(p);
 }
 
 void ControllerCutSpline::deactivate()
 {
-    m_Scene->removeSpline(m_Spline);
-    m_Scene->removeLine(m_Line);
 
-    for(const auto& p : m_Points)
-        m_Scene->removePoint(p);
-
-    for(const auto& p : m_CutPoints)
-        m_Scene->removePoint(p);
 }
 
 bool ControllerCutSpline::handleMouseMoveEvent(QMouseEvent* const event)

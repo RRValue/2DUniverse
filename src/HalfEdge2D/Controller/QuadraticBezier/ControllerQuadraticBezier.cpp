@@ -18,13 +18,7 @@
 
 ControllerQuadraticBezier::ControllerQuadraticBezier()
 {
-    m_Scene = nullptr;
-    m_MovePoint = false;
     m_Name = "ControllerQuadraticBezier";
-    m_CurrentPoint = nullptr;
-    m_Bezier = new QuadraticBezier();
-    m_Bezier->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-    m_Bezier->setVisible(false);
 }
 
 ControllerQuadraticBezier::~ControllerQuadraticBezier()
@@ -35,20 +29,26 @@ ControllerQuadraticBezier::~ControllerQuadraticBezier()
     delete m_Bezier;
 }
 
+void ControllerQuadraticBezier::init()
+{
+    m_MovePoint = false;
+    m_CurrentPoint = nullptr;
+    m_Bezier = new QuadraticBezier();
+    m_Bezier->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    m_Bezier->setVisible(false);
+
+    // add to scene
+    m_Scene->addQuadraticBeziers(m_Bezier);
+}
+
 void ControllerQuadraticBezier::activate()
 {
-    m_Scene->addQuadraticBeziers(m_Bezier);
 
-    for(const auto& p : m_Points)
-        m_Scene->addPoint(p);
 }
 
 void ControllerQuadraticBezier::deactivate()
 {
-    m_Scene->removeQuadraticBeziers(m_Bezier);
 
-    for(const auto& p : m_Points)
-        m_Scene->removePoint(p);
 }
 
 bool ControllerQuadraticBezier::handleMouseMoveEvent(QMouseEvent* const event)

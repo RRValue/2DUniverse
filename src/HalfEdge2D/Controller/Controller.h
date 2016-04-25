@@ -19,6 +19,7 @@ public:
     Controller();
     virtual ~Controller();
 
+    virtual void init() = 0;
     virtual void activate() = 0;
     virtual void deactivate() = 0;
 
@@ -26,9 +27,9 @@ public:
     const std::string& getName() const;
 
     QWidget* const getOptionWidget() const;
+    Scene* const getScene() const;
 
     void setScene(Scene* const scene);
-
     void setChanged();
 
 protected:

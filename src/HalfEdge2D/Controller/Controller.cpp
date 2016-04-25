@@ -17,6 +17,7 @@ Controller::Controller()
     m_ViewportContentChanges = true;
     m_SceneChanges = false;
     m_OptionWidget = nullptr;
+    m_Scene = new Scene();
 }
 
 Controller::~Controller()
@@ -39,6 +40,11 @@ void Controller::postSceneChanged()
 
 }
 
+Scene* const Controller::getScene() const
+{
+    return m_Scene;
+}
+
 void Controller::setScene(Scene* const scene)
 {
     if(scene == nullptr)
@@ -46,6 +52,9 @@ void Controller::setScene(Scene* const scene)
 
     if(scene == m_Scene)
         return;
+
+    if(m_Scene != nullptr)
+        delete m_Scene;
 
     preSceneChanged();
 

@@ -15,14 +15,20 @@
 
 ControllerBuildMesh::ControllerBuildMesh()
 {
-    m_Scene = nullptr;
-    m_MovePoint = false;
     m_Name = "ControllerBuildMesh";
 }
 
 ControllerBuildMesh::~ControllerBuildMesh()
 {
 
+}
+
+void ControllerBuildMesh::init()
+{
+    m_MovePoint = false;
+    m_Mesh = new HESMesh();
+
+    m_Scene->addMesh(m_Mesh);
 }
 
 void ControllerBuildMesh::activate()
@@ -90,7 +96,7 @@ bool ControllerBuildMesh::handleMousePressEvent(QMouseEvent* const event)
     // if hit nothing and point size < 4 -> add
     if(result == -1)
     {
-        (*m_Scene->getMeshes().begin())->addVertex(invTrans(p_f));
+        m_Mesh->addVertex(invTrans(p_f));
 
         m_MovePoint = false;
 
@@ -100,7 +106,7 @@ bool ControllerBuildMesh::handleMousePressEvent(QMouseEvent* const event)
     {
         m_CurrentIdx = result;
         
-        m_CurrentHitDistance = trans((*m_Scene->getMeshes().begin())->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
+        m_CurrentHitDistance = trans(m_Mesh->getVertices()[m_CurrentIdx]->getPosition()) - p_f;
     }
 
     return true;
@@ -134,10 +140,7 @@ bool ControllerBuildMesh::handleWheelEvent(QWheelEvent* const event)
 
 int ControllerBuildMesh::getPointAtPos(const Vec2f& pos) const
 {
-    if(m_Scene->getMeshes().empty())
-        return -1;
-
-    const std::vector<Vertex*>& vertices = (*m_Scene->getMeshes().begin())->getVertices();
+    const std::vector<Vertex*>& vertices = m_Mesh->getVertices();
 
     if(vertices.empty())
         return -1;

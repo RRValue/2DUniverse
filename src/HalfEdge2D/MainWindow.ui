@@ -149,9 +149,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="m_CbMeshSelector"/>
-      </item>
-      <item>
        <widget class="QComboBox" name="m_CbController"/>
       </item>
       <item>

@@ -12,9 +12,24 @@
 
 ControllerCutCircle::ControllerCutCircle() : m_RadusMin(0.001f), m_RadusMax(1.0f)
 {
-    m_Scene = nullptr;
-    m_MovePoint = false;
     m_Name = "ControllerCutCircle";
+}
+
+ControllerCutCircle::~ControllerCutCircle()
+{
+    for(const auto& p : m_Points)
+        delete p;
+
+    delete m_Line;
+    delete m_Circle;
+
+    delete m_CutPoint0;
+    delete m_CutPoint1;
+}
+
+void ControllerCutCircle::init()
+{
+    m_MovePoint = false;
     m_CurrentPoint = nullptr;
 
     m_Line = new Line();
@@ -42,48 +57,26 @@ ControllerCutCircle::ControllerCutCircle() : m_RadusMin(0.001f), m_RadusMax(1.0f
     m_OptionWidgetSetUp.m_RadiusLbl->setText(tr("Radius: %0 ... %1").arg(QString::number(m_RadusMin, 'f', 3)).arg(QString::number(m_RadusMax, 'f', 3)));
 
     m_RadiusSlider = m_OptionWidgetSetUp.m_RadiusSld;
-    
+
     setSliderRadius(m_Circle->getRadius());
 
     connect(m_RadiusSlider, &QSlider::sliderMoved, this, &ControllerCutCircle::onRadiusSliderMoved);
-}
 
-ControllerCutCircle::~ControllerCutCircle()
-{
-    for(const auto& p : m_Points)
-        delete p;
-
-    delete m_Line;
-    delete m_Circle;
-
-    delete m_CutPoint0;
-    delete m_CutPoint1;
-}
-
-void ControllerCutCircle::activate()
-{
+    // add to scene
     m_Scene->addLine(m_Line);
-    
     m_Scene->addCircle(m_Circle);
-    
-    for(const auto& p : m_Points)
-        m_Scene->addPoint(p);
-
     m_Scene->addPoint(m_CutPoint0);
     m_Scene->addPoint(m_CutPoint1);
 }
 
+void ControllerCutCircle::activate()
+{
+
+}
+
 void ControllerCutCircle::deactivate()
 {
-    m_Scene->removeLine(m_Line);
-    
-    m_Scene->removeCircle(m_Circle);
-    
-    for(const auto& p : m_Points)
-        m_Scene->removePoint(p);
 
-    m_Scene->removePoint(m_CutPoint0);
-    m_Scene->removePoint(m_CutPoint1);
 }
 
 bool ControllerCutCircle::handleMouseMoveEvent(QMouseEvent* const event)
