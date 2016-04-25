@@ -382,5 +382,7 @@ void ControllerShowRings::onMeshSelectionChanged(int value)
     HESBuilder builder(m_Mesh);
     builder.build();
 
+    m_SceneChanges = true;
+
     m_Renderer->render();
 }

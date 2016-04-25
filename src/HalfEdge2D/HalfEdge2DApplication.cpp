@@ -135,8 +135,8 @@ void HalfEdge2DApplication::createRendering()
     // add controller to combobox
     m_CbController->blockSignals(true);
     
-    for(const auto& c : m_Controller)
-        m_CbController->addItem(c.first.c_str());
+    for(const auto& c : controller_to_add)
+        m_CbController->addItem(c->getName().c_str());
 
     m_CbController->blockSignals(false);
 
@@ -148,14 +148,14 @@ void HalfEdge2DApplication::createRendering()
     m_EventHandler->setNavigator(m_Navigator);
 
     // add controller to event handler
-    for(const auto& c : m_Controller)
-        m_EventHandler->addController(c.second);
+    for(const auto& c : controller_to_add)
+        m_EventHandler->addController(c);
 
     // set render in event handler
     m_EventHandler->setRenderer(m_Renderer);
 
-    for(const auto& c : m_Controller)
-        c.second->init();
+    for(const auto& c : controller_to_add)
+        c->init();
 
     // activate via cb
     m_CbController->setCurrentIndex(0);
