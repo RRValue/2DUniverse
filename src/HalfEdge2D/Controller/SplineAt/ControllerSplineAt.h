@@ -44,15 +44,18 @@ private:
     void setSliderT(const float& t);
     void setSliderB(const float& b);
     void setSliderA(const float& a);
+    void setSliderAN(const float& an);
 
-    float sliderValueToValue(const int& value, const int& sliderMin, const int& sliderMax, const float& min, const float& max);
-    float valueToSliderValue(const float& value, const int& sliderMin, const int& sliderMax, const float& min, const float& max);
+    float sliderValueToValue(QSlider* const sld, const float& min, const float& max);
+    int valueToSliderValue(const float& value, QSlider* const sld, const float& min, const float& max);
 
 private slots:
     void onSliderMoved(int value);
     void onClosedChanged(int state);
 
+    void updateData();
     void updateDataAt();
+    void updateDataAtN();
 
 private:
     bool m_MovePoint;
@@ -68,12 +71,17 @@ private:
     Line* m_Tangent;
     Line* m_Normal;
 
+    Point* m_PointN;
+    Line* m_TangentN;
+    Line* m_NormalN;
+
     Ui_ControllerSplineAtOptionsWidget m_OptionWidgetSetUp;
 
     QSlider* m_CSlider;
     QSlider* m_TSlider;
     QSlider* m_BSlider;
     QSlider* m_ASlider;
+    QSlider* m_ANSlider;
     QCheckBox* m_ClosedCkb;
 
     const float m_CMin;
