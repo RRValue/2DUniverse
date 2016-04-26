@@ -79,26 +79,16 @@ private:
     size_t m_CurrentPointIdx;
     Vec2f m_CurrentHitDistance;
 
-    PointVector m_LinePoints;
-    PointVector m_SplitLinePoints;
-    
-    PointVector m_QBezierPoints;
-    PointVector m_SplitQBezierPoints;
-    
-    PointVector m_CBezierPoints;
-    PointVector m_SplitCBezierPoints;
+    PointVector m_LinePoints[3];
+    PointVector m_QBezierPoints[3];
+    PointVector m_CBezierPoints[3];
 
     size_t m_CurrentNumMaxPoints;
     size_t m_CurrentNumPoints;
 
-    Line* m_Line;
-    Line* m_SplitLine;
-    
-    QuadraticBezier* m_QBezier;
-    QuadraticBezier* m_SplitQBezier;
-    
-    CubicBezier* m_CBezier;
-    CubicBezier* m_SplitCBezier;
+    Line* m_Line[3];
+    QuadraticBezier* m_QBezier[3];
+    CubicBezier* m_CBezier[3];
 
     Ui_ControllerSplitAtOptionsWidget m_OptionWidgetSetUp;
 

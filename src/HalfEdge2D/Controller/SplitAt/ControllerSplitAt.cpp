@@ -25,32 +25,21 @@ ControllerSplitAt::ControllerSplitAt() :
 
 ControllerSplitAt::~ControllerSplitAt()
 {
-    for(const auto& p : m_LinePoints)
-        delete p;
+    for(size_t i = 0; i < 3; i++)
+    {
+        for(const auto& p : m_LinePoints[i])
+            delete p;
 
-    for(const auto& p : m_SplitLinePoints)
-        delete p;
+        for(const auto& p : m_QBezierPoints[i])
+            delete p;
 
-    for(const auto& p : m_QBezierPoints)
-        delete p;
+        for(const auto& p : m_CBezierPoints[i])
+            delete p;
 
-    for(const auto& p : m_SplitQBezierPoints)
-        delete p;
-
-    for(const auto& p : m_CBezierPoints)
-        delete p;
-
-    for(const auto& p : m_SplitCBezierPoints)
-        delete p;
-
-    delete m_Line;
-    delete m_Line;
-
-    delete m_QBezier;
-    delete m_SplitQBezier;
-
-    delete m_CBezier;
-    delete m_SplitCBezier;
+        delete m_Line[i];
+        delete m_QBezier[i];
+        delete m_CBezier[i];
+    }
 }
 
 void ControllerSplitAt::init()
@@ -58,29 +47,20 @@ void ControllerSplitAt::init()
     m_MovePoint = false;
     m_CurrentPoint = nullptr;
 
-    m_Line = new Line();
-    m_Line->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-    m_Line->setVisible(false);
+    for(size_t i = 0; i < 3; i++)
+    {
+        m_Line[i] = new Line();
+        m_Line[i]->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+        m_Line[i]->setVisible(false);
 
-    m_SplitLine = new Line();
-    m_SplitLine->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-    m_SplitLine->setVisible(false);
+        m_QBezier[i] = new QuadraticBezier();
+        m_QBezier[i]->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+        m_QBezier[i]->setVisible(false);
 
-    m_QBezier = new QuadraticBezier();
-    m_QBezier->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-    m_QBezier->setVisible(false);
-
-    m_SplitQBezier = new QuadraticBezier();
-    m_SplitQBezier->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-    m_SplitQBezier->setVisible(false);
-
-    m_CBezier = new CubicBezier();
-    m_CBezier->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-    m_CBezier->setVisible(false);
-
-    m_SplitCBezier = new CubicBezier();
-    m_SplitCBezier->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-    m_SplitCBezier->setVisible(false);
+        m_CBezier[i] = new CubicBezier();
+        m_CBezier[i]->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+        m_CBezier[i]->setVisible(false);
+    }
 
     // create option widget
     m_OptionWidget = new QWidget();
@@ -103,12 +83,12 @@ void ControllerSplitAt::init()
     connect(m_TypeCbb, SIGNAL(activated(int)), this, SLOT(onTypeChanged(int)));
 
     // add to scene
-    m_Scene->addLine(m_Line);
-    m_Scene->addLine(m_SplitLine);
-    m_Scene->addQuadraticBeziers(m_QBezier);
-    m_Scene->addQuadraticBeziers(m_SplitQBezier);
-    m_Scene->addCubicBeziers(m_CBezier);
-    m_Scene->addCubicBeziers(m_SplitCBezier);
+    for(size_t i = 0; i < 3; i++)
+    {
+        m_Scene->addLine(m_Line[i]);
+        m_Scene->addQuadraticBeziers(m_QBezier[i]);
+        m_Scene->addCubicBeziers(m_CBezier[i]);
+    }
 }
 
 void ControllerSplitAt::activate()
@@ -143,31 +123,31 @@ bool ControllerSplitAt::handleMouseMoveEvent(QMouseEvent* const event)
     {
     case E_ST_LINE:
         {
-            m_LinePoints[m_CurrentPointIdx]->setPosition(new_pos);
-            m_SplitLinePoints[m_CurrentPointIdx]->setPosition(new_pos);
-
-            m_Line->setPoint(m_CurrentPointIdx, new_pos);
-            m_SplitLine->setPoint(m_CurrentPointIdx, new_pos);
+            for(size_t i = 0; i < 3; i++)
+            {
+                m_LinePoints[i][m_CurrentPointIdx]->setPosition(new_pos);
+                m_Line[i]->setPoint(m_CurrentPointIdx, new_pos);
+            }
 
             break;
         }
     case E_ST_QBEZIER:
         {
-            m_QBezierPoints[m_CurrentPointIdx]->setPosition(new_pos);
-            m_SplitQBezierPoints[m_CurrentPointIdx]->setPosition(new_pos);
-
-            m_QBezier->setPoint(m_CurrentPointIdx, new_pos);
-            m_SplitQBezier->setPoint(m_CurrentPointIdx, new_pos);
+            for(size_t i = 0; i < 3; i++)
+            {
+                m_QBezierPoints[i][m_CurrentPointIdx]->setPosition(new_pos);
+                m_QBezier[i]->setPoint(m_CurrentPointIdx, new_pos);
+            }
 
             break;
         }
     case E_ST_CBEZIER:
         {
-            m_CBezierPoints[m_CurrentPointIdx]->setPosition(new_pos);
-            m_SplitCBezierPoints[m_CurrentPointIdx]->setPosition(new_pos);
-
-            m_CBezier->setPoint(m_CurrentPointIdx, new_pos);
-            m_SplitCBezier->setPoint(m_CurrentPointIdx, new_pos);
+            for(size_t i = 0; i < 3; i++)
+            {
+                m_CBezierPoints[i][m_CurrentPointIdx]->setPosition(new_pos);
+                m_CBezier[i]->setPoint(m_CurrentPointIdx, new_pos);
+            }
 
             break;
         }
@@ -265,42 +245,54 @@ void ControllerSplitAt::setLineVisible(const bool& visible)
 {
     bool l_visible = m_CurrentNumPoints == m_CurrentNumMaxPoints;
 
-    for(const auto& p : m_LinePoints)
+    for(const auto& p : m_LinePoints[0])
         p->setVisible(visible);
 
-    for(const auto& p : m_SplitLinePoints)
-        p->setVisible(m_Splitable && visible);
+    m_Line[0]->setVisible(visible && l_visible);
 
-    m_Line->setVisible(visible && l_visible);
-    m_SplitLine->setVisible(m_Splitable && visible && l_visible);
+    for(size_t i = 1; i < 3; i++)
+    {
+        for(const auto& p : m_LinePoints[i])
+            p->setVisible(m_Splitable && visible);
+
+        m_Line[i]->setVisible(m_Splitable && visible && l_visible);
+    }
 }
 
 void ControllerSplitAt::setQBezVisible(const bool& visible)
 {
     bool l_visible = m_CurrentNumPoints == m_CurrentNumMaxPoints;
 
-    for(const auto& p : m_QBezierPoints)
+    for(const auto& p : m_QBezierPoints[0])
         p->setVisible(visible);
 
-    for(const auto& p : m_SplitQBezierPoints)
-        p->setVisible(m_Splitable && visible);
+    m_QBezier[0]->setVisible(visible && l_visible);
 
-    m_QBezier->setVisible(visible && l_visible);
-    m_SplitQBezier->setVisible(m_Splitable && visible && l_visible);
+    for(size_t i = 1; i < 3; i++)
+    {
+        for(const auto& p : m_QBezierPoints[i])
+            p->setVisible(m_Splitable && visible);
+
+        m_QBezier[i]->setVisible(m_Splitable && visible && l_visible);
+    }
 }
 
 void ControllerSplitAt::setCBezVisible(const bool& visible)
 {
     bool l_visible = m_CurrentNumPoints == m_CurrentNumMaxPoints;
 
-    for(const auto& p : m_CBezierPoints)
+    for(const auto& p : m_CBezierPoints[0])
         p->setVisible(visible);
 
-    for(const auto& p : m_SplitCBezierPoints)
-        p->setVisible(m_Splitable && visible);
+    m_CBezier[0]->setVisible(visible && l_visible);
 
-    m_CBezier->setVisible(visible && l_visible);
-    m_SplitCBezier->setVisible(m_Splitable && visible && l_visible);
+    for(size_t i = 1; i < 3; i++)
+    {
+        for(const auto& p : m_CBezierPoints[i])
+            p->setVisible(m_Splitable && visible);
+
+        m_CBezier[i]->setVisible(m_Splitable && visible && l_visible);
+    }
 }
 
 bool ControllerSplitAt::addPoint(const Vec2f& pos)
@@ -312,16 +304,17 @@ bool ControllerSplitAt::addPoint(const Vec2f& pos)
         return false;
     }
 
-    Point* new_point0 = new Point();
-    Point* new_point1 = new Point();
-
-    m_CurrentPoint = new_point0;
+    Point* new_points[3];
     
-    new_point0->setPosition(pos);
-    new_point1->setPosition(pos);
+    for(size_t i = 0; i < 3; i++)
+    {
+        new_points[i] = new Point();
+        new_points[i]->setPosition(pos);
 
-    m_Scene->addPoint(new_point0);
-    m_Scene->addPoint(new_point1);
+        m_Scene->addPoint(new_points[i]);
+    }
+
+    m_CurrentPoint = new_points[0];
 
     m_CurrentPointIdx = m_CurrentNumPoints;
 
@@ -329,23 +322,23 @@ bool ControllerSplitAt::addPoint(const Vec2f& pos)
     {
     case E_ST_LINE:
         {
-            m_LinePoints.push_back(new_point0);
-            m_SplitLinePoints.push_back(new_point1);
-    
-            m_Line->setPoint(m_CurrentPointIdx, pos);
-            m_SplitLine->setPoint(m_CurrentPointIdx, pos);
-
+            for(size_t i = 0; i < 3; i++)
+            {
+                m_LinePoints[i].push_back(new_points[i]);
+                m_Line[i]->setPoint(m_CurrentPointIdx, pos);
+            }
+            
             m_CurrentNumPoints++;
 
             break;
         }
     case E_ST_QBEZIER:
         {
-            m_QBezierPoints.push_back(new_point0);
-            m_SplitQBezierPoints.push_back(new_point1);
-
-            m_QBezier->setPoint(m_CurrentPointIdx, pos);
-            m_SplitQBezier->setPoint(m_CurrentPointIdx, pos);
+            for(size_t i = 0; i < 3; i++)
+            {
+                m_QBezierPoints[i].push_back(new_points[i]);
+                m_QBezier[i]->setPoint(m_CurrentPointIdx, pos);
+            }
 
             m_CurrentNumPoints++;
 
@@ -353,11 +346,11 @@ bool ControllerSplitAt::addPoint(const Vec2f& pos)
         }
     case E_ST_CBEZIER:
         {
-            m_CBezierPoints.push_back(new_point0);
-            m_SplitCBezierPoints.push_back(new_point1);
-
-            m_CBezier->setPoint(m_CurrentPointIdx, pos);
-            m_SplitCBezier->setPoint(m_CurrentPointIdx, pos);
+            for(size_t i = 0; i < 3; i++)
+            {
+                m_CBezierPoints[i].push_back(new_points[i]);
+                m_CBezier[i]->setPoint(m_CurrentPointIdx, pos);
+            }
 
             m_CurrentNumPoints++;
 
@@ -402,17 +395,17 @@ Point* const ControllerSplitAt::getPointAtPos(const Vec2f& pos, size_t* const id
     {
     case E_ST_LINE:
         {
-            c_points = m_LinePoints;
+            c_points = m_LinePoints[0];
             break;
         }
     case E_ST_QBEZIER:
         {
-            c_points = m_QBezierPoints;
+            c_points = m_QBezierPoints[0];
             break;
         }
     case E_ST_CBEZIER:
         {
-            c_points = m_CBezierPoints;
+            c_points = m_CBezierPoints[0];
             break;
         }
     }
@@ -463,21 +456,21 @@ void ControllerSplitAt::onTypeChanged(int idx)
     case E_ST_LINE:
         {
             m_CurrentNumMaxPoints = 2;
-            m_CurrentNumPoints = m_LinePoints.size();
+            m_CurrentNumPoints = m_LinePoints[0].size();
             
             break;
         }
     case E_ST_QBEZIER:
         {
             m_CurrentNumMaxPoints = 3;
-            m_CurrentNumPoints = m_QBezierPoints.size();
+            m_CurrentNumPoints = m_QBezierPoints[0].size();
 
             break;
         }
     case E_ST_CBEZIER:
         {
             m_CurrentNumMaxPoints = 4;
-            m_CurrentNumPoints = m_CBezierPoints.size();
+            m_CurrentNumPoints = m_CBezierPoints[0].size();
 
             break;
         }
