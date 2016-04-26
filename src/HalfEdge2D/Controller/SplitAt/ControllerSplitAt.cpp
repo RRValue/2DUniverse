@@ -1,19 +1,13 @@
 #include "HalfEdge2D/Controller/SplitAt/ControllerSplitAt.h"
 
-#include "HalfEdge2D/Rendering/RenderTarget.h"
 #include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
-#include "HalfEdge2D/Scene/ViewPort.h"
-#include "HalfEdge2D/Scene/Camera.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
-#include "HalfEdge2D/Renderables/Spline.h"
-
-#include "HalfEdge2D/HalfEdge/HESMesh.h"
-
-#include "HalfEdge2D/Mesh/Vertex.h"
+#include "HalfEdge2D/Renderables/QuadraticBezier.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
 
 #include <QtGui/QMouseEvent>
 
@@ -359,6 +353,8 @@ bool ControllerSplitAt::addPoint(const Vec2f& pos)
     default:
         break;
     }
+
+    return false;
 }
 
 bool ControllerSplitAt::handleMouseReleaseEvent(QMouseEvent* const event)
@@ -433,6 +429,85 @@ void ControllerSplitAt::updateSplit()
     m_Splitable = s > 0.0 && s < 1.0;
 
     updateVisibility();
+
+    // split
+    switch(m_SplitType)
+    {
+    case E_ST_LINE:
+        {
+            if(!m_Line[0]->isVisible())
+                break;
+
+            m_Line[0]->splitAt(s, *m_Line[1], *m_Line[2]);
+
+            Vec2f d(0.0f, 0.1f);
+
+            if(!m_Line[1]->isVisible() || !m_Line[2]->isVisible())
+                break;
+
+            for(size_t i = 1; i < 3; i++)
+            {
+                for(size_t j = 0; j < m_CurrentNumMaxPoints; j++)
+                {
+                    m_Line[i]->setPoint(j, m_Line[i]->getPoint(j) + d);
+
+                    m_LinePoints[i][j]->setPosition(m_Line[i]->getPoint(j));
+                }
+            }
+
+            break;
+        }
+    case E_ST_QBEZIER:
+        {
+            if(!m_QBezier[0]->isVisible())
+                break;
+
+            m_QBezier[0]->splitAt(s, *m_QBezier[1], *m_QBezier[2]);
+
+            Vec2f d(0.0f, 0.1f);
+
+            if(!m_QBezier[1]->isVisible() || !m_QBezier[2]->isVisible())
+                break;
+
+            for(size_t i = 1; i < 3; i++)
+            {
+                for(size_t j = 0; j < m_CurrentNumMaxPoints; j++)
+                {
+                    m_QBezier[i]->setPoint(j, m_QBezier[i]->getPoint(j) + d);
+
+                    m_QBezierPoints[i][j]->setPosition(m_QBezier[i]->getPoint(j));
+                }
+            }
+
+            break;
+        }
+    case E_ST_CBEZIER:
+        {
+            if(!m_CBezier[0]->isVisible())
+                break;
+
+            m_CBezier[0]->splitAt(s, *m_CBezier[1], *m_CBezier[2]);
+
+            Vec2f d(0.0f, 0.1f);
+
+            if(!m_CBezier[1]->isVisible() || !m_CBezier[2]->isVisible())
+                break;
+
+            for(size_t i = 1; i < 3; i++)
+            {
+                for(size_t j = 0; j < m_CurrentNumMaxPoints; j++)
+                {
+                    m_CBezier[i]->setPoint(j, m_CBezier[i]->getPoint(j) + d);
+
+                    m_CBezierPoints[i][j]->setPosition(m_CBezier[i]->getPoint(j));
+                }
+            }
+
+            break;
+        }
+    default:
+        break;
+    }
 }
 
 void ControllerSplitAt::onSliderMoved(int value)

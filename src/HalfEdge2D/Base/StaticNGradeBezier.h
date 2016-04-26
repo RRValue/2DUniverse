@@ -164,6 +164,30 @@ public:
         return solve(m_DerivedParams[0].row(c));
     }
 
+    void splitAt(const float& a, StaticNGradeBezier<T, G, D>& l, StaticNGradeBezier<T, G, D>& r)
+    {
+        // sources:
+        /// http://www.realtimerendering.com/resources/GraphicsGems/gems.html#gems
+        /// http://www.realtimerendering.com/resources/GraphicsGems/gems/NearestPoint.c
+
+        BezierPointType temp[N][N];
+
+        // Copy control points
+        for(unsigned int j = 0; j < N; j++)
+            temp[0][j] = m_Params.col(j);
+
+        // Triangle computation
+        for(unsigned int i = 1; i < N; i++)
+            for(unsigned int j = 0; j < N - i; j++)
+                temp[i][j] = ((1.0 - a) * temp[i - 1][j]) + (a * temp[i - 1][j + 1]);
+
+        for(unsigned int j = 0; j < N; j++)
+            l.m_Params.col(j) = temp[j][0];
+
+        for(unsigned int j = 0; j < N; j++)
+            r.m_Params.col(j) = temp[N - j - 1][j];
+    }
+
 private:
     void updateParams()
     {
