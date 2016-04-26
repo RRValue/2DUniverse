@@ -16,6 +16,7 @@
 #include "HalfEdge2D/Controller/CutCubicBezier/ControllerCutCubicBezier.h"
 #include "HalfEdge2D/Controller/CutCircle/ControllerCutCircle.h"
 #include "HalfEdge2D/Controller/CutSpline/ControllerCutSpline.h"
+#include "HalfEdge2D/Controller/CutMesh/ControllerCutMesh.h"
 
 #include "HalfEdge2D/Navigation/Navigator.h"
 
@@ -142,7 +143,8 @@ void HalfEdge2DApplication::createController()
         new ControllerCutQuadraticBezier(),
         new ControllerCutCubicBezier(),
         new ControllerCutCircle(),
-        new ControllerCutSpline()
+        new ControllerCutSpline(),
+        new ControllerCutMesh()
     };
 
     for(const auto& c : controller_to_add)
