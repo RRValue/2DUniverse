@@ -12,7 +12,10 @@
 #include <QtGui/QMouseEvent>
 
 ControllerSplitAt::ControllerSplitAt() :
-    m_SplitMin(0.0f), m_SplitMax(1.0f)
+    m_SplitMin(0.0f), m_SplitMax(1.0f),
+    m_ColourOrg(Vec4f(0.0f, 0.0f, 0.0f, 1.0f)),
+    m_ColourL(Vec4f(1.0f, 0.0f, 0.0f, 0.5f)),
+    m_ColourR(Vec4f(0.0f, 0.0f, 1.0f, 0.5f))
 {
     m_Name = "ControllerSplitAt";
 }
@@ -43,16 +46,25 @@ void ControllerSplitAt::init()
 
     for(size_t i = 0; i < 3; i++)
     {
+        Vec4f c;
+
+        if(i == 0)
+            c = m_ColourOrg;
+        else if(i == 1)
+            c = m_ColourL;
+        else if(i == 2)
+            c = m_ColourR;
+
         m_Line[i] = new Line();
-        m_Line[i]->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+        m_Line[i]->setColour(c);
         m_Line[i]->setVisible(false);
 
         m_QBezier[i] = new QuadraticBezier();
-        m_QBezier[i]->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+        m_QBezier[i]->setColour(c);
         m_QBezier[i]->setVisible(false);
 
         m_CBezier[i] = new CubicBezier();
-        m_CBezier[i]->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+        m_CBezier[i]->setColour(c);
         m_CBezier[i]->setVisible(false);
     }
 
@@ -302,8 +314,18 @@ bool ControllerSplitAt::addPoint(const Vec2f& pos)
     
     for(size_t i = 0; i < 3; i++)
     {
+        Vec4f c;
+
+        if(i == 0)
+            c = m_ColourOrg;
+        else if(i == 1)
+            c = m_ColourL;
+        else if(i == 2)
+            c = m_ColourR;
+
         new_points[i] = new Point();
         new_points[i]->setPosition(pos);
+        new_points[i]->setColour(c);
 
         m_Scene->addPoint(new_points[i]);
     }
@@ -354,7 +376,7 @@ bool ControllerSplitAt::addPoint(const Vec2f& pos)
         break;
     }
 
-    return false;
+    return true;
 }
 
 bool ControllerSplitAt::handleMouseReleaseEvent(QMouseEvent* const event)

@@ -38,6 +38,7 @@ private:
 public:
     ControllerSplitAt();
     virtual ~ControllerSplitAt();
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
 protected:
     virtual void init() final override;
@@ -101,6 +102,10 @@ private:
 
     const float m_SplitMin;
     const float m_SplitMax;
+
+    const Vec4f m_ColourOrg;
+    const Vec4f m_ColourL;
+    const Vec4f m_ColourR;
 };
 
 #endif //_CONTROLLER_CONTROLLERSPLINEAT_H_

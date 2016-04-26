@@ -177,15 +177,21 @@ public:
             temp[0][j] = m_Params.col(j);
 
         // Triangle computation
+        T a0 = a;
+        T a1 = StaticIdentities.identityMult<T>() - a;
+        
         for(unsigned int i = 1; i < N; i++)
             for(unsigned int j = 0; j < N - i; j++)
-                temp[i][j] = ((1.0 - a) * temp[i - 1][j]) + (a * temp[i - 1][j + 1]);
+                temp[i][j] = (a1 * temp[i - 1][j]) + (a0 * temp[i - 1][j + 1]);
 
         for(unsigned int j = 0; j < N; j++)
             l.m_Params.col(j) = temp[j][0];
 
         for(unsigned int j = 0; j < N; j++)
             r.m_Params.col(j) = temp[N - j - 1][j];
+
+        l.updateParams();
+        r.updateParams();
     }
 
 private:
