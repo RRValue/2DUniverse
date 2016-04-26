@@ -7,9 +7,21 @@
 #include "HalfEdge2D/Base/StaticPolynomialSolver.h"
 #include "HalfEdge2D/Base/StaticBernsteinMatrix.h"
 
+template<typename T>
+struct StaticNGradeBezierLengthErrorTolerance
+{
+    static T m_Epsilon;
+};
+
+template<> float StaticNGradeBezierLengthErrorTolerance<float>::m_Epsilon = 1e-05f;
+template<> double StaticNGradeBezierLengthErrorTolerance<double>::m_Epsilon = 1e-05;
+
 template <typename T, unsigned int G, unsigned int D, unsigned N = G + 1>
 class StaticNGradeBezier : StaticPolynomialSolver<T, G>, public StaticBernsteinMatrix<T, G>
 {
+private:
+    StaticNGradeBezierLengthErrorTolerance<T> m_LengthError;
+
 private:
     // typedefs
     typedef Eigen::Matrix<T, D, N> BezierParamType;
@@ -35,6 +47,8 @@ public:
         m_DerivedParams[0].setZero();
         m_DerivedParams[1].setZero();
         m_DerivedParams[2].setZero();
+
+        m_LengthDirty = true;
     }
 
     StaticNGradeBezier(const StaticNGradeBezier& other)
@@ -60,6 +74,8 @@ public:
         m_Params.col(idx) = p;
 
         updateParams();
+
+        m_LengthDirty = true;
     }
 
     BezierPointType pointAt(const T& alpha) const
@@ -164,34 +180,29 @@ public:
         return solve(m_DerivedParams[0].row(c));
     }
 
-    void splitAt(const float& a, StaticNGradeBezier<T, G, D>& l, StaticNGradeBezier<T, G, D>& r)
+    void splitAt(const float& a, StaticNGradeBezier& l, StaticNGradeBezier& r)
     {
-        // sources:
-        /// http://www.realtimerendering.com/resources/GraphicsGems/gems.html#gems
-        /// http://www.realtimerendering.com/resources/GraphicsGems/gems/NearestPoint.c
-
-        BezierPointType temp[N][N];
-
-        // Copy control points
-        for(unsigned int j = 0; j < N; j++)
-            temp[0][j] = m_Params.col(j);
-
-        // Triangle computation
-        T a0 = a;
-        T a1 = StaticIdentities.identityMult<T>() - a;
+        splitAtImpl(m_Params, a, l.m_Params, r.m_Params);
         
-        for(unsigned int i = 1; i < N; i++)
-            for(unsigned int j = 0; j < N - i; j++)
-                temp[i][j] = (a1 * temp[i - 1][j]) + (a0 * temp[i - 1][j + 1]);
-
-        for(unsigned int j = 0; j < N; j++)
-            l.m_Params.col(j) = temp[j][0];
-
-        for(unsigned int j = 0; j < N; j++)
-            r.m_Params.col(j) = temp[N - j - 1][j];
-
         l.updateParams();
         r.updateParams();
+
+        l.m_LengthDirty = true;
+        r.m_LengthDirty = true;
+    }
+
+    T getLength()
+    {
+        if(m_LengthDirty)
+        {
+            m_Length = StaticIdentities.identityAdd<T>();
+
+            lengthImpl(m_Params, m_LengthError.m_Epsilon);
+
+            m_LengthDirty = false;
+        }
+
+        return m_Length;
     }
 
 private:
@@ -219,6 +230,60 @@ private:
         return m_DerivedParams[DEV] * a_vec;
     }
 
+    void splitAtImpl(const BezierParamType& p, const float& a, BezierParamType& l, BezierParamType& r)
+    {
+        // sources:
+        /// http://www.realtimerendering.com/resources/GraphicsGems/gems.html#gems
+        /// http://www.realtimerendering.com/resources/GraphicsGems/gems/NearestPoint.c
+
+        BezierPointType temp[N][N];
+
+        // Copy control points
+        for(unsigned int j = 0; j < N; j++)
+            temp[0][j] = p.col(j);
+
+        // Triangle computation
+        T a0 = a;
+        T a1 = StaticIdentities.identityMult<T>() - a;
+
+        for(unsigned int i = 1; i < N; i++)
+            for(unsigned int j = 0; j < N - i; j++)
+                temp[i][j] = (a1 * temp[i - 1][j]) + (a0 * temp[i - 1][j + 1]);
+
+        for(unsigned int j = 0; j < N; j++)
+            l.col(j) = temp[j][0];
+
+        for(unsigned int j = 0; j < N; j++)
+            r.col(j) = temp[N - j - 1][j];
+    }
+
+    void lengthImpl(const BezierParamType& points, const T& error)
+    {
+        BezierParamType l, r;
+
+        T len_a = StaticIdentities.identityAdd<T>();
+        T len_c = StaticIdentities.identityAdd<T>();
+        T s = StaticIdentities.identityMult<T>() / T(2);
+
+        for(unsigned int i = 0; i < N - 1; i++)
+            len_a += (points.col(i + 1) - points.col(i)).norm();
+
+        len_c = (points.col(N - 1) - points.col(0)).norm();
+
+        if(std::abs(len_a - len_c) > error)
+        {
+            splitAtImpl(points, s, l, r);
+            lengthImpl(l, error);
+            lengthImpl(r, error);
+
+            return;
+        }
+
+        m_Length += len_a;
+
+        return;
+    }
+
 private:
     static const size_t m_Grade = G;
     static const size_t m_Dim = D;
@@ -227,6 +292,9 @@ private:
 
     BezierParamType m_Params;
     BezierParamType m_DerivedParams[m_Derivations + 1];
+
+    bool m_LengthDirty;
+    T m_Length;
 };
 
 typedef StaticNGradeBezier<float, 1, 2> Line2F;
