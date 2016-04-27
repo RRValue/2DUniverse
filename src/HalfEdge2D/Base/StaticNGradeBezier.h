@@ -222,43 +222,41 @@ public:
 
     T getLength()
     {
-        if(!m_LengthDirty)
-            return m_Length;
-
-        // clear length related memeber
-        m_Length = StaticIdentities.identityAdd<T>();
-        m_RangeLengthMap.clear();
-        m_LengthVector.clear();
-
-        // update length
-        m_LengthVector.push_back(T(0));
-
-        lengthImpl(m_Params, m_LengthError.m_Epsilon, 0);
-
-        m_LengthVector.push_back(m_Length);
-
-        m_LengthDirty = false;
-
-        // update length map
-        if(m_LengthVector.size() == m_LengthCacheMax)
-        {
-            T a = T(0);
-
-            for(const auto& l : m_LengthVector)
-            {
-                m_RangeLengthMap.insert(std::make_pair(a, l));
-                a += m_LengthCacheStep;
-            }
-        }
-        else
-        {
-            m_RangeLengthMap.insert(std::make_pair(T(0), T(0)));
-            m_RangeLengthMap.insert(std::make_pair(T(0), m_Length));
-        }
-
-        m_LengthVector.clear();
+        if(m_LengthDirty)
+            updateLength();
 
         return m_Length;
+    }
+
+    T getLength(const T& a)
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        auto i = --m_RangeLengthMap.upper_bound(a);
+
+        if(i->first == a)
+            return i->second;
+
+        return getLengthImpl(*i, a);
+    }
+
+    T getLength(const T& from, const T& to)
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        auto i0 = --m_RangeLengthMap.upper_bound(from);
+        auto i1 = --m_RangeLengthMap.upper_bound(to);
+
+        if(i0->first == from && i1->first == to)
+            return i1->second - i0->second;
+        else if(i0->first == from)
+            return (++i1)->second - getLengthImpl(*i0, to);
+        else if(i1->first == to)
+            return getLengthImpl(*i0, from) - i0->second;
+        
+        return getLengthImpl(*i1, to) - getLengthImpl(*i0, from);
     }
 
 private:
@@ -322,7 +320,7 @@ private:
         return m_DerivedParams[DEV] * a_vec;
     }
 
-    void splitAtImpl(const BezierParamType& p, const float& a, BezierParamType& l, BezierParamType& r)
+    void splitAtImpl(const BezierParamType& p, const T& a, BezierParamType& l, BezierParamType& r)
     {
         // sources:
         /// http://www.realtimerendering.com/resources/GraphicsGems/gems.html#gems
@@ -332,7 +330,7 @@ private:
 
         // Copy control points
         for(unsigned int j = 0; j < N; j++)
-            temp[0][j] = p.col(j);
+            temp[0][N - j - 1] = p.col(j);
 
         // Triangle computation
         T a0 = a;
@@ -340,13 +338,35 @@ private:
 
         for(unsigned int i = 1; i < N; i++)
             for(unsigned int j = 0; j < N - i; j++)
-                temp[i][j] = (a1 * temp[i - 1][j]) + (a0 * temp[i - 1][j + 1]);
+                temp[i][j] = (a0 * temp[i - 1][j]) + (a1 * temp[i - 1][j + 1]);
 
         for(unsigned int j = 0; j < N; j++)
-            l.col(j) = temp[j][0];
+            l.col(j) = temp[N - j - 1][j];
 
         for(unsigned int j = 0; j < N; j++)
-            r.col(j) = temp[N - j - 1][j];
+            r.col(j) = temp[j][0];
+    }
+
+    T getLengthImpl(const RangeLengthType& rangeLength, const T& a)
+    {
+        // store old length
+        T l_org = m_Length;
+
+        // calculate length between rangeLength->first ... a
+        m_Length = T(0);
+
+        BezierParamType l, r;
+        splitAtImpl(m_Params, rangeLength.first, l, r);
+        splitAtImpl(r, (a - rangeLength.first) / (T(1) - rangeLength.first), l, r);
+
+        lengthImpl(l, m_LengthError.m_Epsilon, m_LengthCacheDepth);
+
+        T length = m_Length;
+
+        // restore 
+        m_Length = l_org;
+
+        return length + rangeLength.second;
     }
 
     template<unsigned int GRADE = G>
@@ -386,6 +406,43 @@ private:
     void lengthImpl<1>(const BezierParamType& points, const T& error, size_t depth)
     {
         m_Length = (points.col(1) - points.col(0)).norm();
+    }
+
+    void updateLength()
+    {
+        // clear length related memeber
+        m_Length = T(0);
+        m_RangeLengthMap.clear();
+        m_LengthVector.clear();
+
+        // update length
+        m_LengthVector.push_back(T(0));
+
+        lengthImpl(m_Params, m_LengthError.m_Epsilon, 0);
+
+        m_LengthVector.push_back(m_Length);
+
+        // update length map
+        if(m_LengthVector.size() == m_LengthCacheMax)
+        {
+            T a = T(0);
+
+            for(const auto& l : m_LengthVector)
+            {
+                m_RangeLengthMap.insert(std::make_pair(a, l));
+                a += m_LengthCacheStep;
+            }
+        }
+        else
+        {
+            m_RangeLengthMap.insert(std::make_pair(T(0), T(0)));
+            m_RangeLengthMap.insert(std::make_pair(T(1), m_Length));
+        }
+
+        m_LengthVector.clear();
+
+        // set length map to undirty
+        m_LengthDirty = false;
     }
 
 private:
