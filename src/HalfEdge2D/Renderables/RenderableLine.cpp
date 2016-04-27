@@ -10,6 +10,11 @@ RenderableLine::RenderableLine(const RenderableLine& other) : Renderable(other),
 
 }
 
+RenderableLine::RenderableLine(RenderableLine&& other) : Renderable(std::move(other)), m_Thickness(std::move(other.m_Thickness))
+{
+
+}
+
 RenderableLine::~RenderableLine()
 {
 

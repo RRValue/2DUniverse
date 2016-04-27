@@ -10,6 +10,7 @@ class RenderableLine : public Renderable
 public:
     RenderableLine();
     RenderableLine(const RenderableLine& other);
+    RenderableLine(RenderableLine&& other);
     ~RenderableLine();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

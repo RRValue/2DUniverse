@@ -10,6 +10,7 @@ class QuadraticBezier : public QBezier2F, public RenderableLine
 public:
     QuadraticBezier();
     QuadraticBezier(const QuadraticBezier& other);
+    QuadraticBezier(QuadraticBezier&& other);
     ~QuadraticBezier();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };

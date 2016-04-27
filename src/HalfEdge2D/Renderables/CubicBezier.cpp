@@ -10,6 +10,11 @@ CubicBezier::CubicBezier(const CubicBezier& other) : CBezier2F(other), Renderabl
 
 }
 
+CubicBezier::CubicBezier(CubicBezier&& other) : CBezier2F(std::move(other)), RenderableLine(std::move(other))
+{
+
+}
+
 CubicBezier::~CubicBezier()
 {
 

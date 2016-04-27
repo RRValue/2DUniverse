@@ -12,6 +12,11 @@ Line::Line(const Line& other) : Line2F(other), RenderableLine(other)
 
 }
 
+Line::Line(Line&& other) : Line2F(std::move(other)), RenderableLine(std::move(other))
+{
+
+}
+
 Line::~Line()
 {
 

@@ -10,6 +10,7 @@ class Spline : public Spline2F, public RenderableLine
 public:
     Spline();
     Spline(const Spline& other);
+    Spline(Spline&& other);
     ~Spline();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };

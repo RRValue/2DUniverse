@@ -8,6 +8,7 @@ class Renderable
 public:
     Renderable();
     Renderable(const Renderable& other);
+    Renderable(Renderable&& other);
     ~Renderable();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

@@ -13,9 +13,31 @@ public:
         {
             m_Active = false;
         }
+
         Segment(const Segment& other) : m_Active(other.m_Active), m_Bezier(other.m_Bezier)
         {
 
+        }
+
+        Segment(Segment&& other) : m_Active(std::move(other.m_Active)), m_Bezier(std::move(other.m_Bezier))
+        {
+
+        }
+
+        Segment& operator=(const Segment& other)
+        {
+            m_Active = other.m_Active;
+            m_Bezier = other.m_Bezier;
+
+            return *this;
+        }
+
+        Segment& operator=(Segment&& other)
+        {
+            m_Active = std::move(other.m_Active);
+            m_Bezier = std::move(other.m_Bezier);
+
+            return *this;
         }
 
         StaticNGradeBezier<T, 3, D> m_Bezier;

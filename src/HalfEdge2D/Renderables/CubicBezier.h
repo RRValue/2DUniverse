@@ -10,6 +10,7 @@ class CubicBezier : public CBezier2F, public RenderableLine
 public:
     CubicBezier();
     CubicBezier(const CubicBezier& other);
+    CubicBezier(CubicBezier&& other);
     ~CubicBezier();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

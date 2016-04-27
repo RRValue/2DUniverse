@@ -11,6 +11,11 @@ Renderable::Renderable(const Renderable& other) : m_Colour(other.m_Colour), m_Vi
 
 }
 
+Renderable::Renderable(Renderable&& other) : m_Colour(std::move(other.m_Colour)), m_Visible(std::move(other.m_Visible))
+{
+
+}
+
 Renderable::~Renderable()
 {
 

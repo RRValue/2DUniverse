@@ -19,6 +19,7 @@ class Line : public Line2F, public RenderableLine
 public:
     Line();
     Line(const Line& other);
+    Line(Line&& other);
     ~Line();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     

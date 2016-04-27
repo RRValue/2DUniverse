@@ -7,6 +7,9 @@
 #include "HalfEdge2D/Base/StaticPolynomialSolver.h"
 #include "HalfEdge2D/Base/StaticBernsteinMatrix.h"
 
+#include <map>
+#include <vector>
+
 template<typename T>
 struct StaticNGradeBezierLengthErrorTolerance
 {
@@ -28,6 +31,10 @@ private:
     typedef Eigen::Matrix<T, D, 1> BezierPointType;
     typedef Eigen::Matrix<T, D + 1, 1> TransformPointType;
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
+    
+    typedef std::pair<T, T> RangeLengthType;
+    typedef std::map<T, T> RangeLengthMapType;
+    typedef std::vector<T> LengthVectoeType;
 
 public:
     typedef Eigen::Matrix<T, N, 1> ComponentValuesType;
@@ -41,7 +48,9 @@ public:
     static_assert(G <= 13, "13 Is max for StaticNGradeBezier");
 
 public:
-    StaticNGradeBezier()
+    StaticNGradeBezier() : 
+        m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
+        m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
     {
         m_Params.setZero();
         m_DerivedParams[0].setZero();
@@ -51,12 +60,32 @@ public:
         m_LengthDirty = true;
     }
 
-    StaticNGradeBezier(const StaticNGradeBezier& other)
+    StaticNGradeBezier(const StaticNGradeBezier& other) :
+        m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
+        m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
     {
-        m_Params = other.m_Params;
-        m_DerivedParams[0] = other.m_DerivedParams[0];
-        m_DerivedParams[1] = other.m_DerivedParams[1];
-        m_DerivedParams[2] = other.m_DerivedParams[2];
+        copy(other, *this);
+    }
+
+    StaticNGradeBezier(StaticNGradeBezier&& other) :
+        m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
+        m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
+    {
+        move(std::move(other), *this);
+    }
+
+    StaticNGradeBezier& operator=(const StaticNGradeBezier& other)
+    {
+        copy(other, *this);
+
+        return *this;
+    }
+
+    StaticNGradeBezier& operator=(StaticNGradeBezier&& other)
+    {
+        move(other, *this);
+
+        return *this;
     }
 
     BezierPointType getPoint(const size_t& idx) const
@@ -193,19 +222,82 @@ public:
 
     T getLength()
     {
-        if(m_LengthDirty)
+        if(!m_LengthDirty)
+            return m_Length;
+
+        // clear length related memeber
+        m_Length = StaticIdentities.identityAdd<T>();
+        m_RangeLengthMap.clear();
+        m_LengthVector.clear();
+
+        // update length
+        m_LengthVector.push_back(T(0));
+
+        lengthImpl(m_Params, m_LengthError.m_Epsilon, 0);
+
+        m_LengthVector.push_back(m_Length);
+
+        m_LengthDirty = false;
+
+        // update length map
+        if(m_LengthVector.size() == m_LengthCacheMax)
         {
-            m_Length = StaticIdentities.identityAdd<T>();
+            T a = T(0);
 
-            lengthImpl(m_Params, m_LengthError.m_Epsilon);
-
-            m_LengthDirty = false;
+            for(const auto& l : m_LengthVector)
+            {
+                m_RangeLengthMap.insert(std::make_pair(a, l));
+                a += m_LengthCacheStep;
+            }
         }
+        else
+        {
+            m_RangeLengthMap.insert(std::make_pair(T(0), T(0)));
+            m_RangeLengthMap.insert(std::make_pair(T(0), m_Length));
+        }
+
+        m_LengthVector.clear();
 
         return m_Length;
     }
 
 private:
+    void copy(const StaticNGradeBezier& from, StaticNGradeBezier& to)
+    {
+        m_Params = from.m_Params;
+        m_DerivedParams[0] = from.m_DerivedParams[0];
+        m_DerivedParams[1] = from.m_DerivedParams[1];
+        m_DerivedParams[2] = from.m_DerivedParams[2];
+        m_RangeLengthMap = from.m_RangeLengthMap;
+        m_LengthVector = from.m_LengthVector;
+        m_Length = from.m_Length;
+        m_LengthDirty = from.m_LengthDirty;
+
+    }
+    void swap(StaticNGradeBezier& from, StaticNGradeBezier& to)
+    {
+        std::swap(from.m_Params, to.m_Params);
+        std::swap(from.m_DerivedParams[0], to.m_DerivedParams[0]);
+        std::swap(from.m_DerivedParams[1], to.m_DerivedParams[1]);
+        std::swap(from.m_DerivedParams[2], to.m_DerivedParams[2]);
+        std::swap(from.m_RangeLengthMap, to.m_RangeLengthMap);
+        std::swap(from.m_LengthVector, to.m_LengthVector);
+        std::swap(from.m_Length, to.m_Length);
+        std::swap(from.m_LengthDirty, to.m_LengthDirty);
+    }
+
+    void move(StaticNGradeBezier&& from, StaticNGradeBezier& to)
+    {
+        m_Params = std::move(from.m_Params);
+        m_DerivedParams[0] = std::move(from.m_DerivedParams[0]);
+        m_DerivedParams[1] = std::move(from.m_DerivedParams[1]);
+        m_DerivedParams[2] = std::move(from.m_DerivedParams[2]);
+        m_RangeLengthMap = std::move(from.m_RangeLengthMap);
+        m_LengthVector = std::move(from.m_LengthVector);
+        m_Length = std::move(from.m_Length);
+        m_LengthDirty = std::move(from.m_LengthDirty);
+    }
+
     void updateParams()
     {
         m_DerivedParams[0] = m_Params * getDerivedBernsteinMatrix<0>();
@@ -257,7 +349,8 @@ private:
             r.col(j) = temp[N - j - 1][j];
     }
 
-    void lengthImpl(const BezierParamType& points, const T& error)
+    template<unsigned int GRADE = G>
+    void lengthImpl(const BezierParamType& points, const T& error, size_t depth)
     {
         BezierParamType l, r;
 
@@ -273,8 +366,13 @@ private:
         if(std::abs(len_a - len_c) > error)
         {
             splitAtImpl(points, s, l, r);
-            lengthImpl(l, error);
-            lengthImpl(r, error);
+
+            lengthImpl(l, error, depth + 1);
+
+            if(depth < m_LengthCacheDepth)
+                m_LengthVector.push_back(m_Length);
+
+            lengthImpl(r, error, depth + 1);
 
             return;
         }
@@ -282,6 +380,12 @@ private:
         m_Length += len_a;
 
         return;
+    }
+
+    template<>
+    void lengthImpl<1>(const BezierParamType& points, const T& error, size_t depth)
+    {
+        m_Length = (points.col(1) - points.col(0)).norm();
     }
 
 private:
@@ -295,6 +399,13 @@ private:
 
     bool m_LengthDirty;
     T m_Length;
+
+    RangeLengthMapType m_RangeLengthMap;
+    LengthVectoeType m_LengthVector;
+
+    static const size_t m_LengthCacheDepth = 5; // will expand to 2^n + 1 values in m_RangeLengthMap 0, 1/2^n, 2/2^n ... 1
+    const size_t m_LengthCacheMax;
+    const T m_LengthCacheStep;
 };
 
 typedef StaticNGradeBezier<float, 1, 2> Line2F;
