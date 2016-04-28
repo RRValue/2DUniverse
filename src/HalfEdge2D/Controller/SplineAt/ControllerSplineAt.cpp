@@ -79,26 +79,22 @@ void ControllerSplineAt::init()
     m_OptionWidgetSetUp.m_TLbl->setText(tr("T(%0...%1)").arg(QString::number(m_TMin, 'f', 0)).arg(QString::number(m_TMax, 'f', 0)));
     m_OptionWidgetSetUp.m_BLbl->setText(tr("B(%0...%1)").arg(QString::number(m_BMin, 'f', 0)).arg(QString::number(m_BMax, 'f', 0)));
     m_OptionWidgetSetUp.m_AlphaLbl->setText(tr("B(%0...%1)").arg(QString::number(m_AMin, 'f', 0)).arg(QString::number(m_AMax, 'f', 0)));
-    m_OptionWidgetSetUp.m_AlphaNormLbl->setText(tr("B(%0...%1)").arg(QString::number(m_AMin, 'f', 0)).arg(QString::number(m_AMax, 'f', 0)));
 
     m_CSlider = m_OptionWidgetSetUp.m_CSld;
     m_TSlider = m_OptionWidgetSetUp.m_TSld;
     m_BSlider = m_OptionWidgetSetUp.m_BSld;
     m_ASlider = m_OptionWidgetSetUp.m_AlphaSld;
-    m_ANSlider = m_OptionWidgetSetUp.m_AlphaNormSld;
     m_ClosedCkb = m_OptionWidgetSetUp.m_CloseCkb;
 
     setSliderC(0.0f);
     setSliderT(0.0f);
     setSliderB(0.0f);
     setSliderA(0.0f);
-    setSliderAN(0.0f);
 
     connect(m_CSlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
     connect(m_TSlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
     connect(m_BSlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
     connect(m_ASlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
-    connect(m_ANSlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
     connect(m_ClosedCkb, &QCheckBox::stateChanged, this, &ControllerSplineAt::onClosedChanged);
 
     // add to scene
@@ -257,56 +253,39 @@ Point* const ControllerSplineAt::getPointAtPos(const Vec2f& pos, size_t* const i
 
 void ControllerSplineAt::updateData()
 {
-    updateDataAt();
-    updateDataAtN();
-}
-
-void ControllerSplineAt::updateDataAt()
-{
     if(!m_Spline->isVisible() || m_Spline->getNumControllPoints() < 2)
         return;
 
     float alpha = sliderValueToValue(m_ASlider, m_AMin, m_AMax);
 
-    Vec2f p_at = m_Spline->pointAt(alpha);
-    Vec2f t_at = m_Spline->tangentAt(alpha) / 10.0f;
-    Vec2f n_at = m_Spline->normalAt(alpha) / 10.0f;
+    Vec2f p_at0 = m_Spline->pointAt(alpha);
+    Vec2f p_at1 = m_Spline->pointAtL(alpha);
+    Vec2f t_at0 = m_Spline->tangentAt(alpha) / 10.0f;
+    Vec2f t_at1 = m_Spline->tangentAtL(alpha) / 10.0f;
+    Vec2f n_at0 = m_Spline->normalAt(alpha) / 10.0f;
+    Vec2f n_at1 = m_Spline->normalAtL(alpha) / 10.0f;
 
     m_Point->setVisible(true);
-    m_Point->setPosition(p_at);
+    m_Point->setPosition(p_at0);
 
     m_Tangent->setVisible(true);
-    m_Tangent->setPoint(0, p_at);
-    m_Tangent->setPoint(1, p_at + t_at);
+    m_Tangent->setPoint(0, p_at0);
+    m_Tangent->setPoint(1, p_at0 + t_at0);
 
     m_Normal->setVisible(true);
-    m_Normal->setPoint(0, p_at);
-    m_Normal->setPoint(1, p_at + n_at);
-
-    m_Renderer->render();
-}
-
-void ControllerSplineAt::updateDataAtN()
-{
-    if(!m_Spline->isVisible() || m_Spline->getNumControllPoints() < 2)
-        return;
-
-    float alpha = sliderValueToValue(m_ANSlider, m_AMin, m_AMax);
-
-    Vec2f p_at = m_Spline->pointAt(alpha);
-    Vec2f t_at = m_Spline->tangentAt(alpha) / 10.0f;
-    Vec2f n_at = m_Spline->normalAt(alpha) / 10.0f;
+    m_Normal->setPoint(0, p_at0);
+    m_Normal->setPoint(1, p_at0 + n_at0);
 
     m_PointN->setVisible(true);
-    m_PointN->setPosition(p_at);
+    m_PointN->setPosition(p_at1);
 
     m_TangentN->setVisible(true);
-    m_TangentN->setPoint(0, p_at);
-    m_TangentN->setPoint(1, p_at + t_at);
+    m_TangentN->setPoint(0, p_at1);
+    m_TangentN->setPoint(1, p_at1 + t_at1);
 
     m_NormalN->setVisible(true);
-    m_NormalN->setPoint(0, p_at);
-    m_NormalN->setPoint(1, p_at + n_at);
+    m_NormalN->setPoint(0, p_at1);
+    m_NormalN->setPoint(1, p_at1 + n_at1);
 
     m_Renderer->render();
 }
@@ -377,19 +356,12 @@ void ControllerSplineAt::setSliderA(const float& a)
     m_ASlider->blockSignals(false);
 }
 
-void ControllerSplineAt::setSliderAN(const float& a)
-{
-    m_ANSlider->blockSignals(true);
-    m_ANSlider->setValue(valueToSliderValue(a, m_ANSlider, m_AMin, m_AMax));
-    m_ANSlider->blockSignals(false);
-}
-
 float ControllerSplineAt::sliderValueToValue(QSlider* const sld, const float& min, const float& max)
 {
     // slider properties
     float sld_min = (float)sld->minimum();
     float sld_max = (float)sld->maximum();
-    float range = sld_max - sld_min;
+    float range = sld_max - 1 - sld_min;
 
     // radius
     float r = (float)sld->value();
@@ -410,7 +382,7 @@ int ControllerSplineAt::valueToSliderValue(const float& value, QSlider* const sl
     // slider properties
     float sld_min = (float)sld->minimum();
     float sld_max = (float)sld->maximum();
-    float range = sld_max - sld_min;
+    float range = sld_max - 1 - sld_min;
 
     // radius
     float v = (float)value;

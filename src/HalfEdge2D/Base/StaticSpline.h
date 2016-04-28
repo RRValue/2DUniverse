@@ -63,6 +63,7 @@ public:
         m_Bias = T(0);
         m_TangentFactors = TangentFactorsType(T(0.5), T(0.5), T(0.5), T(0.5));
         m_Closed = false;
+        m_LengthDirty = true;
     }
     StaticSpline(const StaticSpline& other)
     {
@@ -71,6 +72,7 @@ public:
         m_Bias = other.m_Bias;
         m_Segments = other.m_Segments;
         m_Closed = other.m_Closed;
+        m_LengthDirty = true;
     }
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -210,6 +212,19 @@ public:
         return m_Segments[s].m_Bezier.pointAt(a);
     }
 
+    SplinePointType pointAtL(const T& alpha)
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        T a = alpha;
+
+        getSegmentAndFractionL(s, a);
+
+        return m_Segments[s].m_Bezier.pointAt(a);
+    }
+
     SplinePointType tangentAt(const T& alpha) const
     {
         if(m_Segments.empty())
@@ -219,6 +234,19 @@ public:
         float a = alpha;
 
         getSegmentAndFraction(s, a);
+
+        return m_Segments[s].m_Bezier.tangentAt(a);
+    }
+
+    SplinePointType tangentAtL(const T& alpha)
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        T a = alpha;
+
+        getSegmentAndFractionL(s, a);
 
         return m_Segments[s].m_Bezier.tangentAt(a);
     }
@@ -236,6 +264,19 @@ public:
         return m_Segments[s].m_Bezier.normalAt(a);
     }
 
+    SplinePointType normalAtL(const T& alpha)
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        T a = alpha;
+
+        getSegmentAndFractionL(s, a);
+
+        return m_Segments[s].m_Bezier.normalAt(a);
+    }
+
     SplinePointType biNormalAt(const T& alpha) const
     {
         if(m_Segments.empty())
@@ -245,6 +286,19 @@ public:
         float a = alpha;
 
         getSegmentAndFraction(s, a);
+
+        return m_Segments[s].m_Bezier.biNormalAt(a);
+    }
+
+    SplinePointType biNormalAtL(const T& alpha)
+    {
+        if(m_Segments.empty())
+            return SplinePointType();
+
+        unsigned int s = 0;
+        T a = alpha;
+
+        getSegmentAndFractionL(s, a);
 
         return m_Segments[s].m_Bezier.biNormalAt(a);
     }
@@ -262,10 +316,25 @@ public:
         return m_Segments[s].m_Bezier.curvationAt(a);
     }
 
+    T curvationAtL(const T& alpha) const
+    {
+        if(m_Segments.empty())
+            return T(0);
+
+        unsigned int s = 0;
+        T a = alpha;
+
+        getSegmentAndFractionL(s, a);
+
+        return m_Segments[s].m_Bezier.curvationAt(a);
+    }
+
     void transform(const TransformType& m)
     {
         for(auto& s : m_Segments)
             s.m_Bezier.transform(m);
+
+        m_LengthDirty = true;
     }
 
 private:
@@ -294,6 +363,35 @@ private:
 
         if(m_Closed && seg == m_Segments.size())
             seg = 0;
+    }
+    void getSegmentAndFractionL(unsigned int& seg, T& alpha)
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        T l = alpha * m_Length;
+        T l_accum = T(0);
+        T l0;
+        T l1;
+
+        size_t i;
+        for(i = 0; i < m_Segments.size(); i++)
+        {
+            const T& seg_l = m_Segments[i].m_Bezier.getLength();
+
+            l_accum += seg_l;
+
+            if(l_accum <= l)
+                continue;
+
+            l1 = l_accum;
+            l0 = l_accum - seg_l;
+
+            break;
+        }
+
+        seg = i;
+        alpha = (l - l0) / (l1 - l0);
     }
     void update()
     {
@@ -370,6 +468,17 @@ private:
                 m_Segments[i].m_Bezier.setPoint(j + 1, t);
             }
         }
+
+        m_LengthDirty = true;
+    }
+
+    void updateLength()
+    {
+        m_Length = T(0);
+
+        for(auto& s : m_Segments)
+            if(s.m_Active)
+                m_Length += s.m_Bezier.getLength();
     }
 
 private:
@@ -379,6 +488,8 @@ private:
     T m_Continuity;
     T m_Bias;
     TangentFactorsType m_TangentFactors;
+    T m_Length;
+    bool m_LengthDirty;
 };
 
 typedef StaticSpline<float, 2> Spline2F;
