@@ -113,9 +113,25 @@ public:
         return derived<0>(alpha);
     }
 
+    BezierPointType pointAtL(const T& alpha) const
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        return pointAt(getAlphaAtLength(alpha * m_Length));
+    }
+
     BezierPointType tangentAt(const T& alpha) const
     {
         return derived<1>(alpha).normalized();
+    }
+
+    BezierPointType tangentAtL(const T& alpha) const
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        return tangentAt(getAlphaAtLength(alpha * m_Length));
     }
 
     template<unsigned int Dim = D>
@@ -141,6 +157,14 @@ public:
         return der1.cross(der2).cross(der1).normalized();
     }
 
+    BezierPointType normalAtL(const T& alpha) const
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        return normalAt<D>(getAlphaAtLength(alpha * m_Length));
+    }
+
     template<unsigned int Dim = D>
     BezierPointType biNormalAt(const T& alpha) const
     {
@@ -154,6 +178,14 @@ public:
         BezierPointType der2 = derived<1>(alpha);
 
         return der1.cross(der2).normalized();
+    }
+
+    BezierPointType biNormalAtL(const T& alpha) const
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        return biNormalAt<D>(getAlphaAtLength(alpha * m_Length));
     }
 
     template<unsigned int Dim = D>
@@ -185,6 +217,14 @@ public:
         return der1.cross(der2).norm() / std::pow(der1.norm(), T(3));
     }
 
+    T curvationAtL(const T& alpha) const
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        return curvationAt<D>(getAlphaAtLength(alpha * m_Length));
+    }
+
     void transform(const TransformType& m)
     {
         TransformPointType p;
@@ -203,6 +243,8 @@ public:
         }
 
         updateParams();
+
+        m_LengthDirty = true;
     }
 
     Roots componentRoots(const size_t& c) const
