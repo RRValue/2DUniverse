@@ -32,9 +32,10 @@ private:
     typedef Eigen::Matrix<T, D + 1, 1> TransformPointType;
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
     
-    typedef std::pair<T, T> RangeLengthType;
-    typedef std::map<T, T> RangeLengthMapType;
-    typedef std::vector<T> LengthVectoeType;
+    typedef typename std::pair<T, T> RangeLengthType;
+    typedef typename std::map<T, T> RangeLengthMapType;
+    typedef typename RangeLengthMapType::const_iterator RangeLengthMapContIterType;
+    typedef typename std::vector<T> LengthVectoeType;
 
 public:
     typedef Eigen::Matrix<T, N, 1> ComponentValuesType;
@@ -259,6 +260,92 @@ public:
         return getLengthImpl(*i1, to) - getLengthImpl(*i0, from);
     }
 
+    T getAlphaAtLength(const T& targetLength)
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        if(targetLength == T(0))
+            return T(0);
+        else if(targetLength == m_Length)
+            return T(1);
+
+        RangeLengthMapContIterType it0, it1;
+
+        for(RangeLengthMapContIterType iter = m_RangeLengthMap.begin(); iter != m_RangeLengthMap.end(); ++iter)
+        {
+            if(iter->second <= targetLength)
+                it0 = iter;
+            
+            if(iter->second >= targetLength)
+            {
+                it1 = iter;
+
+                break;
+            }
+        }
+
+        // store old length
+        T old_length = m_Length;
+
+        // search between it0.first and it1.first for l
+        T a_at_length = it0->first;
+        T range = it1->first - it0->first;
+        T length = it0->second;
+
+        BezierParamType l, r;
+        BezierParamType o = sectionImpl(m_Params, it0->first, it1->first);
+        
+        bool add = true;
+
+        while(range > m_LengthError.m_Epsilon)
+        {
+            splitAtImpl(o, T(1) / T(2), l, r);
+
+            if(add)
+                o = r;
+            else
+                o = l;
+
+            m_Length = T(0);
+            range /= T(2);
+
+            lengthImpl(o, m_LengthError.m_Epsilon, m_LengthCacheDepth);
+
+            if(add)
+            {
+                length += m_Length;
+                a_at_length += range;
+            }
+            else
+            {
+                length -= m_Length;
+                a_at_length -= range;
+            }
+
+            if(std::abs(targetLength - length) <= m_LengthError.m_Epsilon)
+                break;
+
+            add = length < targetLength;
+        }
+
+        // restore length
+        m_Length = old_length;
+
+        return a_at_length;
+    }
+
+    void getSection(StaticNGradeBezier& b, const T& from, const T& to)
+    {
+        if(from < to)
+            b.m_Params = sectionImpl(m_Params, from, to);
+        else
+            b.m_Params = m_Params;
+
+        b.updateParams();
+        b.m_LengthDirty = true;
+    }
+
 private:
     void copy(const StaticNGradeBezier& from, StaticNGradeBezier& to)
     {
@@ -322,29 +409,46 @@ private:
 
     void splitAtImpl(const BezierParamType& p, const T& a, BezierParamType& l, BezierParamType& r)
     {
-        // sources:
-        /// http://www.realtimerendering.com/resources/GraphicsGems/gems.html#gems
-        /// http://www.realtimerendering.com/resources/GraphicsGems/gems/NearestPoint.c
+        BezierPointType temp[G][G];
 
-        BezierPointType temp[N][N];
+        T a0 = StaticIdentities.identityMult<T>() - a;
+        T a1 = a;
 
-        // Copy control points
-        for(unsigned int j = 0; j < N; j++)
-            temp[0][N - j - 1] = p.col(j);
+        for(unsigned int i = 0; i < G; i++)
+            temp[0][i] = a0 * p.col(i) + a1 * p.col(i + 1);
 
-        // Triangle computation
-        T a0 = a;
-        T a1 = StaticIdentities.identityMult<T>() - a;
+        for(unsigned int i = 0; i < G - 1; i++)
+            for(unsigned int j = 0; j < G - 1 - i; j++)
+                temp[i + 1][j] = a0 * temp[i][j] + a1 * temp[i][j + 1];
 
-        for(unsigned int i = 1; i < N; i++)
-            for(unsigned int j = 0; j < N - i; j++)
-                temp[i][j] = (a0 * temp[i - 1][j]) + (a1 * temp[i - 1][j + 1]);
+        for(unsigned int i = 0; i < G; i++)
+        {
+            l.col(i + 1) = temp[i][0];
+            r.col(i) = temp[G - 1 - i][i];
+        }
 
-        for(unsigned int j = 0; j < N; j++)
-            l.col(j) = temp[N - j - 1][j];
+        l.col(0) = p.col(0);
+        r.col(G) = p.col(G);
+    }
 
-        for(unsigned int j = 0; j < N; j++)
-            r.col(j) = temp[j][0];
+    BezierParamType sectionImpl(const BezierParamType& p, const T& from, const T& to)
+    {
+        if(from >= to)
+            return p;
+
+        BezierParamType o, l, r;
+
+        o = p;
+
+        splitAtImpl(o, from, l, r);
+        
+        o = r;
+        
+        splitAtImpl(o, (to - from) / (T(1) - from), l, r);
+
+        o = l;
+
+        return o;
     }
 
     T getLengthImpl(const RangeLengthType& rangeLength, const T& a)
@@ -355,11 +459,9 @@ private:
         // calculate length between rangeLength->first ... a
         m_Length = T(0);
 
-        BezierParamType l, r;
-        splitAtImpl(m_Params, rangeLength.first, l, r);
-        splitAtImpl(r, (a - rangeLength.first) / (T(1) - rangeLength.first), l, r);
+        BezierParamType s = sectionImpl(m_Params, rangeLength.first, a);
 
-        lengthImpl(l, m_LengthError.m_Epsilon, m_LengthCacheDepth);
+        lengthImpl(s, m_LengthError.m_Epsilon, m_LengthCacheDepth);
 
         T length = m_Length;
 

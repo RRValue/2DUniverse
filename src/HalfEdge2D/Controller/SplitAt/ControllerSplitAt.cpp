@@ -482,9 +482,10 @@ void ControllerSplitAt::updateSplit()
     case E_ST_QBEZIER:
         {
             if(!m_QBezier[0]->isVisible())
-                break;
+                break;;
 
-            m_QBezier[0]->splitAt(s, *m_QBezier[1], *m_QBezier[2]);
+            m_QBezier[0]->getSection(*m_QBezier[1], 0.0f, s);
+            m_QBezier[0]->getSection(*m_QBezier[2], s, 1.0f);
 
             Vec2f d(0.0f, 0.1f);
 
@@ -508,7 +509,8 @@ void ControllerSplitAt::updateSplit()
             if(!m_CBezier[0]->isVisible())
                 break;
 
-            m_CBezier[0]->splitAt(s, *m_CBezier[1], *m_CBezier[2]);
+            m_CBezier[0]->getSection(*m_CBezier[1], 0.0f, s);
+            m_CBezier[0]->getSection(*m_CBezier[2], s, 1.0f);
 
             Vec2f d(0.0f, 0.1f);
 
