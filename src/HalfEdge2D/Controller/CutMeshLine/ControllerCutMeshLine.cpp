@@ -1,35 +1,35 @@
-#include "HalfEdge2D/Controller/CutMesh/ControllerCutMesh.h"
+#include "HalfEdge2D/Controller/CutMeshLine/ControllerCutMeshLine.h"
 
 #include "HalfEdge2D/Controller/CutMesh/CutMeshOption_uic.h"
 
 #include <QtGui/QMouseEvent>
 
-ControllerCutMesh::ControllerCutMesh()
+ControllerCutMeshLine::ControllerCutMeshLine()
 {
-    m_Name = "ControllerCutMesh";
+    m_Name = "ControllerCutMeshLine";
 }
 
-ControllerCutMesh::~ControllerCutMesh()
-{
-
-}
-
-void ControllerCutMesh::init()
+ControllerCutMeshLine::~ControllerCutMeshLine()
 {
 
 }
 
-void ControllerCutMesh::activate()
+void ControllerCutMeshLine::init()
 {
 
 }
 
-void ControllerCutMesh::deactivate()
+void ControllerCutMeshLine::activate()
 {
 
 }
 
-bool ControllerCutMesh::handleMouseMoveEvent(QMouseEvent* const event)
+void ControllerCutMeshLine::deactivate()
+{
+
+}
+
+bool ControllerCutMeshLine::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
         return false;
@@ -40,7 +40,7 @@ bool ControllerCutMesh::handleMouseMoveEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutMesh::handleMousePressEvent(QMouseEvent* const event)
+bool ControllerCutMeshLine::handleMousePressEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -57,7 +57,7 @@ bool ControllerCutMesh::handleMousePressEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutMesh::handleMouseReleaseEvent(QMouseEvent* const event)
+bool ControllerCutMeshLine::handleMouseReleaseEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -68,12 +68,12 @@ bool ControllerCutMesh::handleMouseReleaseEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutMesh::handleResizeEvent(QResizeEvent* const event)
+bool ControllerCutMeshLine::handleResizeEvent(QResizeEvent* const event)
 {
     return false;
 }
 
-bool ControllerCutMesh::handleWheelEvent(QWheelEvent* const event)
+bool ControllerCutMeshLine::handleWheelEvent(QWheelEvent* const event)
 {
     return false;
 }

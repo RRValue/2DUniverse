@@ -1,5 +1,5 @@
-#ifndef _CONTROLLER_CONTROLLERCUTMESH_H_
-#define _CONTROLLER_CONTROLLERCUTMESH_H_
+#ifndef _CONTROLLER_CONTROLLERCUTMESHLINE_H_
+#define _CONTROLLER_CONTROLLERCUTMESHLINE_H_
 
 #include "HalfEdge2D/Controller/Controller.h"
 
@@ -7,13 +7,13 @@
 
 class QSlider;
 
-class ControllerCutMesh : public QObject, public Controller
+class ControllerCutMeshLine : public QObject, public Controller
 {
     Q_OBJECT;
 
 public:
-    ControllerCutMesh();
-    virtual ~ControllerCutMesh();
+    ControllerCutMeshLine();
+    virtual ~ControllerCutMeshLine();
 
 protected:
     virtual void init() final override;
@@ -27,4 +27,4 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 };
 
-#endif //_CONTROLLER_CONTROLLERCUTMESH_H_
+#endif //_CONTROLLER_CONTROLLERCUTMESHLINE_H_
