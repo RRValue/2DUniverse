@@ -1,7 +1,7 @@
 #ifndef _RENDERABLE_QUDRATICBEZIER_H_
 #define _RENDERABLE_QUDRATICBEZIER_H_
 
-#include "HalfEdge2D/Base/StaticNGradeBezier.h"
+#include "HalfEdge2D/Base/NGradeBezier.h"
 
 #include "HalfEdge2D/Renderables/RenderableLine.h"
 

@@ -145,8 +145,8 @@ void HalfEdge2DApplication::createController()
         new ControllerCutCubicBezier(),
         new ControllerCutCircle(),
         new ControllerCutSpline(),
-        new ControllerCutMesh(),
-        new ControllerSplitAt()
+        new ControllerSplitAt(),
+        new ControllerCutMesh()
     };
 
     for(const auto& c : controller_to_add)

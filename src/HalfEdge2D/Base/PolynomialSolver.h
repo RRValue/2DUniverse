@@ -1,5 +1,5 @@
-#ifndef _BASE_STATICPOLYNOMIALSOLVER_H_
-#define _BASE_STATICPOLYNOMIALSOLVER_H_
+#ifndef _BASE_POLYNOMIALSOLVER_H_
+#define _BASE_POLYNOMIALSOLVER_H_
 
 #include <array>
 #include <initializer_list>
@@ -7,28 +7,28 @@
 
 // define solver traits
 template<typename T>
-struct StaticPolynomialSolverTypeTrait
+struct PolynomialSolverTypeTrait
 {
-    StaticPolynomialSolverTypeTrait() { static_assert(false, "Type of StaticPolynomialSolver not supported") }
+    PolynomialSolverTypeTrait() { static_assert(false, "Type of PolynomialSolver not supported") }
 };
 
 template<>
-struct StaticPolynomialSolverTypeTrait<float>
+struct PolynomialSolverTypeTrait<float>
 {
-    StaticPolynomialSolverTypeTrait() {}
+    PolynomialSolverTypeTrait() {}
 };
 
 template<>
-struct StaticPolynomialSolverTypeTrait<double>
+struct PolynomialSolverTypeTrait<double>
 {
-    StaticPolynomialSolverTypeTrait() {}
+    PolynomialSolverTypeTrait() {}
 };
 
 #define ConstTypeRef(T) const T&
 
 // define solver
 template <typename T, unsigned int G, unsigned int N = G + 1>
-class StaticPolynomialSolver : protected StaticPolynomialSolverTypeTrait<T>
+class PolynomialSolver : protected PolynomialSolverTypeTrait<T>
 {
     static_assert(G >= 1 && G <= 4, "Grade must between 1 and 4");
 
@@ -194,4 +194,4 @@ private:
     }
 };
 
-#endif //_BASE_STATICPOLYNOMIALSOLVER_H_
+#endif //_BASE_POLYNOMIALSOLVER_H_

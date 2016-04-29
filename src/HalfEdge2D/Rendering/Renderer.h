@@ -3,7 +3,7 @@
 
 #include "HalfEdge2D/Base/Vector.h"
 
-#include "HalfEdge2D/Base/StaticNGradeBezier.h"
+#include "HalfEdge2D/Base/NGradeBezier.h"
 
 #include <QtCore/QPointF>
 #include <QtCore/QRectF>

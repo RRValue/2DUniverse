@@ -2,7 +2,7 @@
 #define _RENDERABLE_LINE_H_
 
 #include "HalfEdge2D/Base/Vector.h"
-#include "HalfEdge2D/Base/StaticNGradeBezier.h"
+#include "HalfEdge2D/Base/NGradeBezier.h"
 
 #include "HalfEdge2D/Renderables/RenderableLine.h"
 

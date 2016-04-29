@@ -1,7 +1,7 @@
 #ifndef _RENDERABLE_SPLINE_H_
 #define _RENDERABLE_SPLINE_H_
 
-#include "HalfEdge2D/Base/StaticSpline.h"
+#include "HalfEdge2D/Base/Spline.h"
 
 #include "HalfEdge2D/Renderables/RenderableLine.h"
 

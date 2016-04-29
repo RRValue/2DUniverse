@@ -1,10 +1,10 @@
-#ifndef _BASE_STATICBERNSTEINMATRIX_H_
-#define _BASE_STATICBERNSTEINMATRIX_H_
+#ifndef _BASE_BERNSTEINMATRIX_H_
+#define _BASE_BERNSTEINMATRIX_H_
 
-#include "HalfEdge2D/Base/StaticGroupElements.h"
+#include "HalfEdge2D/Base/GroupElements.h"
 
 template <typename T, unsigned int G, unsigned int N = G + 1>
-struct StaticBernsteinMatrix
+struct BernsteinMatrix
 {
     typedef Eigen::Matrix<T, N, N> MatrixType;
     typedef Eigen::Matrix<T, N, 1> MatrixRowType;
@@ -118,4 +118,4 @@ private:
     }
 };
 
-#endif //_BASE_STATICBERNSTEINMATRIX_H_
+#endif //_BASE_BERNSTEINMATRIX_H_

@@ -1,10 +1,10 @@
-#ifndef _BASE_STATICSPLINE_H_
-#define _BASE_STATICSPLINE_H_
+#ifndef _BASE_SPLINE_H_
+#define _BASE_SPLINE_H_
 
-#include "HalfEdge2D/Base/StaticNGradeBezier.h"
+#include "HalfEdge2D/Base/NGradeBezier.h"
 
 template<typename T, unsigned int D>
-class StaticSpline
+class NSpline
 {
 public:
     struct Segment
@@ -40,7 +40,7 @@ public:
             return *this;
         }
 
-        StaticNGradeBezier<T, 3, D> m_Bezier;
+        NGradeBezier<T, 3, D> m_Bezier;
         bool m_Active;
     };
 
@@ -56,7 +56,7 @@ private:
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
 
 public:
-    StaticSpline()
+    NSpline()
     {
         m_Tension = T(0);
         m_Continuity = T(0);
@@ -65,7 +65,7 @@ public:
         m_Closed = false;
         m_LengthDirty = true;
     }
-    StaticSpline(const StaticSpline& other)
+    NSpline(const NSpline& other)
     {
         m_Tension = other.m_Tension;
         m_Continuity = other.m_Continuity;
@@ -95,7 +95,7 @@ public:
     }
     const SplinePointType& getPoint(const size_t& idx) const
     {
-        assert(idx >= 0 && idx < m_Segments.size() && "Spline::getPoint: idx out of range");
+        assert(idx >= 0 && idx < m_Segments.size() && "NSpline::getPoint: idx out of range");
 
         return m_Segments[idx].getPoint(0);
     }
@@ -161,7 +161,7 @@ public:
     }
     void setPoint(const size_t& idx, const SplinePointType& point)
     {
-        assert(idx >= 0 && idx < m_Segments.size() && "Spline::setPoint: idx out of range");
+        assert(idx >= 0 && idx < m_Segments.size() && "NSpline::setPoint: idx out of range");
 
         m_Segments[idx].m_Bezier.setPoint(0, point);
 
@@ -189,7 +189,7 @@ public:
     }
     void removePoint(const SplinePointType& idx)
     {
-        assert(idx >= 0 && idx < m_Segments.size() && "Spline::removePoint: idx out of range");
+        assert(idx >= 0 && idx < m_Segments.size() && "NSpline::removePoint: idx out of range");
 
         m_Segments.erase(m_Segments.begin() + idx);
 
@@ -495,9 +495,9 @@ private:
     bool m_LengthDirty;
 };
 
-typedef StaticSpline<float, 2> Spline2F;
-typedef StaticSpline<float, 3> Spline3F;
-typedef StaticSpline<double, 2> Spline2D;
-typedef StaticSpline<double, 3> Spline3D;
+typedef NSpline<float, 2> Spline2F;
+typedef NSpline<float, 3> Spline3F;
+typedef NSpline<double, 2> Spline2D;
+typedef NSpline<double, 3> Spline3D;
 
 #endif //_BASE_STATICSPLINE_H_

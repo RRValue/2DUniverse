@@ -3,27 +3,27 @@
 
 #include "HalfEdge2D/Base/Vector.h"
 
-#include "HalfEdge2D/Base/StaticGroupElements.h"
-#include "HalfEdge2D/Base/StaticPolynomialSolver.h"
-#include "HalfEdge2D/Base/StaticBernsteinMatrix.h"
+#include "HalfEdge2D/Base/GroupElements.h"
+#include "HalfEdge2D/Base/PolynomialSolver.h"
+#include "HalfEdge2D/Base/BernsteinMatrix.h"
 
 #include <map>
 #include <vector>
 
 template<typename T>
-struct StaticNGradeBezierLengthErrorTolerance
+struct NGradeBezierLengthErrorTolerance
 {
     static T m_Epsilon;
 };
 
-template<> float StaticNGradeBezierLengthErrorTolerance<float>::m_Epsilon = 1e-05f;
-template<> double StaticNGradeBezierLengthErrorTolerance<double>::m_Epsilon = 1e-05;
+template<> float NGradeBezierLengthErrorTolerance<float>::m_Epsilon = 1e-05f;
+template<> double NGradeBezierLengthErrorTolerance<double>::m_Epsilon = 1e-05;
 
 template <typename T, unsigned int G, unsigned int D, unsigned N = G + 1>
-class StaticNGradeBezier : StaticPolynomialSolver<T, G>, public StaticBernsteinMatrix<T, G>
+class NGradeBezier : PolynomialSolver<T, G>, public BernsteinMatrix<T, G>
 {
 private:
-    StaticNGradeBezierLengthErrorTolerance<T> m_LengthError;
+    NGradeBezierLengthErrorTolerance<T> m_LengthError;
 
 private:
     // typedefs
@@ -46,10 +46,10 @@ public:
     typedef BezierParamType BezierPointsType;
     typedef Result Roots;
 
-    static_assert(G <= 13, "13 Is max for StaticNGradeBezier");
+    static_assert(G <= 13, "13 Is max for NGradeBezier");
 
 public:
-    StaticNGradeBezier() : 
+    NGradeBezier() : 
         m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
         m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
     {
@@ -61,28 +61,28 @@ public:
         m_LengthDirty = true;
     }
 
-    StaticNGradeBezier(const StaticNGradeBezier& other) :
+    NGradeBezier(const NGradeBezier& other) :
         m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
         m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
     {
         copy(other, *this);
     }
 
-    StaticNGradeBezier(StaticNGradeBezier&& other) :
+    NGradeBezier(NGradeBezier&& other) :
         m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
         m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
     {
         move(std::move(other), *this);
     }
 
-    StaticNGradeBezier& operator=(const StaticNGradeBezier& other)
+    NGradeBezier& operator=(const NGradeBezier& other)
     {
         copy(other, *this);
 
         return *this;
     }
 
-    StaticNGradeBezier& operator=(StaticNGradeBezier&& other)
+    NGradeBezier& operator=(NGradeBezier&& other)
     {
         move(other, *this);
 
@@ -234,7 +234,7 @@ public:
             for(size_t j = 0; j < D; j++)
                 p(j) = m_Params(j, i);
 
-            p(D) = StaticIdentities.identityMult<T>();
+            p(D) = Identities.identityMult<T>();
 
             p = m * p;
 
@@ -252,7 +252,7 @@ public:
         return solve(m_DerivedParams[0].row(c));
     }
 
-    void splitAt(const float& a, StaticNGradeBezier& l, StaticNGradeBezier& r)
+    void splitAt(const float& a, NGradeBezier& l, NGradeBezier& r)
     {
         splitAtImpl(m_Params, a, l.m_Params, r.m_Params);
         
@@ -377,7 +377,7 @@ public:
         return a_at_length;
     }
 
-    void getSection(StaticNGradeBezier& b, const T& from, const T& to)
+    void getSection(NGradeBezier& b, const T& from, const T& to)
     {
         if(from < to)
             b.m_Params = sectionImpl(m_Params, from, to);
@@ -389,7 +389,7 @@ public:
     }
 
 private:
-    void copy(const StaticNGradeBezier& from, StaticNGradeBezier& to)
+    void copy(const NGradeBezier& from, NGradeBezier& to)
     {
         m_Params = from.m_Params;
         m_DerivedParams[0] = from.m_DerivedParams[0];
@@ -401,7 +401,7 @@ private:
         m_LengthDirty = from.m_LengthDirty;
 
     }
-    void swap(StaticNGradeBezier& from, StaticNGradeBezier& to)
+    void swap(NGradeBezier& from, NGradeBezier& to)
     {
         std::swap(from.m_Params, to.m_Params);
         std::swap(from.m_DerivedParams[0], to.m_DerivedParams[0]);
@@ -413,7 +413,7 @@ private:
         std::swap(from.m_LengthDirty, to.m_LengthDirty);
     }
 
-    void move(StaticNGradeBezier&& from, StaticNGradeBezier& to)
+    void move(NGradeBezier&& from, NGradeBezier& to)
     {
         m_Params = std::move(from.m_Params);
         m_DerivedParams[0] = std::move(from.m_DerivedParams[0]);
@@ -437,7 +437,7 @@ private:
     {
         ComponentValuesType a_vec;
 
-        T ca = StaticIdentities.identityMult<T>();
+        T ca = Identities.identityMult<T>();
 
         for(size_t i = 0; i < N - DEV; i++)
         {
@@ -453,7 +453,7 @@ private:
     {
         BezierPointType temp[G][G];
 
-        T a0 = StaticIdentities.identityMult<T>() - a;
+        T a0 = Identities.identityMult<T>() - a;
         T a1 = a;
 
         for(unsigned int i = 0; i < G; i++)
@@ -518,9 +518,9 @@ private:
     {
         BezierParamType l, r;
 
-        T len_a = StaticIdentities.identityAdd<T>();
-        T len_c = StaticIdentities.identityAdd<T>();
-        T s = StaticIdentities.identityMult<T>() / T(2);
+        T len_a = Identities.identityAdd<T>();
+        T len_c = Identities.identityAdd<T>();
+        T s = Identities.identityMult<T>() / T(2);
 
         for(unsigned int i = 0; i < N - 1; i++)
             len_a += (points.col(i + 1) - points.col(i)).norm();
@@ -609,20 +609,20 @@ private:
     const T m_LengthCacheStep;
 };
 
-typedef StaticNGradeBezier<float, 1, 2> Line2F;
-typedef StaticNGradeBezier<float, 2, 2> QBezier2F;
-typedef StaticNGradeBezier<float, 3, 2> CBezier2F;
+typedef NGradeBezier<float, 1, 2> Line2F;
+typedef NGradeBezier<float, 2, 2> QBezier2F;
+typedef NGradeBezier<float, 3, 2> CBezier2F;
 
-typedef StaticNGradeBezier<float, 1, 3> Line3F;
-typedef StaticNGradeBezier<float, 2, 3> QBezier3F;
-typedef StaticNGradeBezier<float, 3, 3> CBezier3F;
+typedef NGradeBezier<float, 1, 3> Line3F;
+typedef NGradeBezier<float, 2, 3> QBezier3F;
+typedef NGradeBezier<float, 3, 3> CBezier3F;
 
-typedef StaticNGradeBezier<double, 1, 2> Line2D;
-typedef StaticNGradeBezier<double, 2, 2> QBezier2D;
-typedef StaticNGradeBezier<double, 3, 2> CBezier2D;
+typedef NGradeBezier<double, 1, 2> Line2D;
+typedef NGradeBezier<double, 2, 2> QBezier2D;
+typedef NGradeBezier<double, 3, 2> CBezier2D;
 
-typedef StaticNGradeBezier<double, 1, 3> Line3D;
-typedef StaticNGradeBezier<double, 2, 3> QBezier3D;
-typedef StaticNGradeBezier<double, 3, 3> CBezier3D;
+typedef NGradeBezier<double, 1, 3> Line3D;
+typedef NGradeBezier<double, 2, 3> QBezier3D;
+typedef NGradeBezier<double, 3, 3> CBezier3D;
 
 #endif //_BASE_NGRADEBEZIER_H_

@@ -1,9 +1,9 @@
-#ifndef _BASE_STATICGROUPELEMENT_H_
-#define _BASE_STATICGROUPELEMENT_H_
+#ifndef _BASE_GROUPELEMENT_H_
+#define _BASE_GROUPELEMENT_H_
 
 #include "HalfEdge2D/Base/Vector.h"
 
-struct Identites
+struct IdentitiesTpl
 {
     // identityAdd
     template<typename S>
@@ -32,6 +32,6 @@ struct Identites
     template<> static Vec2f identityMult<Vec2f>() { return Vec2f(1.0f, 1.0f); }
 };
 
-static Identites StaticIdentities;
+static IdentitiesTpl Identities;
 
-#endif //_BASE_STATICGROUPELEMENT_H_
+#endif //_BASE_GROUPELEMENT_H_
