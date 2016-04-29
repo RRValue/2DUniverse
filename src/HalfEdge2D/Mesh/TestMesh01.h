@@ -3,7 +3,7 @@
 
 #include <vector>
 
-std::vector<float> testVertices01 = {0.309016994375f, 0.951056516295f,
+static std::vector<float> testVertices01 = {0.309016994375f, 0.951056516295f,
 -0.809016994375f, 0.587785252292f,
 -0.809016994375f, -0.587785252292f,
 0.309016994375f, -0.951056516295f,
@@ -21,7 +21,7 @@ std::vector<float> testVertices01 = {0.309016994375f, 0.951056516295f,
 0.154508497189f, 0.475528258147f
 };
 
-std::vector<size_t> testTriangles01 = {1, 11, 5,
+static std::vector<size_t> testTriangles01 = {1, 11, 5,
 2, 12, 6,
 3, 14, 7,
 4, 13, 8,

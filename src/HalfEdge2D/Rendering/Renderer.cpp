@@ -252,26 +252,26 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
             painter->setPen(Qt::NoPen);
             painter->fillPath(path, QBrush(paint_color));
         }
+    }
 
-        if(m_RenderTrianglesEdges)
+    if(m_RenderTrianglesEdges)
+    {
+        // paint traingles edges
+        for(const auto& face : faces)
         {
-            // paint traingles edges
-            for(const auto& face : faces)
-            {
-                Vec2f vp0 = vertices[face->getVertIdx(0)]->getPosition();
-                Vec2f vp1 = vertices[face->getVertIdx(1)]->getPosition();
-                Vec2f vp2 = vertices[face->getVertIdx(2)]->getPosition();
+            Vec2f vp0 = vertices[face->getVertIdx(0)]->getPosition();
+            Vec2f vp1 = vertices[face->getVertIdx(1)]->getPosition();
+            Vec2f vp2 = vertices[face->getVertIdx(2)]->getPosition();
 
-                QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
-                QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
-                QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
+            QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
+            QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
+            QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
 
-                painter->setPen(Qt::SolidLine);
-                painter->setPen(Qt::black);
-                painter->drawLine(p0, p1);
-                painter->drawLine(p1, p2);
-                painter->drawLine(p2, p0);
-            }
+            painter->setPen(Qt::SolidLine);
+            painter->setPen(Qt::black);
+            painter->drawLine(p0, p1);
+            painter->drawLine(p1, p2);
+            painter->drawLine(p2, p0);
         }
     }
 
