@@ -43,32 +43,37 @@ void ControllerSplineAt::init()
     m_MovePoint = false;
     m_CurrentPoint = nullptr;
 
+    Vec4f black(0.0f, 0.0f, 0.0f, 1.0f);
+    Vec4f red(0.0f, 1.0f, 0.0f, 1.0f);
+    Vec4f blue(0.0f, 0.0f, 1.0f, 1.0f);
+
     m_Spline = new Spline();
-    m_Spline->setColour(Vec4f(0.0f, 0.0f, 0.0f, 0.2f));
+    m_Spline->setColour(black);
+    m_Spline->setThickness(m_Spline->getThickness() / 2.0f);
     m_Spline->setVisible(false);
 
     m_Point = new Point();
-    m_Point->setColour(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+    m_Point->setColour(red);
     m_Point->setVisible(false);
 
     m_Tangent = new Line();
-    m_Tangent->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    m_Tangent->setColour(red);
     m_Tangent->setVisible(false);
 
     m_Normal = new Line();
-    m_Normal->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+    m_Normal->setColour(red);
     m_Normal->setVisible(false);
 
     m_PointN = new Point();
-    m_PointN->setColour(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+    m_PointN->setColour(blue);
     m_PointN->setVisible(false);
 
     m_TangentN = new Line();
-    m_TangentN->setColour(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    m_TangentN->setColour(blue);
     m_TangentN->setVisible(false);
 
     m_NormalN = new Line();
-    m_NormalN->setColour(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
+    m_NormalN->setColour(blue);
     m_NormalN->setVisible(false);
 
     // create option widget
