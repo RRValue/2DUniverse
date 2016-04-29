@@ -11,6 +11,7 @@
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
+#include "HalfEdge2D/HalfEdge/HESCutter.h"
 
 #include "HalfEdge2D/Mesh/TestMesh01.h"
 #include "HalfEdge2D/Mesh/TestMesh02.h"
@@ -26,16 +27,24 @@ ControllerCutMeshLine::ControllerCutMeshLine()
 ControllerCutMeshLine::~ControllerCutMeshLine()
 {
     delete m_Mesh;
+    delete m_CutMesh;
 
     for(const auto& p : m_Points)
         delete p;
 
     delete m_Line;
+
+    delete m_MeshCutter;
+    delete m_MeshBuilder;
 }
 
 void ControllerCutMeshLine::init()
 {
     m_Mesh = new HESMesh();
+    m_CutMesh = new HESMesh();
+
+    m_MeshCutter = new HESCutter(m_Mesh);
+    m_MeshBuilder = new HESBuilder(m_Mesh);
 
     m_MovePoint = false;
     m_CurrentPoint = nullptr;
@@ -47,6 +56,7 @@ void ControllerCutMeshLine::init()
     // add to scene
     m_Scene->addLine(m_Line);
     m_Scene->addMesh(m_Mesh);
+    m_Scene->addMesh(m_CutMesh);
 
     // init gui
     m_OptionWidget = new QWidget();
@@ -256,8 +266,7 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
     for(size_t i = 0; i < idx_array.size(); i += 3)
         m_Mesh->addFace({idx_array[i], idx_array[i + 1], idx_array[i + 2]});
 
-    HESBuilder builder(m_Mesh);
-    builder.build();
+    m_MeshBuilder->build();
 
     m_SceneChanges = true;
 
@@ -268,4 +277,8 @@ void ControllerCutMeshLine::cut()
 {
     if(m_Points.size() != 2)
         return;
+
+    bool cutted = m_MeshCutter->cutLine(m_CutMesh, m_Line);
+
+    m_CutMesh->setVisible(cutted);
 }
