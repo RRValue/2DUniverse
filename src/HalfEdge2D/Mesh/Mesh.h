@@ -17,6 +17,8 @@ public:
     virtual void clear();
 
     // getter
+    size_t getNumVertices() const;
+    size_t getNumFaces() const;
     const std::vector<Vertex*>& getVertices() const;
     const std::vector<Face*>& getFaces() const;
 

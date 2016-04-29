@@ -37,6 +37,16 @@ void Mesh::setVisible(const bool& visible)
     m_Visible = visible;
 }
 
+size_t Mesh::getNumVertices() const
+{
+    return m_Vertices.size();
+}
+
+size_t Mesh::getNumFaces() const
+{
+    return m_Faces.size();
+}
+
 const std::vector<Vertex*>& Mesh::getVertices() const
 {
     return m_Vertices;

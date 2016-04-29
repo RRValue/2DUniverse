@@ -25,6 +25,18 @@ void HESMesh::clear()
     Mesh::clear();
 }
 
+size_t HESMesh::getNumEdges() const
+{
+    return m_Edges.size();
+}
+
+HESEdge* HESMesh::getHESEdge(const size_t& idx) const
+{
+    assert(idx >= 0 && idx < m_Edges.size());
+
+    return m_Edges[idx];
+}
+
 HESVertex* HESMesh::getHESVertex(const size_t& idx) const
 {
     return dynamic_cast<HESVertex*>(getVertex(idx));

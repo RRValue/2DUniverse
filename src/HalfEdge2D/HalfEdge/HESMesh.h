@@ -16,6 +16,8 @@ public:
     virtual void clear();
 
     // getter
+    size_t getNumEdges() const;
+    HESEdge* getHESEdge(const size_t& idx) const;
     HESVertex* getHESVertex(const size_t& idx) const;
     HESFace* getHESFace(const size_t& idx) const;
     const bool& hasChanged() const;
