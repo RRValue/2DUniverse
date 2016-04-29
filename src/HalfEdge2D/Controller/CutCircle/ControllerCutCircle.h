@@ -38,7 +38,7 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private slots:
-    void onRadiusSliderMoved(int value);
+    void onRadiusSliderValueChanged(int value);
 
 private:
     Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;

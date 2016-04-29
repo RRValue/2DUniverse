@@ -391,7 +391,14 @@ private:
         }
 
         seg = i;
-        alpha = (l - l0) / (l1 - l0);
+
+        if(m_Closed && seg == m_Segments.size())
+        {
+            seg = 0;
+            alpha = T(0);
+        }
+        else
+            alpha = (l - l0) / (l1 - l0);
     }
     void update()
     {
@@ -443,15 +450,9 @@ private:
                 p2 = m_Segments[idx2].m_Bezier.getPoint(0);
 
                 if(idx1 == 0 && !m_Closed)
-                {
-                    pp0 = p1;
-                    pp1 = p2 - p1;
-                }
+                    pp0 = pp1 = p2 - p1;
                 else if(idx1 == num_seg - 1 && !m_Closed)
-                {
-                    pp0 = p1 - p0;
-                    pp1 = -p1;
-                }
+                    pp0 = pp1 = p1 - p0;
                 else
                 {
                     pp0 = p1 - p0;
@@ -479,6 +480,8 @@ private:
         for(auto& s : m_Segments)
             if(s.m_Active)
                 m_Length += s.m_Bezier.getLength();
+
+        m_LengthDirty = false;
     }
 
 private:

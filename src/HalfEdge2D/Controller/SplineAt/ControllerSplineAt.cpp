@@ -91,10 +91,10 @@ void ControllerSplineAt::init()
     setSliderB(0.0f);
     setSliderA(0.0f);
 
-    connect(m_CSlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
-    connect(m_TSlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
-    connect(m_BSlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
-    connect(m_ASlider, &QSlider::sliderMoved, this, &ControllerSplineAt::onSliderMoved);
+    connect(m_CSlider, &QSlider::valueChanged, this, &ControllerSplineAt::onSliderValueChanged);
+    connect(m_TSlider, &QSlider::valueChanged, this, &ControllerSplineAt::onSliderValueChanged);
+    connect(m_BSlider, &QSlider::valueChanged, this, &ControllerSplineAt::onSliderValueChanged);
+    connect(m_ASlider, &QSlider::valueChanged, this, &ControllerSplineAt::onSliderValueChanged);
     connect(m_ClosedCkb, &QCheckBox::stateChanged, this, &ControllerSplineAt::onClosedChanged);
 
     // add to scene
@@ -290,7 +290,7 @@ void ControllerSplineAt::updateData()
     m_Renderer->render();
 }
 
-void ControllerSplineAt::onSliderMoved(int value)
+void ControllerSplineAt::onSliderValueChanged(int value)
 {
     QObject* sendet_from = sender();
 
@@ -356,12 +356,14 @@ void ControllerSplineAt::setSliderA(const float& a)
     m_ASlider->blockSignals(false);
 }
 
+#include <qdebug.h>
+
 float ControllerSplineAt::sliderValueToValue(QSlider* const sld, const float& min, const float& max)
 {
     // slider properties
     float sld_min = (float)sld->minimum();
     float sld_max = (float)sld->maximum();
-    float range = sld_max - 1 - sld_min;
+    float range = sld_max - sld_min;
 
     // radius
     float r = (float)sld->value();

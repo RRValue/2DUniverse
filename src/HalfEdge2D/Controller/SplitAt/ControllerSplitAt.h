@@ -68,7 +68,7 @@ private slots:
     void setQBezVisible(const bool& visible);
     void setCBezVisible(const bool& visible);
 
-    void onSliderMoved(int value);
+    void onSliderValueChanged(int value);
     void onTypeChanged(int idx);
 
     void updateSplit();

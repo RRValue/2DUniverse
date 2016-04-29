@@ -49,7 +49,7 @@ private:
     int valueToSliderValue(const float& value, QSlider* const sld, const float& min, const float& max);
 
 private slots:
-    void onSliderMoved(int value);
+    void onSliderValueChanged(int value);
     void onClosedChanged(int state);
 
     void updateData();

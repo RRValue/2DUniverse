@@ -57,9 +57,9 @@ void ControllerSpline::init()
     setSliderT(0.0f);
     setSliderB(0.0f);
 
-    connect(m_CSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
-    connect(m_TSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
-    connect(m_BSlider, &QSlider::sliderMoved, this, &ControllerSpline::onSliderMoved);
+    connect(m_CSlider, &QSlider::valueChanged, this, &ControllerSpline::onSliderValueChanged);
+    connect(m_TSlider, &QSlider::valueChanged, this, &ControllerSpline::onSliderValueChanged);
+    connect(m_BSlider, &QSlider::valueChanged, this, &ControllerSpline::onSliderValueChanged);
     connect(m_ClosedCkb, &QCheckBox::stateChanged, this, &ControllerSpline::onClosedChanged);
 
     // add to scene
@@ -206,7 +206,7 @@ Point* const ControllerSpline::getPointAtPos(const Vec2f& pos, size_t* const idx
     return nullptr;
 }
 
-void ControllerSpline::onSliderMoved(int value)
+void ControllerSpline::onSliderValueChanged(int value)
 {
     QObject* sendet_from = sender();
 

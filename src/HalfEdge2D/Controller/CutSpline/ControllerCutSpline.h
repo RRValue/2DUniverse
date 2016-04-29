@@ -50,7 +50,7 @@ private:
     void cut();
 
 private slots:
-    void onSliderMoved(int value);
+    void onSliderValueChanged(int value);
     void onClosedChanged(int state);
 
 private:

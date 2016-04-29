@@ -47,7 +47,7 @@ private:
     float valueToSliderValue(const float& value, const int& sliderMin, const int& sliderMax, const float& min, const float& max);
 
 private slots:
-    void onSliderMoved(int value);
+    void onSliderValueChanged(int value);
     void onClosedChanged(int state);
 
 private:

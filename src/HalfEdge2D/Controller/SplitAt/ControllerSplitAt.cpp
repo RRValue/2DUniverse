@@ -85,7 +85,7 @@ void ControllerSplitAt::init()
 
     onTypeChanged(0);
     
-    connect(m_SplitSlider, &QSlider::sliderMoved, this, &ControllerSplitAt::onSliderMoved);
+    connect(m_SplitSlider, &QSlider::valueChanged, this, &ControllerSplitAt::onSliderValueChanged);
     connect(m_TypeCbb, SIGNAL(activated(int)), this, SLOT(onTypeChanged(int)));
 
     // add to scene
@@ -534,7 +534,7 @@ void ControllerSplitAt::updateSplit()
     }
 }
 
-void ControllerSplitAt::onSliderMoved(int value)
+void ControllerSplitAt::onSliderValueChanged(int value)
 {
     QObject* sendet_from = sender();
 

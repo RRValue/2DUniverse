@@ -67,9 +67,9 @@ void ControllerCutSpline::init()
     setSliderT(0.0f);
     setSliderB(0.0f);
 
-    connect(m_CSlider, &QSlider::sliderMoved, this, &ControllerCutSpline::onSliderMoved);
-    connect(m_TSlider, &QSlider::sliderMoved, this, &ControllerCutSpline::onSliderMoved);
-    connect(m_BSlider, &QSlider::sliderMoved, this, &ControllerCutSpline::onSliderMoved);
+    connect(m_CSlider, &QSlider::valueChanged, this, &ControllerCutSpline::onSliderValueChanged);
+    connect(m_TSlider, &QSlider::valueChanged, this, &ControllerCutSpline::onSliderValueChanged);
+    connect(m_BSlider, &QSlider::valueChanged, this, &ControllerCutSpline::onSliderValueChanged);
     connect(m_ClosedCkb, &QCheckBox::stateChanged, this, &ControllerCutSpline::onClosedChanged);
 
     // add to scene
@@ -244,7 +244,7 @@ Point* const ControllerCutSpline::getPointAtPos(const Vec2f& pos, size_t* const 
     return nullptr;
 }
 
-void ControllerCutSpline::onSliderMoved(int value)
+void ControllerCutSpline::onSliderValueChanged(int value)
 {
     QObject* sendet_from = sender();
 

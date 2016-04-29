@@ -60,7 +60,7 @@ void ControllerCutCircle::init()
 
     setSliderRadius(m_Circle->getRadius());
 
-    connect(m_RadiusSlider, &QSlider::sliderMoved, this, &ControllerCutCircle::onRadiusSliderMoved);
+    connect(m_RadiusSlider, &QSlider::valueChanged, this, &ControllerCutCircle::onRadiusSliderValueChanged);
 
     // add to scene
     m_Scene->addLine(m_Line);
@@ -257,7 +257,7 @@ void ControllerCutCircle::cut()
     }
 }
 
-void ControllerCutCircle::onRadiusSliderMoved(int value)
+void ControllerCutCircle::onRadiusSliderValueChanged(int value)
 {
     // set to circle
     m_Circle->setRadius(sliderValueToRadius(value));
