@@ -7,12 +7,42 @@
 
 Mesh::Mesh()
 {
-    m_Visible = true;
+
+}
+
+Mesh::Mesh(const Mesh& other) : Renderable(other)
+{
+    copy(other);
 }
 
 Mesh::~Mesh()
 {
     clear();
+}
+
+Mesh& Mesh::operator=(const Mesh& other)
+{
+    clear();
+    copy(other);
+
+    return *this;
+}
+
+void Mesh::copy(const Mesh& other)
+{
+    // copy vertices
+    size_t num_v = other.m_Vertices.size();
+    m_Vertices = std::vector<Vertex*>(num_v);
+
+    for(size_t i = 0; i < num_v; i++)
+        m_Vertices[i] = new Vertex(*m_Vertices[i]);
+
+    // copy faces
+    size_t num_f = other.m_Faces.size();
+    m_Faces = std::vector<Face*>(num_f);
+
+    for(size_t i = 0; i < num_f; i++)
+        m_Faces[i] = new Face(*m_Faces[i]);
 }
 
 void Mesh::clear()
@@ -25,16 +55,6 @@ void Mesh::clear()
 
     m_Vertices.clear();
     m_Faces.clear();
-}
-
-const bool& Mesh::isVisible() const
-{
-    return m_Visible;
-}
-
-void Mesh::setVisible(const bool& visible)
-{
-    m_Visible = visible;
 }
 
 size_t Mesh::getNumVertices() const
@@ -86,6 +106,16 @@ void Mesh::addVertex()
     m_Vertices.push_back(allocateVertex());
 }
 
+void Mesh::addVertex(const Vertex& vertex)
+{
+    Vertex* new_vertex = allocateVertex();
+    new_vertex->setPosition(vertex.getPosition());
+    new_vertex->setNormal(vertex.getNormal());
+    new_vertex->setColour(vertex.getColour());
+
+    m_Vertices.push_back(new_vertex);
+}
+
 void Mesh::addVertex(const Vec2f& pos)
 {
     Vertex* new_vertex = allocateVertex();
@@ -103,6 +133,16 @@ void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
     m_Vertices.push_back(new_vertex);
 }
 
+void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal, const Vec4f& color)
+{
+    Vertex* new_vertex = allocateVertex();
+    new_vertex->setPosition(pos);
+    new_vertex->setNormal(normal);
+    new_vertex->setColour(color);
+
+    m_Vertices.push_back(new_vertex);
+}
+
 void Mesh::removeVertex(const size_t& idx)
 {
     assert(idx >= 0 && idx < m_Vertices.size());
@@ -112,6 +152,15 @@ void Mesh::removeVertex(const size_t& idx)
     delete *iter;
 
     m_Vertices.erase(iter);
+}
+
+void Mesh::addFace(const Face& f)
+{
+    Face* new_face = allocateFace();
+    new_face->addVertIdx(f.getVertIds());
+    new_face->setColour(f.getColour());
+
+    m_Faces.push_back(new_face);
 }
 
 void Mesh::addFace(const size_t& idx0, const size_t& idx1, const size_t& idx2)

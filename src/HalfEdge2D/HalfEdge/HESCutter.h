@@ -21,6 +21,7 @@ public:
     bool cutLine(HESMesh* const outMesh, Line* const line);
 
 private:
+    void prepareTargetMesh();
     void clearCutPoints();
 
 private:

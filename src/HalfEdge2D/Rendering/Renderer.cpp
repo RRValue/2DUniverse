@@ -239,7 +239,7 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
             QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
 
             // fill triangle
-            const Vec4f& tris_color = face->getColor();
+            const Vec4f& tris_color = face->getColour();
             paint_color = QColor::fromRgbF(tris_color[0], tris_color[1], tris_color[2], tris_color[3]);
 
             QPainterPath path;
@@ -282,7 +282,7 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
         {
             QPointF vert_pos(vert->getPosition().x(), vert->getPosition().y());
 
-            const Vec4f& vert_color = vert->getColor();
+            const Vec4f& vert_color = vert->getColour();
             paint_color = QColor::fromRgbF(vert_color[0], vert_color[1], vert_color[2], vert_color[3]);
 
             painter->setPen(Qt::NoPen);

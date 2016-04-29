@@ -50,8 +50,7 @@ bool HESCutter::cutLine(HESMesh* const outMesh, Line* const line)
     clearCutPoints();
 
     // prepare target mesh
-    /// copy everthing to from source to target mesh
-    /// find borders and assign null edges
+    prepareTargetMesh();
     
     // find cuts in border of mesh
     /// if we have no cutts -> the line cutts no parts of the mesh
@@ -59,4 +58,13 @@ bool HESCutter::cutLine(HESMesh* const outMesh, Line* const line)
     /// otherwise we have a cut
 
     return false;
+}
+
+void HESCutter::prepareTargetMesh()
+{
+    // copy everthing to from source to target mesh
+    *m_TargetMesh = *m_SourceMesh;
+
+    // find borders and assign null edges
+    /// to do
 }

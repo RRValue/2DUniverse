@@ -1,9 +1,13 @@
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 
+#include "HalfEdge2D/Renderables/Renderable.h"
+
 #include "HalfEdge2D/Mesh/Vertex.h"
+
 #include "HalfEdge2D/HalfEdge/HESVertex.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
+#include "HalfEdge2D/HalfEdge/HESBuilder.h"
 
 HESMesh::HESMesh()
 {
@@ -65,4 +69,19 @@ Vertex* HESMesh::allocateVertex()
 Face* HESMesh::allocateFace()
 {
     return new HESFace();
+}
+
+HESMesh& HESMesh::operator=(const HESMesh& other)
+{
+    clear();
+
+    for(const auto& v : other.m_Vertices)
+        addVertex(*v);
+
+    for(const auto& f : other.m_Faces)
+        addFace(*f);
+
+    HESBuilder(this).build();
+
+    return *this;
 }

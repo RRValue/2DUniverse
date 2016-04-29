@@ -13,6 +13,8 @@ public:
     HESMesh();
     virtual ~HESMesh();
 
+    HESMesh& operator=(const HESMesh& other);
+
     virtual void clear();
 
     // getter

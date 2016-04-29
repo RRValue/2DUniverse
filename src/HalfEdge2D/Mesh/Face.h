@@ -9,6 +9,7 @@ class Face
 {
 public:
     Face();
+    Face(const Face& other);
     virtual ~Face();
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -16,16 +17,17 @@ public:
     size_t getNumVert() const;
     const std::vector<size_t>& getVertIds() const;
     const size_t& getVertIdx(const size_t& idx) const;
-    const Vec4f& getColor() const;
+    const Vec4f& getColour() const;
 
     // setter
     void addVertIdx(const size_t& idxVert);
+    void addVertIdx(const std::vector<size_t>& idxs);
     void addVertIdx(const std::initializer_list<size_t>& idxs);
     void setVertIdx(const size_t& idx, const size_t& idxVert);
-    void setColor(const Vec4f& color);
+    void setColour(const Vec4f& color);
 
 private:
-    Vec4f m_Color;
+    Vec4f m_Colour;
     std::vector<size_t> m_idx;
 };
 

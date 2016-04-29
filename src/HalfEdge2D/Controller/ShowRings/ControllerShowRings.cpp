@@ -139,7 +139,7 @@ bool ControllerShowRings::handleMouseMoveEvent(QMouseEvent* const event)
 void ControllerShowRings::unsetLastFaces()
 {
     for(const auto& last_colour : m_LastColourVector)
-        last_colour.m_Face->setColor(last_colour.m_Colour);
+        last_colour.m_Face->setColour(last_colour.m_Colour);
 }
 
 void ControllerShowRings::colourRingFaces(const RingFacesVector& rings)
@@ -168,13 +168,13 @@ void ControllerShowRings::colourRingFaces(const RingFacesVector& rings)
     {
         for(const auto& face : ring)
         {
-            m_LastColourVector.push_back({face, face->getColor()});
+            m_LastColourVector.push_back({face, face->getColour()});
             
             r = 1.0f - b_value[idx];
             g = r_value[idx] + (1.0f - b_value[idx]);
             b = r_value[idx];
 
-            face->setColor(Vec4f(r, g, b, 1.0f));
+            face->setColour(Vec4f(r, g, b, 1.0f));
         }
 
         idx++;
@@ -313,15 +313,15 @@ void ControllerShowRings::updateIdTarget()
     if(m_Faces.empty())
         return;
 
-    Vec4f prev_triangle_color = m_Faces[0]->getColor();
+    Vec4f prev_triangle_color = m_Faces[0]->getColour();
 
     for(size_t i = 0; i < m_Faces.size(); i++)
-        m_Faces[i]->setColor(idToColour(i));
+        m_Faces[i]->setColour(idToColour(i));
 
     m_IdRenderer->render(m_IdTarget);
 
     for(size_t i = 0; i < m_Faces.size(); i++)
-        m_Faces[i]->setColor(prev_triangle_color);
+        m_Faces[i]->setColour(prev_triangle_color);
 }
 
 Vec4f ControllerShowRings::idToColour(const unsigned int& id)
