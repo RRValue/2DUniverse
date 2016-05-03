@@ -134,87 +134,119 @@ void HESCheck::splitPartsConnectedInOneVertex()
 void HESCheck::splitParts()
 {
     // find boundary circles
-    std::vector<std::vector<HESEdge*>> boundaries;
+    std::vector<HESEdgeConstVector> boundaries;
 
-    HESEdge* e_start;
     HESEdge* e;
-    bool loop_closed;
-    bool error_find_loop = false;
-    bool found_next_edge;
+    bool error = false;
     size_t num_edges = m_ProcessingMesh->getNumEdges();
     
+    // iterate over all edges
     for(size_t i = 0; i < num_edges; i++)
     {
         e = m_ProcessingMesh->getHESEdge(i);
 
+        // if visited -> continue
         if(e->visited())
             continue;
 
-        if(e->opposite() == nullptr)
+        // if edge has opposit (edge is no border) -> continue
+        if(e->opposite() != nullptr)
+            continue;
+
+        // find boundary (edges with same border) with boundary edge
+        HESEdgeConstVector edge_loop = findBoundary(e);
+
+        // if edge loop is empty -> some error must have occured, mesh is dirty -> break
+        if(edge_loop.empty())
         {
-            std::vector<HESEdge*> boundary;
+            error = true;
 
-            boundary.push_back(e);
-            e->setVisited(true);
-
-            e_start = e;
-            loop_closed = false;
-
-            while(!loop_closed)
-            {
-                found_next_edge = false;
-
-                for(const auto& e_out : e->to()->getEdges())
-                {
-                    if(e_out == e_start)
-                        loop_closed = true;
-
-                    if(loop_closed)
-                        break;
-
-                    if(e_out == e)
-                        continue;
-
-                    e_out->setVisited(true);
-
-                    if(e_out->opposite() != nullptr)
-                        continue;
-
-                    e = e_out;
-                    found_next_edge = true;
-
-                    break;
-                }
-
-                if(loop_closed)
-                    break;
-
-                if(!found_next_edge)
-                    break;
-
-                boundary.push_back(e);
-            }
-
-            if(loop_closed)
-            {
-                boundaries.push_back(boundary);
-                boundary.clear();
-
-                continue;
-            }
-
-            if(!found_next_edge)
-                error_find_loop = true;
-        }
-
-        if(error_find_loop)
             break;
+        }
+        
+        // add boundary to boundary list
+        boundaries.push_back(edge_loop);
     }
 
-    if(error_find_loop)
+    // if error occured -> clear boundary list
+    if(error)
         boundaries.clear();
 
-    // reset visited
+    // reset visited stated in all edges
     for(size_t i = 0; i < num_edges; i++)
         m_ProcessingMesh->getHESEdge(i)->setVisited(false);
+}
+
+HESCheck::HESEdgeConstVector HESCheck::findBoundary(HESEdge* const edge)
+{
+    // if edge has a opposite, it is no boundary edge -> return nothing
+    if(edge->opposite() != nullptr)
+        return HESEdgeConstVector();
+
+    // set edge to process
+    HESEdge* e = edge;
+    HESEdgeConstVector boundary;
+
+    // add edge to boundary and set visited
+    boundary.push_back(e);
+    e->setVisited(true);
+
+    // set start edge, need to be compared while looping through
+    HESEdge* const e_start = e;
+    bool loop_closed = false;
+    bool found_next_edge = false;
+
+    // while loop is not closed (found e_start)
+    while(!loop_closed)
+    {
+        found_next_edge = false;
+
+        // iterate over all outgoing edges of the to vertex of the current edge
+        for(const auto& e_out : e->to()->getEdges())
+        {
+            // if we found the starting edge -> loop is closed, nothing to process anymore
+            if(e_out == e_start)
+            {
+                loop_closed = true;
+
+                break;
+            }
+
+            // if current outgoing edge of vertex was visited -> continue
+            if(e_out->visited())
+                continue;
+
+            // set current outgoing edge visited
+            e_out->setVisited(true);
+
+            // if current outgoing edge is no border edge (opposite is not null) -> continue
+            if(e_out->opposite() != nullptr)
+                continue;
+
+            // we found the next border edge
+            /// set current edge to e and remind us that we found the next border edge -> break
+            e = e_out;
+            found_next_edge = true;
+
+            break;
+        }
+
+        // if lopp is closed -> nothing to process here -> break
+        if(loop_closed)
+            break;
+
+        // if we did not found a next edge -> mesh is dirty -> break
+        if(!found_next_edge)
+            break;
+
+        // add current e to boundary
+        boundary.push_back(e);
+    }
+
+    // if did not we found a boundary -> return nothing
+    if(!loop_closed)
+        return HESEdgeConstVector();
+
+    // return boundary
+    return boundary;
 }
