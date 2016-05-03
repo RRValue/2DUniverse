@@ -28,6 +28,7 @@ void HESCheck::run()
         splitPartsConnectedInOneVertex();
 
     // check for unconnected parts
+    splitParts();
 }
 
 void HESCheck::checkHasPartsConnectedInOneVertex()
@@ -111,6 +112,10 @@ void HESCheck::splitPartsConnectedInOneVertex()
             curr_edge->setFrom(new_vertex);
             prev_edge->setTo(new_vertex);
 
+            new_vertex->addEdge(curr_edge);
+
+            from_vert->removeEdge(curr_edge);
+
             // create new vertex idx list for face
             for(const auto& idx : face_vert_idxs)
             {
@@ -124,4 +129,92 @@ void HESCheck::splitPartsConnectedInOneVertex()
             face->setVertIdx(new_face_vert_idxs);
         }
     }
+}
+
+void HESCheck::splitParts()
+{
+    // find boundary circles
+    std::vector<std::vector<HESEdge*>> boundaries;
+
+    HESEdge* e_start;
+    HESEdge* e;
+    bool loop_closed;
+    bool error_find_loop = false;
+    bool found_next_edge;
+    size_t num_edges = m_ProcessingMesh->getNumEdges();
+    
+    for(size_t i = 0; i < num_edges; i++)
+    {
+        e = m_ProcessingMesh->getHESEdge(i);
+
+        if(e->visited())
+            continue;
+
+        if(e->opposite() == nullptr)
+        {
+            std::vector<HESEdge*> boundary;
+
+            boundary.push_back(e);
+            e->setVisited(true);
+
+            e_start = e;
+            loop_closed = false;
+
+            while(!loop_closed)
+            {
+                found_next_edge = false;
+
+                for(const auto& e_out : e->to()->getEdges())
+                {
+                    if(e_out == e_start)
+                        loop_closed = true;
+
+                    if(loop_closed)
+                        break;
+
+                    if(e_out == e)
+                        continue;
+
+                    e_out->setVisited(true);
+
+                    if(e_out->opposite() != nullptr)
+                        continue;
+
+                    e = e_out;
+                    found_next_edge = true;
+
+                    break;
+                }
+
+                if(loop_closed)
+                    break;
+
+                if(!found_next_edge)
+                    break;
+
+                boundary.push_back(e);
+            }
+
+            if(loop_closed)
+            {
+                boundaries.push_back(boundary);
+                boundary.clear();
+
+                continue;
+            }
+
+            if(!found_next_edge)
+                error_find_loop = true;
+        }
+
+        if(error_find_loop)
+            break;
+    }
+
+    if(error_find_loop)
+        boundaries.clear();
+
+    // reset visited
+    for(size_t i = 0; i < num_edges; i++)
+        m_ProcessingMesh->getHESEdge(i)->setVisited(false);
 }

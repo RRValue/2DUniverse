@@ -24,6 +24,8 @@ private:
     void checkHasPartsConnectedInOneVertex();
     void splitPartsConnectedInOneVertex();
 
+    void splitParts();
+
 private:
     HESMesh* const m_SourceMesh;
     HESMesh* m_ProcessingMesh;

@@ -11,8 +11,7 @@ static std::vector<float> testVertices05 =
      0.68f,  0.83f,
      0.79f,  0.53f,
      0.40f,  0.26f,
-     0.65f,  0.25f,
-     0.49f,  0.55f,
+     0.65f,  0.25f
 };
 
 static std::vector<size_t> testTriangles05 = 
