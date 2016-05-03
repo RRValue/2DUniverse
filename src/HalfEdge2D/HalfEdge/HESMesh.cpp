@@ -14,6 +14,11 @@ HESMesh::HESMesh()
     m_Changed = false;
 }
 
+HESMesh::HESMesh(const HESMesh& other)
+{
+    *this = other;
+}
+
 HESMesh::~HESMesh()
 {
 
@@ -74,6 +79,8 @@ Face* HESMesh::allocateFace()
 HESMesh& HESMesh::operator=(const HESMesh& other)
 {
     clear();
+
+    m_Changed = other.m_Changed;
 
     for(const auto& v : other.m_Vertices)
         addVertex(*v);

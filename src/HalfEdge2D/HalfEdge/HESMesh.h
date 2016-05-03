@@ -11,6 +11,7 @@ class HESMesh : public Mesh
 {
 public:
     HESMesh();
+    HESMesh(const HESMesh& other);
     virtual ~HESMesh();
 
     HESMesh& operator=(const HESMesh& other);

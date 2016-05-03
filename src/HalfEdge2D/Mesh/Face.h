@@ -24,6 +24,7 @@ public:
     void addVertIdx(const std::vector<size_t>& idxs);
     void addVertIdx(const std::initializer_list<size_t>& idxs);
     void setVertIdx(const size_t& idx, const size_t& idxVert);
+    void setVertIdx(const std::vector<size_t>& idxs);
     void setColour(const Vec4f& color);
 
 private:

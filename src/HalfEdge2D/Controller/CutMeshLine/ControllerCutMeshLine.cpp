@@ -12,11 +12,13 @@
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
 #include "HalfEdge2D/HalfEdge/HESCutter.h"
+#include "HalfEdge2D/HalfEdge/HESCheck.h"
 
 #include "HalfEdge2D/Mesh/TestMesh01.h"
 #include "HalfEdge2D/Mesh/TestMesh02.h"
 #include "HalfEdge2D/Mesh/TestMesh03.h"
 #include "HalfEdge2D/Mesh/TestMesh04.h"
+#include "HalfEdge2D/Mesh/TestMesh05.h"
 
 #include <QtGui/QMouseEvent>
 
@@ -66,7 +68,7 @@ void ControllerCutMeshLine::init()
     ui_options.setupUi(m_OptionWidget);
 
     m_CbMeshSelector = ui_options.m_CbMeshSelector;
-    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Parts" << "Clear");
+    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Parts" << "Parts2" << "Clear");
 
     connect(m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
 
@@ -233,7 +235,7 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
 {
     m_Mesh->clear();
 
-    if(value < 0 || value >= 4)
+    if(value < 0 || value >= 5)
     {
         m_Renderer->render();
 
@@ -267,6 +269,12 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
         idx_array = testTriangles04;
     }
 
+    if(value == 4)
+    {
+        float_array = testVertices05;
+        idx_array = testTriangles05;
+    }
+
     for(size_t i = 0; i < float_array.size(); i += 2)
         m_Mesh->addVertex(Vec2f(float_array[i], float_array[i + 1]));
 
@@ -288,6 +296,8 @@ void ControllerCutMeshLine::cut()
     // remove cut points
     for(const auto& p : m_MeshCutter->getCutPoints())
         m_Scene->removePoint(p);
+
+    HESCheck bla(m_Mesh);
 
     bool cutted = m_MeshCutter->cutLine(m_CutMesh, m_Line);
 

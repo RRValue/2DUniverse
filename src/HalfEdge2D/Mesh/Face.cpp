@@ -57,6 +57,11 @@ void Face::setVertIdx(const size_t& idx, const size_t& idxVert)
     m_idx[idx] = idxVert;
 }
 
+void Face::setVertIdx(const std::vector<size_t>& idxs)
+{
+    m_idx = idxs;
+}
+
 void Face::setColour(const Vec4f& color)
 {
     m_Colour = color;

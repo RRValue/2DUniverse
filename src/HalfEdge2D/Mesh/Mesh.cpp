@@ -35,14 +35,14 @@ void Mesh::copy(const Mesh& other)
     m_Vertices = std::vector<Vertex*>(num_v);
 
     for(size_t i = 0; i < num_v; i++)
-        m_Vertices[i] = new Vertex(*m_Vertices[i]);
+        m_Vertices[i] = new Vertex(*other.m_Vertices[i]);
 
     // copy faces
     size_t num_f = other.m_Faces.size();
     m_Faces = std::vector<Face*>(num_f);
 
     for(size_t i = 0; i < num_f; i++)
-        m_Faces[i] = new Face(*m_Faces[i]);
+        m_Faces[i] = new Face(*other.m_Faces[i]);
 }
 
 void Mesh::clear()
