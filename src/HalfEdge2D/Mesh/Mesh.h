@@ -42,6 +42,7 @@ public:
     void addFace(const Face& f);
     void addFace(const size_t& idx0, const size_t& idx1, const size_t& idx2);
     void addFace(const std::initializer_list<size_t>& idxs);
+    void addFace(const std::vector<size_t>& idxs);
     void removeFace(const size_t& idx);
 
 protected:

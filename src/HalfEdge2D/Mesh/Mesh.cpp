@@ -179,6 +179,14 @@ void Mesh::addFace(const std::initializer_list<size_t>& idxs)
     m_Faces.push_back(new_face);
 }
 
+void Mesh::addFace(const std::vector<size_t>& idxs)
+{
+    Face* new_face = allocateFace();
+    new_face->addVertIdx(idxs);
+
+    m_Faces.push_back(new_face);
+}
+
 void Mesh::removeFace(const size_t& idx)
 {
     assert(idx >= 0 && idx < m_Faces.size());

@@ -1,5 +1,7 @@
 #include "HalfEdge2D/HalfEdge/HESCheck.h"
 
+#include "HalfEdge2D/HalfEdge/HESBuilder.h"
+
 #include "HalfEdge2D/HalfEdge/HESVertex.h"
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
@@ -12,11 +14,12 @@ HESCheck::HESCheck(HESMesh* const mesh) : m_SourceMesh(mesh)
     m_Error = E_HESCE_OK;
     
     run();
+    clear();
 }
 
 HESCheck::~HESCheck()
 {
-    delete m_ProcessingMesh;
+
 }
 
 void HESCheck::run()
@@ -44,6 +47,9 @@ void HESCheck::run()
     if(m_Boundaries.size() > 1)
         m_HasParts = true;
 
+    if(!m_HasParts)
+        return;
+
     findParts();
 
     for(const auto& p : m_MeshParts)
@@ -54,10 +60,29 @@ void HESCheck::run()
             break;
         }
 
+    if(m_MeshParts.size() == 1)
+        m_HasParts = false;
+
     if(m_Error != E_HESCE_OK)
         return;
 
     createMeshesFromParts();
+}
+
+void HESCheck::clear()
+{
+    m_PartsConnectingVertices.clear();
+    m_Boundaries.clear();
+    m_MeshParts.clear();
+
+    if(m_Meshes.size() == 1)
+    {
+        delete m_Meshes[0];
+
+        m_Meshes.clear();
+    }
+
+    delete m_ProcessingMesh;
 }
 
 void HESCheck::hasPartsConnectedInOneVertex()
@@ -207,8 +232,6 @@ void HESCheck::findBoundaries()
         for(const auto& b : m_Boundaries)
             delete b.first;
 
-        m_Boundaries.clear();
-
         m_Error = E_HESCE_BOUNDARYSEARCH;
     }
 
@@ -311,8 +334,6 @@ void HESCheck::findParts()
     HESFaceVector visited_faces;
     HESFaceDeque next_to_visit;
 
-    m_MeshParts.clear();
-
     for(const auto& b : m_Boundaries)
     {
         HESEdge* start_edge = *b.second.begin();
@@ -388,13 +409,66 @@ void HESCheck::findParts()
         }
 
         delete b.first;
-    }
+    };
 
+    // set error if we had not found a single mesh part
     if(m_MeshParts.empty())
         m_Error = E_HESCE_SPLIT;
 }
 
 void HESCheck::createMeshesFromParts()
 {
+    size_t num_vertices = m_ProcessingMesh->getNumVertices();
+    ReIndexVector reindex_vector(num_vertices);
 
+    for(size_t i = 0; i < num_vertices; i++)
+        reindex_vector[i] = ReIndexVertex(m_ProcessingMesh->getHESVertex(i));
+
+    // crate meshes
+    for(const auto& p : m_MeshParts)
+        m_Meshes.push_back(new HESMesh());
+
+    // init add reindex map
+    for(size_t i = 0; i < m_MeshParts.size(); i++)
+    {
+        for(const auto& f : m_MeshParts[i].m_Faces)
+            for(const auto& idx : f->getVertIds())
+            {
+                reindex_vector[idx].m_Add = true;
+                reindex_vector[idx].m_Part = i;
+            }
+    }
+
+    // add vertices and set reindex
+    HESMesh* current_mesh;
+    for(auto& r : reindex_vector)
+        if(r.m_Add)
+        {
+            current_mesh = m_Meshes[r.m_Part];
+
+            r.m_Index = current_mesh->getNumVertices();
+
+            current_mesh->addVertex(*r.m_Vertex);
+        }
+
+    // add faces
+    for(size_t i = 0; i < m_MeshParts.size(); i++)
+    {
+        current_mesh = m_Meshes[i];
+
+        for(const auto& f : m_MeshParts[i].m_Faces)
+        {
+            std::vector<size_t> new_idxs;
+            const std::vector<size_t>& idxs = f->getVertIds();
+
+            for(size_t j = 0; j < idxs.size(); j++)
+                new_idxs.push_back(reindex_vector[idxs[j]].m_Index);
+
+            current_mesh->addFace(new_idxs);
+        }
+    }
+
+    // build meshes
+    for(const auto& m : m_Meshes)
+        HESBuilder(m).build();
 }

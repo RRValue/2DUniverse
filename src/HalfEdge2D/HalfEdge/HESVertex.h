@@ -11,6 +11,7 @@ class HESVertex : public Vertex
 {
 public:
     HESVertex();
+    HESVertex(const HESVertex& other);
     virtual ~HESVertex();
 
     // getter

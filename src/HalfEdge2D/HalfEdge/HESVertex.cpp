@@ -5,6 +5,11 @@ HESVertex::HESVertex()
     m_Visited = false;
 }
 
+HESVertex::HESVertex(const HESVertex& other) : Vertex(other), m_Visited(other.m_Visited)
+{
+
+}
+
 HESVertex::~HESVertex()
 {
 
