@@ -19,6 +19,7 @@
 #include "HalfEdge2D/Mesh/TestMesh03.h"
 #include "HalfEdge2D/Mesh/TestMesh04.h"
 #include "HalfEdge2D/Mesh/TestMesh05.h"
+#include "HalfEdge2D/Mesh/TestMesh06.h"
 
 #include <QtGui/QMouseEvent>
 
@@ -68,7 +69,7 @@ void ControllerCutMeshLine::init()
     ui_options.setupUi(m_OptionWidget);
 
     m_CbMeshSelector = ui_options.m_CbMeshSelector;
-    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Parts" << "Parts2" << "Clear");
+    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Parts" << "Parts2" << "Hole" << "Clear");
 
     connect(m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
 
@@ -235,7 +236,7 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
 {
     m_Mesh->clear();
 
-    if(value < 0 || value >= 5)
+    if(value < 0 || value >= 6)
     {
         m_Renderer->render();
 
@@ -273,6 +274,12 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
     {
         float_array = testVertices05;
         idx_array = testTriangles05;
+    }
+
+    if(value == 5)
+    {
+        float_array = testVertices06;
+        idx_array = testTriangles06;
     }
 
     for(size_t i = 0; i < float_array.size(); i += 2)

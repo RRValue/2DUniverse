@@ -133,15 +133,28 @@ void HESCheck::splitPartsConnectedInOneVertex()
 
 void HESCheck::splitParts()
 {
-    // find boundary circles
-    std::vector<HESEdgeConstVector> boundaries;
+    // find boundaries
+    findBoundary();
 
+    if(m_Boundaries.empty()) // -> some error must have occured -> return
+        return;
+
+    findParts();
+
+    if(m_MeshParts.empty()) // -> some error must ahve occured -> return
+        return;
+
+    return;
+}
+
+void HESCheck::findBoundary()
+{
     HESEdge* e;
     bool error = false;
     size_t num_edges = m_ProcessingMesh->getNumEdges();
 
     HESEdgeConstVector visited_edges;
-    
+
     // iterate over all edges
     for(size_t i = 0; i < num_edges; i++)
     {
@@ -176,14 +189,19 @@ void HESCheck::splitParts()
 
             break;
         }
-        
+
         // add boundary to boundary list
-        boundaries.push_back(edge_loop);
+        m_Boundaries.insert(std::make_pair(new HESFace, edge_loop));
     }
 
     // if error occured -> clear boundary list
     if(error)
-        boundaries.clear();
+    {
+        for(const auto& b : m_Boundaries)
+            delete b.first;
+
+        m_Boundaries.clear();
+    }
 
     // reset visited stated in visited edges
     for(const auto& e_visited : visited_edges)
@@ -254,4 +272,112 @@ HESCheck::HESEdgeConstVector HESCheck::walkBoundary(HESEdge* const edge)
 
     // return boundary
     return boundary;
+}
+
+void HESCheck::findParts()
+{
+    // assign boundary edges to faces
+    for(const auto& b : m_Boundaries)
+    {
+        for(const auto& e : b.second)
+        {
+            HESEdge* e_opp = new HESEdge();
+
+            e_opp->setFrom(e->to());
+            e_opp->setTo(e->from());
+
+            e->setOpposite(e_opp);
+            e_opp->setOpposite(e);
+
+            b.first->addEdge(e_opp);
+
+            e_opp->setFace(b.first);
+
+            // mark e_opp as visited aka is boundary
+            e_opp->setVisited(true);
+        }
+    }
+
+    // walk faces and check if we found another boundary (check for mesh with hole)
+    HESFaceVector visited_faces;
+    HESFaceDeque next_to_visit;
+
+    m_MeshParts.clear();
+
+    for(const auto& b : m_Boundaries)
+    {
+        HESEdge* start_edge = *b.second.begin();
+        HESEdge* boundary_edge = start_edge->opposite();
+
+        HESFace* boundary_face = boundary_edge->face();
+
+        if(boundary_face->visited())
+            continue;
+
+        m_MeshParts.push_back(MeshPart());
+        MeshPart& mesh_part = m_MeshParts.back();
+
+        HESEdge* edge_opp;
+        HESFace* face_opp;
+        HESFace* curr_face = start_edge->face();
+
+        // set boundary face to visited
+        boundary_face->setVisited(true);
+
+        next_to_visit.push_back(curr_face);
+
+        while(!next_to_visit.empty())
+        {
+            // get next face
+            curr_face = next_to_visit.front();
+            next_to_visit.pop_front();
+
+            // if we had visted the face -> continue
+            if(curr_face->visited())
+                continue;
+
+            mesh_part.m_Faces.push_back(curr_face);
+
+            // set visited and add to visited vector
+            curr_face->setVisited(true);
+            visited_faces.push_back(curr_face);
+
+            // get faces arround curr_face
+            for(const auto& e_face : curr_face->getEdges())
+            {
+                edge_opp = e_face->opposite();
+                face_opp = edge_opp->face();
+
+                // if edge_opp is visited (is marked as boundary edge) and
+                // if face_opp is not the current boundary face (it is another face) and
+                // if we had not visited it, yet
+                // -> inc num holes in part and set new boundary edge as visited
+                if(edge_opp->visited() && face_opp != boundary_face && !face_opp->visited())
+                {
+                    mesh_part.m_NumHoles++;
+                    face_opp->setVisited(true);
+                }
+
+                // if face was not visited -> add to next to visit
+                if(!face_opp->visited())
+                    next_to_visit.push_back(face_opp);
+            }
+        }
+    }
+
+    // clear visited faces
+    for(const auto& f : visited_faces)
+        f->setVisited(false);
+
+    // clear boundaries
+    for(const auto& b : m_Boundaries)
+    {
+        for(const auto& e : b.second)
+        {
+            delete e->opposite();
+            e->setOpposite(nullptr);
+        }
+
+        delete b.first;
+    }
 }

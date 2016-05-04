@@ -5,13 +5,33 @@
 
 #include <vector>
 #include <set>
+#include <map>
+#include <deque>
 
 class HESCheck
 {
 private:
     typedef std::vector<HESMesh*> HESMeshVector;
+    typedef std::vector<HESFace* const> HESFaceVector;
+    typedef std::deque<HESFace* const> HESFaceDeque;
     typedef std::vector<HESEdge* const> HESEdgeConstVector;
     typedef std::set<HESVertex* const> HESVertexConstSet;
+
+    typedef std::map<HESFace*, HESEdgeConstVector> HESFaceBoundaryMap;
+    typedef std::set<HESFace* const> HESFaceSet;
+
+    struct MeshPart
+    {
+        MeshPart()
+        {
+            m_NumHoles = 0;
+        }
+
+        HESFaceVector m_Faces;
+        size_t m_NumHoles;
+    };
+
+    typedef std::vector<MeshPart> HESMeshPartVector;
 
 public:
     HESCheck() = delete;
@@ -26,14 +46,19 @@ private:
 
     void splitParts();
 
+    void findBoundary();
     HESEdgeConstVector walkBoundary(HESEdge* const edge);
+
+    void findParts();
 
 private:
     HESMesh* const m_SourceMesh;
     HESMesh* m_ProcessingMesh;
-    HESMeshVector m_MeshParts;
 
     HESVertexConstSet m_PartsConnectingVertices;
+
+    HESFaceBoundaryMap m_Boundaries;
+    HESMeshPartVector m_MeshParts;
 
     bool m_HasPartConnectedInOneVertex;
     bool m_HasParts;

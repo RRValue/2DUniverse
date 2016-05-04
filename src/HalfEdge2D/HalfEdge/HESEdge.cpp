@@ -78,9 +78,6 @@ void HESEdge::setFace(HESFace* const face)
 
 void HESEdge::setOpposite(HESEdge* const oppositeEdge)
 {
-    if(oppositeEdge == nullptr)
-        return;
-
     m_Opposite = oppositeEdge;
 }
 
