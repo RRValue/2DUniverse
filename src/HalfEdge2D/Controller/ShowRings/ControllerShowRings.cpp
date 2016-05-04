@@ -20,6 +20,9 @@
 #include "HalfEdge2D/Mesh/TestMesh01.h"
 #include "HalfEdge2D/Mesh/TestMesh02.h"
 #include "HalfEdge2D/Mesh/TestMesh03.h"
+#include "HalfEdge2D/Mesh/TestMesh04.h"
+#include "HalfEdge2D/Mesh/TestMesh05.h"
+#include "HalfEdge2D/Mesh/TestMesh06.h"
 
 #include <math.h>
 
@@ -68,7 +71,7 @@ void ControllerShowRings::init()
     ui_options.setupUi(m_OptionWidget);
 
     m_CbMeshSelector = ui_options.m_CbMeshSelector;
-    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Clear");
+    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Part1" << "Part2" << "Hole" << "Clear");
 
     connect(m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
 
@@ -345,7 +348,7 @@ void ControllerShowRings::onMeshSelectionChanged(int value)
 {
     m_Mesh->clear();
 
-    if(value < 0 || value >= 3)
+    if(value < 0 || value >= 6)
     {
         m_Renderer->render();
 
@@ -371,6 +374,24 @@ void ControllerShowRings::onMeshSelectionChanged(int value)
     {
         float_array = testVertices03;
         idx_array = testTriangles03;
+    }
+
+    if(value == 3)
+    {
+        float_array = testVertices04;
+        idx_array = testTriangles04;
+    }
+
+    if(value == 4)
+    {
+        float_array = testVertices05;
+        idx_array = testTriangles05;
+    }
+
+    if(value == 5)
+    {
+        float_array = testVertices06;
+        idx_array = testTriangles06;
     }
 
     for(size_t i = 0; i < float_array.size(); i += 2)
