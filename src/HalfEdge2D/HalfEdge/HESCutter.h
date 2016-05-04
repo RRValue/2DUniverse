@@ -12,7 +12,7 @@ typedef std::vector<Point*> CutPointVector;
 class HESCutter
 {
 public:
-    HESCutter() = delete;
+    HESCutter();
     HESCutter(HESMesh* const mesh);
     ~HESCutter();
 
@@ -25,7 +25,7 @@ private:
     void clearCutPoints();
 
 private:
-    HESMesh* const m_SourceMesh;
+    HESMesh* m_SourceMesh;
     HESMesh* m_TargetMesh;
 
     CutPointVector m_CutPoints;

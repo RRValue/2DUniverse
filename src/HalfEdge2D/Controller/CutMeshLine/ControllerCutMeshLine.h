@@ -11,12 +11,16 @@ class HESMesh;
 
 class HESBuilder;
 class HESCutter;
+class HESCheck;
 
 class QComboBox;
 
 class ControllerCutMeshLine : public QObject, public Controller
 {
     Q_OBJECT;
+
+private:
+    typedef std::vector<HESMesh*> HESMeshVector;
 
 public:
     ControllerCutMeshLine();
@@ -43,8 +47,8 @@ private slots:
 private:
     QComboBox* m_CbMeshSelector;
 
-    HESMesh* m_Mesh;
-    HESMesh* m_CutMesh;
+    HESMeshVector m_Meshes;
+    HESMeshVector m_CutMeshes;
     
     bool m_MovePoint;
 
@@ -57,6 +61,7 @@ private:
 
     HESBuilder* m_MeshBuilder;
     HESCutter* m_MeshCutter;
+    HESCheck* m_MeshChecker;
 };
 
 #endif //_CONTROLLER_CONTROLLERCUTMESHLINE_H_

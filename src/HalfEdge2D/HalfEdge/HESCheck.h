@@ -14,6 +14,7 @@ public:
     enum HESCheckError
     {
         E_HESCE_FIRST,
+        E_HESCE_NOMESH,
         E_HESCE_OK,
         E_HESCE_BOUNDARYSEARCH,
         E_HESCE_SPLIT,
@@ -78,13 +79,19 @@ private:
     typedef std::vector<ReIndexVertex, Eigen::aligned_allocator<ReIndexVertex>> ReIndexVector;
 
 public:
-    HESCheck() = delete;
+    HESCheck();
     HESCheck(HESMesh* const mesh);
     ~HESCheck();
+
+    const HESCheckError& getError() const;
+    void run(HESMesh* const mesh);
+
+    HESMeshVector getMeshes();
 
 private:
     void run();
     void clear();
+    void reset();
 
     void hasPartsConnectedInOneVertex();
     void splitPartsConnectedInOneVertex();
@@ -97,7 +104,7 @@ private:
     void createMeshesFromParts();
 
 private:
-    HESMesh* const m_SourceMesh;
+    HESMesh* m_SourceMesh;
     HESMesh* m_ProcessingMesh;
 
     HESCheckError m_Error;

@@ -6,12 +6,16 @@
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
 
-HESCheck::HESCheck(HESMesh* const mesh) : m_SourceMesh(mesh)
+HESCheck::HESCheck()
 {
-    m_HasPartConnectedInOneVertex = false;
-    m_HasParts = false;
-    m_HasHoles = false;
-    m_Error = E_HESCE_OK;
+    reset();
+}
+
+HESCheck::HESCheck(HESMesh* const mesh)
+{
+    reset();
+
+    m_SourceMesh = mesh;
     
     run();
     clear();
@@ -22,8 +26,57 @@ HESCheck::~HESCheck()
 
 }
 
+void HESCheck::reset()
+{
+    if(m_Error != E_HESCE_OK)
+        for(auto& m : m_Meshes)
+            delete m;
+    
+    m_Meshes.clear();
+
+    m_HasPartConnectedInOneVertex = false;
+    m_HasParts = false;
+    m_HasHoles = false;
+    m_Error = E_HESCE_NOMESH;
+    
+    m_SourceMesh = nullptr;
+    m_ProcessingMesh = nullptr;
+}
+
+const HESCheck::HESCheckError& HESCheck::getError() const
+{
+    return m_Error;
+}
+
+HESCheck::HESMeshVector HESCheck::getMeshes()
+{
+    HESMeshVector res = m_Meshes;
+
+    reset();
+
+    return res;
+}
+
+void HESCheck::run(HESMesh* const mesh)
+{
+    m_SourceMesh = mesh;
+
+    run();
+    clear();
+}
+
 void HESCheck::run()
 {
+    m_Error = E_HESCE_OK;
+
+    if(m_SourceMesh == nullptr)
+        m_Error = E_HESCE_NOMESH;
+    else
+        m_Error = E_HESCE_OK;
+
+    if(m_Error != E_HESCE_OK)
+        return;
+
     m_ProcessingMesh = new HESMesh(*m_SourceMesh);
 
     // check for connected parts in one vertex
@@ -47,9 +100,6 @@ void HESCheck::run()
     if(m_Boundaries.size() > 1)
         m_HasParts = true;
 
-    if(!m_HasParts)
-        return;
-
     findParts();
 
     for(const auto& p : m_MeshParts)
@@ -66,6 +116,8 @@ void HESCheck::run()
     if(m_Error != E_HESCE_OK)
         return;
 
+    m_Meshes.clear();
+
     createMeshesFromParts();
 }
 
@@ -75,14 +127,10 @@ void HESCheck::clear()
     m_Boundaries.clear();
     m_MeshParts.clear();
 
-    if(m_Meshes.size() == 1)
-    {
-        delete m_Meshes[0];
-
-        m_Meshes.clear();
-    }
-
-    delete m_ProcessingMesh;
+    if(m_ProcessingMesh != nullptr)
+        delete m_ProcessingMesh;
+    
+    m_ProcessingMesh = nullptr;
 }
 
 void HESCheck::hasPartsConnectedInOneVertex()

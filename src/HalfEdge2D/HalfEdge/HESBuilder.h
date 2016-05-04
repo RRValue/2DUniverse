@@ -12,18 +12,19 @@ class HESFace;
 class HESBuilder
 {
 public:
-    HESBuilder() = delete;
+    HESBuilder();
     HESBuilder(HESMesh* const mesh);
     ~HESBuilder();
 
     bool build();
+    bool build(HESMesh* const mesh);
 
 private:
     void buildFace(const std::array<HESVertex* const, 3>& vertices, const std::array<HESEdge* const, 3>& edges, HESFace* const face);
     void connectEdges(const std::initializer_list<HESEdge* const>& edges);
 
 private:
-    HESMesh* const m_Mesh;
+    HESMesh* m_Mesh;
 };
 
 #endif //_HALFEDGESTRUCTURE_BUILDER_H_

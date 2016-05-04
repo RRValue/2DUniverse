@@ -8,6 +8,11 @@
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 
+HESBuilder::HESBuilder() : m_Mesh(nullptr)
+{
+
+}
+
 HESBuilder::HESBuilder(HESMesh* const mesh) : m_Mesh(mesh)
 {
 
@@ -16,6 +21,13 @@ HESBuilder::HESBuilder(HESMesh* const mesh) : m_Mesh(mesh)
 HESBuilder::~HESBuilder()
 {
 
+}
+
+bool HESBuilder::build(HESMesh* const mesh)
+{
+    m_Mesh = mesh;
+
+    return build();
 }
 
 bool HESBuilder::build()

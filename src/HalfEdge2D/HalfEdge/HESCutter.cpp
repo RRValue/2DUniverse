@@ -10,6 +10,11 @@
 
 #include "HalfEdge2D/Renderables/Point.h"
 
+HESCutter::HESCutter() : m_SourceMesh(nullptr)
+{
+
+}
+
 HESCutter::HESCutter(HESMesh* const mesh) : m_SourceMesh(mesh)
 {
 

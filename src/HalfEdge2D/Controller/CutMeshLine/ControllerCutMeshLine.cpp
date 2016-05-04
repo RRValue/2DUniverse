@@ -10,6 +10,7 @@
 #include "HalfEdge2D/Renderables/Line.h"
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
+#include "HalfEdge2D/HalfEdge/HESFace.h"
 #include "HalfEdge2D/HalfEdge/HESBuilder.h"
 #include "HalfEdge2D/HalfEdge/HESCutter.h"
 #include "HalfEdge2D/HalfEdge/HESCheck.h"
@@ -30,8 +31,11 @@ ControllerCutMeshLine::ControllerCutMeshLine()
 
 ControllerCutMeshLine::~ControllerCutMeshLine()
 {
-    delete m_Mesh;
-    delete m_CutMesh;
+    for(auto& m : m_Meshes)
+        delete m;
+
+    for(auto& m : m_CutMeshes)
+        delete m;
 
     for(const auto& p : m_Points)
         delete p;
@@ -44,11 +48,9 @@ ControllerCutMeshLine::~ControllerCutMeshLine()
 
 void ControllerCutMeshLine::init()
 {
-    m_Mesh = new HESMesh();
-    m_CutMesh = new HESMesh();
-
-    m_MeshCutter = new HESCutter(m_Mesh);
-    m_MeshBuilder = new HESBuilder(m_Mesh);
+    m_MeshCutter = new HESCutter();
+    m_MeshBuilder = new HESBuilder();
+    m_MeshChecker = new HESCheck();
 
     m_MovePoint = false;
     m_CurrentPoint = nullptr;
@@ -59,8 +61,6 @@ void ControllerCutMeshLine::init()
 
     // add to scene
     m_Scene->addLine(m_Line);
-    m_Scene->addMesh(m_Mesh);
-    m_Scene->addMesh(m_CutMesh);
 
     // init gui
     m_OptionWidget = new QWidget();
@@ -234,7 +234,7 @@ Point* const ControllerCutMeshLine::getPointAtPos(const Vec2f& pos, size_t* cons
 
 void ControllerCutMeshLine::onMeshSelectionChanged(int value)
 {
-    m_Mesh->clear();
+    HESMesh tmp_mesh;
 
     if(value < 0 || value >= 6)
     {
@@ -283,23 +283,36 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
     }
 
     for(size_t i = 0; i < float_array.size(); i += 2)
-        m_Mesh->addVertex(Vec2f(float_array[i], float_array[i + 1]));
+        tmp_mesh.addVertex(Vec2f(float_array[i], float_array[i + 1]));
 
     for(size_t i = 0; i < idx_array.size(); i += 3)
-        m_Mesh->addFace({idx_array[i], idx_array[i + 1], idx_array[i + 2]});
+        tmp_mesh.addFace({idx_array[i], idx_array[i + 1], idx_array[i + 2]});
 
-    m_MeshBuilder->build();
+    m_MeshBuilder->build(&tmp_mesh);
+    m_MeshChecker->run(&tmp_mesh);
+
+    // remove old meshes from scene
+    for(auto& m : m_Meshes)
+    {
+        m_Scene->removeMesh(m);
+        delete m;
+    }
+
+    m_Meshes = m_MeshChecker->getMeshes();
+
+    for(auto& m : m_Meshes)
+        m_Scene->addMesh(m);
 
     m_SceneChanges = true;
-
-    HESCheck bla(m_Mesh);
 
     m_Renderer->render();
 }
 
 void ControllerCutMeshLine::cut()
 {
-    if(m_Points.size() != 2)
+    return;
+
+    /*if(m_Points.size() != 2)
         return;
 
     // remove cut points
@@ -316,5 +329,5 @@ void ControllerCutMeshLine::cut()
 
     // add cut points
     for(const auto& p : m_MeshCutter->getCutPoints())
-        m_Scene->addPoint(p);
+        m_Scene->addPoint(p);*/
 }
