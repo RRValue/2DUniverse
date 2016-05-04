@@ -28,7 +28,7 @@ HESCheck::~HESCheck()
 
 void HESCheck::reset()
 {
-    if(m_Error != E_HESCE_OK)
+    if(m_Error == E_HESCE_OK)
         for(auto& m : m_Meshes)
             delete m;
     
@@ -52,6 +52,7 @@ HESCheck::HESMeshVector HESCheck::getMeshes()
 {
     HESMeshVector res = m_Meshes;
 
+    m_Error = E_HESCE_NOMESH;
     reset();
 
     return res;
@@ -59,6 +60,8 @@ HESCheck::HESMeshVector HESCheck::getMeshes()
 
 void HESCheck::run(HESMesh* const mesh)
 {
+    reset();
+
     m_SourceMesh = mesh;
 
     run();
