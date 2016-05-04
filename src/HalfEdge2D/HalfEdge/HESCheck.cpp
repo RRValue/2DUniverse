@@ -8,6 +8,8 @@ HESCheck::HESCheck(HESMesh* const mesh) : m_SourceMesh(mesh)
 {
     m_HasPartConnectedInOneVertex = false;
     m_HasParts = false;
+    m_HasHoles = false;
+    m_Error = E_HESCE_OK;
     
     run();
 }
@@ -22,16 +24,43 @@ void HESCheck::run()
     m_ProcessingMesh = new HESMesh(*m_SourceMesh);
 
     // check for connected parts in one vertex
-    checkHasPartsConnectedInOneVertex();
+    hasPartsConnectedInOneVertex();
+
+    if(!m_PartsConnectingVertices.empty())
+    {
+        m_HasPartConnectedInOneVertex = true;
+        m_HasParts = true;
+    }
 
     if(m_HasPartConnectedInOneVertex)
         splitPartsConnectedInOneVertex();
 
-    // check for unconnected parts
-    splitParts();
+    // find boundaries
+    findBoundaries();
+
+    if(m_Error != E_HESCE_OK)
+        return;
+
+    if(m_Boundaries.size() > 1)
+        m_HasParts = true;
+
+    findParts();
+
+    for(const auto& p : m_MeshParts)
+        if(p.m_NumHoles > 0)
+        {
+            m_HasHoles = true;
+
+            break;
+        }
+
+    if(m_Error != E_HESCE_OK)
+        return;
+
+    createMeshesFromParts();
 }
 
-void HESCheck::checkHasPartsConnectedInOneVertex()
+void HESCheck::hasPartsConnectedInOneVertex()
 {
     // check if a vertex has more than one outgoing edge without opposite
     size_t num_vertices = m_ProcessingMesh->getNumVertices();
@@ -57,12 +86,6 @@ void HESCheck::checkHasPartsConnectedInOneVertex()
             break;
         }
     }
-
-    if(m_PartsConnectingVertices.empty())
-        return;
-
-    m_HasPartConnectedInOneVertex = true;
-    m_HasParts = true;
 }
 
 void HESCheck::splitPartsConnectedInOneVertex()
@@ -131,23 +154,7 @@ void HESCheck::splitPartsConnectedInOneVertex()
     }
 }
 
-void HESCheck::splitParts()
-{
-    // find boundaries
-    findBoundary();
-
-    if(m_Boundaries.empty()) // -> some error must have occured -> return
-        return;
-
-    findParts();
-
-    if(m_MeshParts.empty()) // -> some error must ahve occured -> return
-        return;
-
-    return;
-}
-
-void HESCheck::findBoundary()
+void HESCheck::findBoundaries()
 {
     HESEdge* e;
     bool error = false;
@@ -201,6 +208,8 @@ void HESCheck::findBoundary()
             delete b.first;
 
         m_Boundaries.clear();
+
+        m_Error = E_HESCE_BOUNDARYSEARCH;
     }
 
     // reset visited stated in visited edges
@@ -226,7 +235,7 @@ HESCheck::HESEdgeConstVector HESCheck::walkBoundary(HESEdge* const edge)
     bool loop_closed = false;
     bool found_next_edge = false;
 
-    // while loop is not closed (found e_start)
+    // while loop is not closed (not found e_start)
     while(!loop_closed)
     {
         found_next_edge = false;
@@ -380,4 +389,12 @@ void HESCheck::findParts()
 
         delete b.first;
     }
+
+    if(m_MeshParts.empty())
+        m_Error = E_HESCE_SPLIT;
+}
+
+void HESCheck::createMeshesFromParts()
+{
+
 }

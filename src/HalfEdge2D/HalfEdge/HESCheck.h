@@ -10,6 +10,16 @@
 
 class HESCheck
 {
+public:
+    enum HESCheckError
+    {
+        E_HESCE_FIRST,
+        E_HESCE_OK,
+        E_HESCE_BOUNDARYSEARCH,
+        E_HESCE_SPLIT,
+        E_HESCE_LAST,
+    };
+
 private:
     typedef std::vector<HESMesh*> HESMeshVector;
     typedef std::vector<HESFace* const> HESFaceVector;
@@ -41,27 +51,29 @@ public:
 private:
     void run();
 
-    void checkHasPartsConnectedInOneVertex();
+    void hasPartsConnectedInOneVertex();
     void splitPartsConnectedInOneVertex();
 
-    void splitParts();
-
-    void findBoundary();
+    void findBoundaries();
     HESEdgeConstVector walkBoundary(HESEdge* const edge);
 
     void findParts();
+
+    void createMeshesFromParts();
 
 private:
     HESMesh* const m_SourceMesh;
     HESMesh* m_ProcessingMesh;
 
-    HESVertexConstSet m_PartsConnectingVertices;
+    HESCheckError m_Error;
 
+    HESVertexConstSet m_PartsConnectingVertices;
     HESFaceBoundaryMap m_Boundaries;
     HESMeshPartVector m_MeshParts;
 
     bool m_HasPartConnectedInOneVertex;
     bool m_HasParts;
+    bool m_HasHoles;
 };
 
 #endif //_HALFEDGESTRUCTURE_CHECK_H_
