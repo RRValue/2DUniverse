@@ -26,7 +26,7 @@ private:
 
     void splitParts();
 
-    HESEdgeConstVector findBoundary(HESEdge* const edge);
+    HESEdgeConstVector walkBoundary(HESEdge* const edge);
 
 private:
     HESMesh* const m_SourceMesh;

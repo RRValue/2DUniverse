@@ -285,6 +285,8 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
 
     m_SceneChanges = true;
 
+    HESCheck bla(m_Mesh);
+
     m_Renderer->render();
 }
 
@@ -296,8 +298,6 @@ void ControllerCutMeshLine::cut()
     // remove cut points
     for(const auto& p : m_MeshCutter->getCutPoints())
         m_Scene->removePoint(p);
-
-    HESCheck bla(m_Mesh);
 
     bool cutted = m_MeshCutter->cutLine(m_CutMesh, m_Line);
 

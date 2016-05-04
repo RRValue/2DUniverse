@@ -14,14 +14,14 @@ HESCheck::HESCheck(HESMesh* const mesh) : m_SourceMesh(mesh)
 
 HESCheck::~HESCheck()
 {
-
+    delete m_ProcessingMesh;
 }
 
 void HESCheck::run()
 {
     m_ProcessingMesh = new HESMesh(*m_SourceMesh);
 
-    // check for unconnected parts
+    // check for connected parts in one vertex
     checkHasPartsConnectedInOneVertex();
 
     if(m_HasPartConnectedInOneVertex)
@@ -112,9 +112,9 @@ void HESCheck::splitPartsConnectedInOneVertex()
             curr_edge->setFrom(new_vertex);
             prev_edge->setTo(new_vertex);
 
-            new_vertex->addEdge(curr_edge);
-
+            // move curr edge to new vertex
             from_vert->removeEdge(curr_edge);
+            new_vertex->addEdge(curr_edge);
 
             // create new vertex idx list for face
             for(const auto& idx : face_vert_idxs)
@@ -139,6 +139,8 @@ void HESCheck::splitParts()
     HESEdge* e;
     bool error = false;
     size_t num_edges = m_ProcessingMesh->getNumEdges();
+
+    HESEdgeConstVector visited_edges;
     
     // iterate over all edges
     for(size_t i = 0; i < num_edges; i++)
@@ -153,8 +155,19 @@ void HESCheck::splitParts()
         if(e->opposite() != nullptr)
             continue;
 
+        // set visited and push to visited
+        e->setVisited(true);
+        visited_edges.push_back(e);
+
         // find boundary (edges with same border) with boundary edge
-        HESEdgeConstVector edge_loop = findBoundary(e);
+        HESEdgeConstVector edge_loop = walkBoundary(e);
+
+        // set found edges to visited
+        for(const auto& e_loop : edge_loop)
+        {
+            e_loop->setVisited(true);
+            visited_edges.push_back(e_loop);
+        }
 
         // if edge loop is empty -> some error must have occured, mesh is dirty -> break
         if(edge_loop.empty())
@@ -172,12 +185,12 @@ void HESCheck::splitParts()
     if(error)
         boundaries.clear();
 
-    // reset visited stated in all edges
-    for(size_t i = 0; i < num_edges; i++)
-        m_ProcessingMesh->getHESEdge(i)->setVisited(false);
+    // reset visited stated in visited edges
+    for(const auto& e_visited : visited_edges)
+        e_visited->setVisited(false);
 }
 
-HESCheck::HESEdgeConstVector HESCheck::findBoundary(HESEdge* const edge)
+HESCheck::HESEdgeConstVector HESCheck::walkBoundary(HESEdge* const edge)
 {
     // if edge has a opposite, it is no boundary edge -> return nothing
     if(edge->opposite() != nullptr)
@@ -187,9 +200,8 @@ HESCheck::HESEdgeConstVector HESCheck::findBoundary(HESEdge* const edge)
     HESEdge* e = edge;
     HESEdgeConstVector boundary;
 
-    // add edge to boundary and set visited
+    // add edge to boundary
     boundary.push_back(e);
-    e->setVisited(true);
 
     // set start edge, need to be compared while looping through
     HESEdge* const e_start = e;
@@ -211,13 +223,6 @@ HESCheck::HESEdgeConstVector HESCheck::findBoundary(HESEdge* const edge)
 
                 break;
             }
-
-            // if current outgoing edge of vertex was visited -> continue
-            if(e_out->visited())
-                continue;
-
-            // set current outgoing edge visited
-            e_out->setVisited(true);
 
             // if current outgoing edge is no border edge (opposite is not null) -> continue
             if(e_out->opposite() != nullptr)
