@@ -225,7 +225,7 @@ void ControllerCutLine::cut()
     // reset cut point
     m_CutPoint->setVisible(false);
 
-    Vec2fVec cut_points = m_Line0->intersect(*m_Line1);
+    Vec2fVector cut_points = m_Line0->intersect(*m_Line1);
 
     if(cut_points.empty())
         return;

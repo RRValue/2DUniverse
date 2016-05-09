@@ -310,24 +310,23 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
 
 void ControllerCutMeshLine::cut()
 {
-    return;
-
-    /*if(m_Points.size() != 2)
+    if(m_Points.size() != 2)
         return;
 
     // remove cut points
     for(const auto& p : m_MeshCutter->getCutPoints())
         m_Scene->removePoint(p);
 
-    bool cutted = m_MeshCutter->cutLine(m_CutMesh, m_Line);
+    for(const auto& m : m_Meshes)
+    {
+        HESMeshVector result;
+        bool cutted = m_MeshCutter->cutLine(m, m_Line, result);
 
-    m_Mesh->setVisible(!cutted);
-    m_CutMesh->setVisible(cutted);
+        //m->setVisible(!cutted);
+        //m_CutMesh->setVisible(cutted);
 
-    if(!cutted)
-        return;
-
-    // add cut points
-    for(const auto& p : m_MeshCutter->getCutPoints())
-        m_Scene->addPoint(p);*/
+        // add cut points
+        for(const auto& p : m_MeshCutter->getCutPoints())
+            m_Scene->addPoint(p);
+    }
 }

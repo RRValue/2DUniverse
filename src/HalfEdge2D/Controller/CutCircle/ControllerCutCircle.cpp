@@ -239,7 +239,7 @@ void ControllerCutCircle::cut()
     m_CutPoint0->setVisible(false);
     m_CutPoint1->setVisible(false);
 
-    Vec2fVec cut_points = m_Line->intersect(*m_Circle);
+    Vec2fVector cut_points = m_Line->intersect(*m_Circle);
 
     if(cut_points.empty())
         return;

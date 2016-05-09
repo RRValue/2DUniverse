@@ -28,11 +28,11 @@ public:
     float getLength() const;
     Vec2f getNormal() const;
     
-    Vec2fVec intersect(const Circle& c) const;
-    Vec2fVec intersect(const Line& l) const;
-    Vec2fVec intersect(const QuadraticBezier& b) const;
-    Vec2fVec intersect(const CubicBezier& b) const;
-    Vec2fVec intersect(const Spline& s) const;
+    Vec2fVector intersect(const Circle& c) const;
+    Vec2fVector intersect(const Line& l) const;
+    Vec2fVector intersect(const QuadraticBezier& b) const;
+    Vec2fVector intersect(const CubicBezier& b) const;
+    Vec2fVector intersect(const Spline& s) const;
 
 private:
     Mat3f getOrthoBaseMatrix() const;

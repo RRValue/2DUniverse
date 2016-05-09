@@ -8,20 +8,19 @@ class Line;
 class Point;
 
 typedef std::vector<Point*> CutPointVector;
+typedef std::vector<HESMesh*> HESMeshVector;
 
 class HESCutter
 {
 public:
     HESCutter();
-    HESCutter(HESMesh* const mesh);
     ~HESCutter();
 
     const CutPointVector& getCutPoints() const;
 
-    bool cutLine(HESMesh* const outMesh, Line* const line);
+    bool cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVector& outMeshes);
 
 private:
-    void prepareTargetMesh();
     void clearCutPoints();
 
 private:

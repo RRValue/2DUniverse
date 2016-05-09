@@ -16,6 +16,6 @@ typedef Eigen::Matrix<float, 4, 1>  Vec4f;
 typedef Eigen::Matrix<float, 2, 2>  Mat2f;
 typedef Eigen::Matrix<float, 3, 3>  Mat3f;
 
-typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> Vec2fVec;
+typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> Vec2fVector;
 
 #endif //_BASE_VECTOR_H_

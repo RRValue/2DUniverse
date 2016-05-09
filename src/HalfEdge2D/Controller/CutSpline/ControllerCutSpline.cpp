@@ -350,7 +350,7 @@ void ControllerCutSpline::cut()
     if(!m_Line->isVisible() || !m_Spline->isVisible())
         return;
 
-    Vec2fVec cut_points = m_Line->intersect(*m_Spline);
+    Vec2fVector cut_points = m_Line->intersect(*m_Spline);
 
     // delete old one
     for(const auto& p : m_CutPoints)
