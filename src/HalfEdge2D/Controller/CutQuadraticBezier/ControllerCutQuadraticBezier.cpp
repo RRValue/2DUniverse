@@ -239,18 +239,18 @@ void ControllerCutQuadraticBezier::cut()
     m_CutPoint0->setVisible(false);
     m_CutPoint1->setVisible(false);
 
-    Vec2fVector cut_points = m_Line->intersect(*m_Bezier);
+    IntersectionVector cut_points = m_Line->intersect(m_Bezier);
 
     if(cut_points.empty())
         return;
     if(cut_points.size() >= 1)
     {
         m_CutPoint0->setVisible(true);
-        m_CutPoint0->setPosition(cut_points[0]);
+        m_CutPoint0->setPosition(cut_points[0].m_Point);
     }
     if(cut_points.size() >= 2)
     {
         m_CutPoint1->setVisible(true);
-        m_CutPoint1->setPosition(cut_points[1]);
+        m_CutPoint1->setPosition(cut_points[1].m_Point);
     }
 }

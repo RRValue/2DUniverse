@@ -302,12 +302,12 @@ void ControllerDelaunay::updateCircumCircle(Circle* const circle, const std::arr
     bisect1.setPoint(0, bs1s);
     bisect1.setPoint(1, bs1e);
 
-    Vec2fVector center = bisect0.intersect(bisect1);
+    IntersectionVector center = bisect0.intersect(&bisect1);
 
     circle->setVisible(!center.empty());
 
-    float radius = (points[0]->getPosition() - center[0]).norm();
+    float radius = (points[0]->getPosition() - center[0].m_Point).norm();
 
-    circle->setPosition(center[0]);
+    circle->setPosition(center[0].m_Point);
     circle->setRadius(radius);
 }

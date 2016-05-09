@@ -2,6 +2,11 @@
 
 #include "HalfEdge2D/Base/MathDefines.h"
 
+#include "HalfEdge2D/Renderables/Circle.h"
+#include "HalfEdge2D/Renderables/QuadraticBezier.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
+#include "HalfEdge2D/Renderables/Spline.h"
+
 Line::Line()
 {
 
@@ -75,12 +80,12 @@ Mat3f Line::getOrthoBaseMatrix() const
     return m_r * m_t;
 }
 
-Vec2fVector Line::intersect(const Circle& circle) const
+IntersectionVector Line::intersect(Circle* const circle) const
 {
     Mat3f trans = getOrthoBaseMatrix();
     Mat3f trans_inv = trans.inverse();
 
-    Circle t_circle(circle);
+    Circle t_circle(*circle);
     Line t_line(*this);
 
     t_circle.transform(trans);
@@ -90,13 +95,13 @@ Vec2fVector Line::intersect(const Circle& circle) const
     const Vec2f& c = t_circle.getPosition();
     float l = t_line.getLength();
 
-    Vec2fVector result;
+    IntersectionVector result;
 
     if(r < c.y())
         return result;
 
     if(r == c.y())
-        result.push_back(Vec2f(c.x(), 0.0f));
+        result.push_back({0.0f, Vec2f(c.x(), 0.0f)});
     else //r > c.y()
     {
         float a = std::sqrt(std::pow(r, 2.0f) - std::pow(c.y(), 2.0f));
@@ -105,31 +110,31 @@ Vec2fVector Line::intersect(const Circle& circle) const
 
         for(const auto& cut_x : cuts_x)
             if(cut_x >= 0.0f && cut_x <= l)
-                result.push_back(Vec2f(cut_x, 0.0f));
+                result.push_back({0.0f, Vec2f(cut_x, 0.0f)});
     }
 
     for(auto& r : result)
     {
-        Vec3f re_t_r = trans_inv * Vec3f(r(0), r(1), 1.0f);
+        Vec3f re_t_r = trans_inv * Vec3f(r.m_Point(0), r.m_Point(1), 1.0f);
 
-        r(0) = re_t_r(0);
-        r(1) = re_t_r(1);
+        r.m_Point(0) = re_t_r(0);
+        r.m_Point(1) = re_t_r(1);
     }
     
     return result;
 }
 
-Vec2fVector Line::intersect(const Line& other) const
+IntersectionVector Line::intersect(Line* const line) const
 {
     Mat3f trans = getOrthoBaseMatrix();
 
-    Line t_line(other); 
+    Line t_line(*line);
     
     t_line.transform(trans);
 
     // find root y compontent (cuts with x axis)
 
-    Vec2fVector results;
+    IntersectionVector results;
     Line::Roots root = t_line.componentRoots(1);
 
     if(root.empty())
@@ -147,22 +152,22 @@ Vec2fVector Line::intersect(const Line& other) const
     if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
         return results;
 
-    results.push_back(other.pointAt(alpha));
+    results.push_back({alpha, line->pointAt(alpha)});
     
     return results;
 }
 
-Vec2fVector Line::intersect(const QuadraticBezier& b) const
+IntersectionVector Line::intersect(QuadraticBezier* const b) const
 {
     Mat3f trans = getOrthoBaseMatrix();
 
-    QuadraticBezier t_bezier(b);
+    QuadraticBezier t_bezier(*b);
 
     t_bezier.transform(trans);
 
     // find root y compontent (cuts with x axis)
 
-    Vec2fVector results;
+    IntersectionVector results;
     QuadraticBezier::Roots roots = t_bezier.componentRoots(1);
 
     if(roots.empty())
@@ -182,21 +187,21 @@ Vec2fVector Line::intersect(const QuadraticBezier& b) const
         if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
             continue;
 
-        results.push_back(b.pointAt(alpha));
+        results.push_back({alpha, b->pointAt(alpha)});
     }
 
     return results;
 }
 
-Vec2fVector Line::intersect(const CubicBezier& b) const
+IntersectionVector Line::intersect(CubicBezier* const b) const
 {
     Mat3f trans = getOrthoBaseMatrix();
 
-    CubicBezier t_bezier(b);
+    CubicBezier t_bezier(*b);
     t_bezier.transform(trans);
 
     // find root y compontent (cuts with x axis)
-    Vec2fVector results;
+    IntersectionVector results;
     CubicBezier::Roots roots = t_bezier.componentRoots(1);
 
     if(roots.empty())
@@ -216,22 +221,22 @@ Vec2fVector Line::intersect(const CubicBezier& b) const
         if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
             continue;
 
-        results.push_back(b.pointAt(alpha));
+        results.push_back({alpha, b->pointAt(alpha)});
     }
 
     return results;
 }
 
-Vec2fVector Line::intersect(const Spline& s) const
+IntersectionVector Line::intersect(Spline* const s) const
 {
     Mat3f trans = getOrthoBaseMatrix();
     Mat3f trans_inv = trans.inverse();
 
-    Spline t_spline(s);
+    Spline t_spline(*s);
     t_spline.transform(trans);
 
-    Vec2fVector results;
-    const Spline::SegmentVector& segements = s.getSegements();
+    IntersectionVector results;
+    const Spline::SegmentVector& segements = s->getSegements();
     const Spline::SegmentVector& t_segements = t_spline.getSegements();
 
     for(size_t i = 0; i < t_spline.getNumControllPoints(); i++)
@@ -259,7 +264,7 @@ Vec2fVector Line::intersect(const Spline& s) const
             if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
                 continue;
 
-            results.push_back(segements[i].m_Bezier.pointAt(alpha));
+            results.push_back({alpha, segements[i].m_Bezier.pointAt(alpha)});
         }
     }
 

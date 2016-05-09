@@ -64,8 +64,8 @@ bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVect
         return false;
 
     Line cut_edge;
-    Vec2fVector cur_cut_points;
-    Vec2fVector cut_points;
+    IntersectionVector cur_cut_points;
+    IntersectionVector cut_points;
     std::vector<HESEdgeConstVector> border_cut_edges;
 
     for(const auto& b : boundaries)
@@ -77,7 +77,7 @@ bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVect
             cut_edge.setPoint(0, e->from()->getPosition());
             cut_edge.setPoint(1, e->to()->getPosition());
 
-            cur_cut_points = cut_edge.intersect(*line);
+            cur_cut_points = cut_edge.intersect(line);
 
             if(cur_cut_points.empty())
                 continue;
