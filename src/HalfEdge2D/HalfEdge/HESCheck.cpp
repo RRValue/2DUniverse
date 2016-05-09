@@ -131,7 +131,13 @@ void HESCheck::clear()
     m_MeshParts.clear();
 
     if(m_ProcessingMesh != nullptr)
+    {
+        m_ProcessingMesh->m_Edges.clear();
+        m_ProcessingMesh->m_Vertices.clear();
+        m_ProcessingMesh->m_Faces.clear();
+
         delete m_ProcessingMesh;
+    }
     
     m_ProcessingMesh = nullptr;
 }
@@ -256,17 +262,18 @@ void HESCheck::findBoundaries()
         visited_edges.push_back(e);
 
         // find boundary (edges with same border) with boundary edge
-        HESEdgeConstVector edge_loop = walkBoundary(e);
+        HESEdgeConstVector boundary;
+        bool found_boundary = m_ProcessingMesh->walkBoundary(e, boundary);
 
         // set found edges to visited
-        for(const auto& e_loop : edge_loop)
+        for(const auto& e_loop : boundary)
         {
             e_loop->setVisited(true);
             visited_edges.push_back(e_loop);
         }
 
         // if edge loop is empty -> some error must have occured, mesh is dirty -> break
-        if(edge_loop.empty())
+        if(!found_boundary)
         {
             error = true;
 
@@ -274,7 +281,7 @@ void HESCheck::findBoundaries()
         }
 
         // add boundary to boundary list
-        m_Boundaries.insert(std::make_pair(new HESFace, edge_loop));
+        m_Boundaries.insert(std::make_pair(new HESFace, boundary));
     }
 
     // if error occured -> clear boundary list
@@ -286,75 +293,13 @@ void HESCheck::findBoundaries()
         m_Error = E_HESCE_BOUNDARYSEARCH;
     }
 
+    // add boundary start edges to mesh
+    for(const auto& b : m_Boundaries)
+        m_ProcessingMesh->addBoundaryStartEdge(*b.second.begin());
+
     // reset visited stated in visited edges
     for(const auto& e_visited : visited_edges)
         e_visited->setVisited(false);
-}
-
-HESCheck::HESEdgeConstVector HESCheck::walkBoundary(HESEdge* const edge)
-{
-    // if edge has a opposite, it is no boundary edge -> return nothing
-    if(edge->opposite() != nullptr)
-        return HESEdgeConstVector();
-
-    // set edge to process
-    HESEdge* e = edge;
-    HESEdgeConstVector boundary;
-
-    // add edge to boundary
-    boundary.push_back(e);
-
-    // set start edge, need to be compared while looping through
-    HESEdge* const e_start = e;
-    bool loop_closed = false;
-    bool found_next_edge = false;
-
-    // while loop is not closed (not found e_start)
-    while(!loop_closed)
-    {
-        found_next_edge = false;
-
-        // iterate over all outgoing edges of the to vertex of the current edge
-        for(const auto& e_out : e->to()->getEdges())
-        {
-            // if we found the starting edge -> loop is closed, nothing to process anymore
-            if(e_out == e_start)
-            {
-                loop_closed = true;
-
-                break;
-            }
-
-            // if current outgoing edge is no border edge (opposite is not null) -> continue
-            if(e_out->opposite() != nullptr)
-                continue;
-
-            // we found the next border edge
-            /// set current edge to e and remind us that we found the next border edge -> break
-            e = e_out;
-            found_next_edge = true;
-
-            break;
-        }
-
-        // if lopp is closed -> nothing to process here -> break
-        if(loop_closed)
-            break;
-
-        // if we did not found a next edge -> mesh is dirty -> break
-        if(!found_next_edge)
-            break;
-
-        // add current e to boundary
-        boundary.push_back(e);
-    }
-
-    // if did not we found a boundary -> return nothing
-    if(!loop_closed)
-        return HESEdgeConstVector();
-
-    // return boundary
-    return boundary;
 }
 
 void HESCheck::findParts()
@@ -475,7 +420,7 @@ void HESCheck::createMeshesFromParts()
     for(size_t i = 0; i < num_vertices; i++)
         reindex_vector[i] = ReIndexVertex(m_ProcessingMesh->getHESVertex(i));
 
-    // crate meshes
+    // create meshes
     for(const auto& p : m_MeshParts)
         m_Meshes.push_back(new HESMesh());
 
@@ -499,7 +444,7 @@ void HESCheck::createMeshesFromParts()
 
             r.m_Index = current_mesh->getNumVertices();
 
-            current_mesh->addVertex(*r.m_Vertex);
+            current_mesh->m_Vertices.push_back(r.m_Vertex);
         }
 
     // add faces
@@ -513,13 +458,76 @@ void HESCheck::createMeshesFromParts()
             const std::vector<size_t>& idxs = f->getVertIds();
 
             for(size_t j = 0; j < idxs.size(); j++)
-                new_idxs.push_back(reindex_vector[idxs[j]].m_Index);
+                f->setVertIdx(j, reindex_vector[idxs[j]].m_Index);
 
-            current_mesh->addFace(new_idxs);
+            current_mesh->m_Faces.push_back(f);
         }
     }
 
-    // build meshes
+    // add edges
+    for(size_t i = 0; i < m_MeshParts.size(); i++)
+    {
+        current_mesh = m_Meshes[i];
+
+        for(const auto& f : m_MeshParts[i].m_Faces)
+            for(const auto& e : f->getEdges())
+                if(!e->visited())
+                {
+                    current_mesh->m_Edges.push_back(e);
+                    
+                    e->setVisited(true);
+                }
+    }
+
+    // set edges unvisited
     for(const auto& m : m_Meshes)
-        HESBuilder(m).build();
+        for(const auto& e : m->m_Edges)
+            e->setVisited(false);
+
+    // find boundary edges
+    for(const auto& m : m_Meshes)
+    {
+        std::set<HESEdge*> mesh_boundary_edges;
+
+        for(const auto& e : m->m_Edges)
+        {
+            if(e->visited())
+                continue;
+
+            if(e->opposite() != nullptr)
+            {
+                e->setVisited(true);
+
+                continue;
+            }
+
+            mesh_boundary_edges.insert(e);
+
+            HESEdgeConstVector boundary;
+            m->walkBoundary(e, boundary);
+
+            for(const auto& be : boundary)
+                be->setVisited(true);
+        }
+
+        for(const auto& e : mesh_boundary_edges)
+            m->addBoundaryStartEdge(e);
+    }
+
+    // set edges unvisited
+    for(const auto& m : m_Meshes)
+        for(const auto& e : m->m_Edges)
+            e->setVisited(false);
+
+    // delete not added vertices
+    for(const auto& e : reindex_vector)
+        if(!e.m_Add)
+            delete e.m_Vertex;
+
+    // sert states of meshes
+    for(const auto& m : m_Meshes)
+    {
+        m->setChecked(true);
+        m->setValid(true);
+    }
 }

@@ -48,6 +48,7 @@ public:
 protected:
     virtual Vertex* allocateVertex();
     virtual Face* allocateFace();
+    virtual void setDirty();
 
 private:
     void copy(const Mesh& other);

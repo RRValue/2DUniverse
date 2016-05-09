@@ -55,6 +55,8 @@ void Mesh::clear()
 
     m_Vertices.clear();
     m_Faces.clear();
+
+    setDirty();
 }
 
 size_t Mesh::getNumVertices() const
@@ -104,6 +106,8 @@ Face* Mesh::allocateFace()
 void Mesh::addVertex()
 {
     m_Vertices.push_back(allocateVertex());
+
+    setDirty();
 }
 
 void Mesh::addVertex(const Vertex& vertex)
@@ -114,6 +118,8 @@ void Mesh::addVertex(const Vertex& vertex)
     new_vertex->setColour(vertex.getColour());
 
     m_Vertices.push_back(new_vertex);
+
+    setDirty();
 }
 
 void Mesh::addVertex(const Vec2f& pos)
@@ -122,6 +128,8 @@ void Mesh::addVertex(const Vec2f& pos)
     new_vertex->setPosition(pos);
     
     m_Vertices.push_back(new_vertex);
+    
+    setDirty();
 }
 
 void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
@@ -131,6 +139,8 @@ void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
     new_vertex->setNormal(normal);
 
     m_Vertices.push_back(new_vertex);
+
+    setDirty();
 }
 
 void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal, const Vec4f& color)
@@ -141,6 +151,8 @@ void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal, const Vec4f& color)
     new_vertex->setColour(color);
 
     m_Vertices.push_back(new_vertex);
+
+    setDirty();
 }
 
 void Mesh::removeVertex(const size_t& idx)
@@ -152,6 +164,8 @@ void Mesh::removeVertex(const size_t& idx)
     delete *iter;
 
     m_Vertices.erase(iter);
+
+    setDirty();
 }
 
 void Mesh::addFace(const Face& f)
@@ -161,6 +175,8 @@ void Mesh::addFace(const Face& f)
     new_face->setColour(f.getColour());
 
     m_Faces.push_back(new_face);
+
+    setDirty();
 }
 
 void Mesh::addFace(const size_t& idx0, const size_t& idx1, const size_t& idx2)
@@ -169,6 +185,8 @@ void Mesh::addFace(const size_t& idx0, const size_t& idx1, const size_t& idx2)
     new_face->addVertIdx({idx0, idx1, idx2});
 
     m_Faces.push_back(new_face);
+
+    setDirty();
 }
 
 void Mesh::addFace(const std::initializer_list<size_t>& idxs)
@@ -177,6 +195,8 @@ void Mesh::addFace(const std::initializer_list<size_t>& idxs)
     new_face->addVertIdx(idxs);
 
     m_Faces.push_back(new_face);
+
+    setDirty();
 }
 
 void Mesh::addFace(const std::vector<size_t>& idxs)
@@ -185,6 +205,8 @@ void Mesh::addFace(const std::vector<size_t>& idxs)
     new_face->addVertIdx(idxs);
 
     m_Faces.push_back(new_face);
+
+    setDirty();
 }
 
 void Mesh::removeFace(const size_t& idx)
@@ -196,4 +218,11 @@ void Mesh::removeFace(const size_t& idx)
     delete *iter;
 
     m_Faces.erase(iter);
+
+    setDirty();
+}
+
+void Mesh::setDirty()
+{
+
 }

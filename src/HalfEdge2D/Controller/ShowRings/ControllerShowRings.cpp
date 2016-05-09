@@ -400,8 +400,7 @@ void ControllerShowRings::onMeshSelectionChanged(int value)
     for(size_t i = 0; i < idx_array.size(); i += 3)
         m_Mesh->addFace({idx_array[i], idx_array[i + 1], idx_array[i + 2]});
 
-    HESBuilder builder(m_Mesh);
-    builder.build();
+    HESBuilder().build(m_Mesh);
 
     m_SceneChanges = true;
 
