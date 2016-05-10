@@ -252,23 +252,23 @@ void ControllerCutCubicBezier::cut()
     m_CutPoint1->setVisible(false);
     m_CutPoint2->setVisible(false);
 
-    IntersectionVector cut_points = m_Line->intersect(m_Bezier);
+    IntersectionVector intersections = m_Line->intersect(m_Bezier);
 
-    if(cut_points.empty())
+    if(intersections.empty())
         return;
-    if(cut_points.size() >= 1)
+    if(intersections.size() >= 1)
     {
         m_CutPoint0->setVisible(true);
-        m_CutPoint0->setPosition(cut_points[0].m_Point);
+        m_CutPoint0->setPosition(intersections[0].m_Point);
     }
-    if(cut_points.size() >= 2)
+    if(intersections.size() >= 2)
     {
         m_CutPoint1->setVisible(true);
-        m_CutPoint1->setPosition(cut_points[1].m_Point);
+        m_CutPoint1->setPosition(intersections[1].m_Point);
     }
-    if(cut_points.size() >= 3)
+    if(intersections.size() >= 3)
     {
         m_CutPoint2->setVisible(true);
-        m_CutPoint2->setPosition(cut_points[2].m_Point);
+        m_CutPoint2->setPosition(intersections[2].m_Point);
     }
 }

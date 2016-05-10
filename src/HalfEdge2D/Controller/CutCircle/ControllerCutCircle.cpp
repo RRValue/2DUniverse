@@ -239,21 +239,21 @@ void ControllerCutCircle::cut()
     m_CutPoint0->setVisible(false);
     m_CutPoint1->setVisible(false);
 
-    IntersectionVector cut_points = m_Line->intersect(m_Circle);
+    IntersectionVector intersections = m_Line->intersect(m_Circle);
 
-    if(cut_points.empty())
+    if(intersections.empty())
         return;
 
-    if(cut_points.size() >= 1)
+    if(intersections.size() >= 1)
     {
         m_CutPoint0->setVisible(true);
-        m_CutPoint0->setPosition(cut_points[0].m_Point);
+        m_CutPoint0->setPosition(intersections[0].m_Point);
     }
 
-    if(cut_points.size() >= 2)
+    if(intersections.size() >= 2)
     {
         m_CutPoint1->setVisible(true);
-        m_CutPoint1->setPosition(cut_points[1].m_Point);
+        m_CutPoint1->setPosition(intersections[1].m_Point);
     }
 }
 

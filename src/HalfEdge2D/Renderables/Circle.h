@@ -4,8 +4,9 @@
 #include "HalfEdge2D/Base/Vector.h"
 
 #include "HalfEdge2D/Renderables/RenderableLine.h"
+#include "HalfEdge2D/Renderables/Intersectable.h"
 
-class Circle : public RenderableLine
+class Circle : public RenderableLine, public Intersectable
 {
 public:
     Circle();
@@ -23,6 +24,13 @@ public:
 
     // tooling
     void transform(const Mat3f& mat);
+
+public:
+    virtual IntersectionVector intersect(Circle* const c, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(Line* const l, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(QuadraticBezier* const b, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(CubicBezier* const b, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(Spline* const s, const bool& valuesFromIntersector = false) const final override;
 
 private:
     float m_Radius;

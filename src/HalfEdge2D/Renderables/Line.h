@@ -24,11 +24,11 @@ public:
     Vec2f getNormal() const;
 
 public:
-    virtual IntersectionVector intersect(Circle* const circle) const final override;
-    virtual IntersectionVector intersect(Line* const line) const final override;
-    virtual IntersectionVector intersect(QuadraticBezier* const b) const final override;
-    virtual IntersectionVector intersect(CubicBezier* const b) const final override;
-    virtual IntersectionVector intersect(Spline* const s) const final override;
+    virtual IntersectionVector intersect(Circle* const c, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(Line* const l, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(QuadraticBezier* const b, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(CubicBezier* const b, const bool& valuesFromIntersector = false) const final override;
+    virtual IntersectionVector intersect(Spline* const s, const bool& valuesFromIntersector = false) const final override;
 
 private:
     Mat3f getOrthoBaseMatrix() const;

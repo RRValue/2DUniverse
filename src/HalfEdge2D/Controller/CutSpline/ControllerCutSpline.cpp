@@ -350,7 +350,7 @@ void ControllerCutSpline::cut()
     if(!m_Line->isVisible() || !m_Spline->isVisible())
         return;
 
-    IntersectionVector cut_points = m_Line->intersect(m_Spline);
+    IntersectionVector intersections = m_Line->intersect(m_Spline);
 
     // delete old one
     for(const auto& p : m_CutPoints)
@@ -362,11 +362,11 @@ void ControllerCutSpline::cut()
     m_CutPoints.clear();
 
     // add new ones
-    for(const auto& cp : cut_points)
+    for(const auto& i : intersections)
     {
         Point* np = new Point();
         np->setVisible(true);
-        np->setPosition(cp.m_Point);
+        np->setPosition(i.m_Point);
         np->setSize(0.025f);
         np->setColour(Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
 

@@ -225,11 +225,11 @@ void ControllerCutLine::cut()
     // reset cut point
     m_CutPoint->setVisible(false);
 
-    IntersectionVector cut_points = m_Line0->intersect(m_Line1);
+    IntersectionVector intersections = m_Line0->intersect(m_Line1);
 
-    if(cut_points.empty())
+    if(intersections.empty())
         return;
 
     m_CutPoint->setVisible(true);
-    m_CutPoint->setPosition(cut_points[0].m_Point);
+    m_CutPoint->setPosition(intersections[0].m_Point);
 }
