@@ -85,6 +85,8 @@ IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromInters
     Mat3f trans = getOrthoBaseMatrix();
     Mat3f trans_inv = trans.inverse();
 
+    float line_angle = -std::acos(trans(0, 0));
+
     Circle t_circle(*c);
     Line t_line(*this);
 
@@ -104,10 +106,10 @@ IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromInters
 
     if(r == p.y())
     {
-        if(!valuesFromIntersector)
-            result.push_back({p.x() / length, Vec2f(p.x(), 0.0f)});
+        if(valuesFromIntersector)
+            result.push_back({-PIHALF_F, Vec2f(p.x(), 0.0f)});
         else
-            result.push_back({0.0f, Vec2f(p.x(), 0.0f)});
+            result.push_back({p.x() / length, Vec2f(p.x(), 0.0f)});
     }
     else //r > c.y()
     {
@@ -124,10 +126,19 @@ IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromInters
             if(cut_x < 0.0f || cut_x > l)
                 continue;
             
-            if(!valuesFromIntersector)
-                result.push_back({cut_x / length, Vec2f(cut_x, 0.0f)});
+            if(valuesFromIntersector)
+            {
+                float angle = -PIHALF_F;
+                
+                if(cut_x > p.x())
+                    angle += std::acos(p.y() / r);
+                else
+                    angle -= std::acos(p.y() / r);
+
+                result.push_back({angle, Vec2f(cut_x, 0.0f)});
+            }
             else
-                result.push_back({0.0f, Vec2f(cut_x, 0.0f)});
+                result.push_back({cut_x / length, Vec2f(cut_x, 0.0f)});
         }
     }
 
@@ -137,6 +148,14 @@ IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromInters
 
         r.m_Point(0) = re_t_r(0);
         r.m_Point(1) = re_t_r(1);
+
+        r.m_Alpha += line_angle;
+
+        while(r.m_Alpha < 0.0f)
+            r.m_Alpha += PI2_F;
+
+        while(r.m_Alpha >= PI2_F)
+            r.m_Alpha -= PI2_F;
     }
 
     return result;

@@ -10,6 +10,9 @@ static double PI_D = (double)M_PI;
 static float PI2_F = PI_F * 2.0f;
 static double PI2_D = PI_D * 2.0;
 
+static float PIHALF_F = PI_F / 2.0f;
+static double PIHALF_D = PI_D / 2.0;
+
 static float factorDegToRadF = PI_F / 180.0f;
 static double factorDegToRadD = PI_D / 180.0;
 
