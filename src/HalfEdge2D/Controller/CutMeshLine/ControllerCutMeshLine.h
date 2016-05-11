@@ -7,6 +7,9 @@
 
 class Point;
 class Line;
+class QuadraticBezier;
+class CubicBezier;
+class Spline;
 class HESMesh;
 
 class HESBuilder;
@@ -18,6 +21,17 @@ class QComboBox;
 class ControllerCutMeshLine : public QObject, public Controller
 {
     Q_OBJECT;
+
+private:
+    enum CutMeshMode
+    {
+        CMM_FIRST,
+        CMM_LINE,
+        CMM_QBEZIER,
+        CMM_CBEZIER,
+        CMM_SPLINE,
+        CMM_LAST
+    };
 
 private:
     typedef std::vector<HESMesh*> HESMeshVector;
@@ -43,9 +57,13 @@ private:
 
 private slots:
     void onMeshSelectionChanged(int value);
+    void onShapeSelectionChanged(int value);
 
 private:
     QComboBox* m_CbMeshSelector;
+    QComboBox* m_CbShapeSelector;
+
+    CutMeshMode m_CutMode;
 
     HESMeshVector m_Meshes;
     HESMeshVector m_CutMeshes;
@@ -56,10 +74,23 @@ private:
     size_t m_CurrentPointIdx;
     Vec2f m_CurrentHitDistance;
 
-    std::vector<Point* const> m_Points;
-    std::vector<Point* const> m_CutPoints;
-    Line* m_Line;
+    std::vector<Point* const> m_LinePoints;
+    std::vector<Point* const> m_QBezierPoints;
+    std::vector<Point* const> m_CBezierPoints;
+    std::vector<Point* const> m_SplinePoints;
 
+    static const size_t m_NumLinePoints = 2;
+    static const size_t m_NumQBezierPoints = 3;
+    static const size_t m_NumCBezierPoints = 4;
+    static const size_t m_NumSplinePoints = 10;
+
+    std::vector<Point* const> m_CutPoints;
+
+    Line* m_Line;
+    QuadraticBezier* m_QBezier;
+    CubicBezier* m_CBezier;
+    Spline* m_Spline;
+    
     HESBuilder* m_MeshBuilder;
     HESCutter* m_MeshCutter;
     HESCheck* m_MeshChecker;

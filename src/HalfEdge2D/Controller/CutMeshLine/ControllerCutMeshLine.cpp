@@ -2,14 +2,15 @@
 
 #include "HalfEdge2D/Controller/CutMeshLine/CutMeshLineOption_uic.h"
 
-#include "HalfEdge2D/Base/Spline.h"
-
 #include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
+#include "HalfEdge2D/Renderables/QuadraticBezier.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
+#include "HalfEdge2D/Renderables/Spline.h"
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
@@ -29,6 +30,7 @@
 ControllerCutMeshLine::ControllerCutMeshLine()
 {
     m_Name = "ControllerCutMeshLine";
+    m_CutMode = CMM_LINE;
 }
 
 ControllerCutMeshLine::~ControllerCutMeshLine()
@@ -39,10 +41,22 @@ ControllerCutMeshLine::~ControllerCutMeshLine()
     for(auto& m : m_CutMeshes)
         delete m;
 
-    for(const auto& p : m_Points)
+    for(const auto& p : m_LinePoints)
+        delete p;
+
+    for(const auto& p : m_QBezierPoints)
+        delete p;
+
+    for(const auto& p : m_CBezierPoints)
+        delete p;
+
+    for(const auto& p : m_SplinePoints)
         delete p;
 
     delete m_Line;
+    delete m_QBezier;
+    delete m_CBezier;
+    delete m_Spline;
 
     delete m_MeshCutter;
     delete m_MeshBuilder;
@@ -61,8 +75,23 @@ void ControllerCutMeshLine::init()
     m_Line->setVisible(false);
     m_Line->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
 
+    m_QBezier = new QuadraticBezier();
+    m_QBezier->setVisible(false);
+    m_QBezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+
+    m_CBezier = new CubicBezier();
+    m_CBezier->setVisible(false);
+    m_CBezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+
+    m_Spline = new Spline();
+    m_Spline->setVisible(false);
+    m_Spline->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+
     // add to scene
     m_Scene->addLine(m_Line);
+    m_Scene->addQuadraticBeziers(m_QBezier);
+    m_Scene->addCubicBeziers(m_CBezier);
+    m_Scene->addSpline(m_Spline);
 
     // init gui
     m_OptionWidget = new QWidget();
@@ -76,6 +105,11 @@ void ControllerCutMeshLine::init()
     connect(m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
 
     onMeshSelectionChanged(m_CbMeshSelector->currentIndex());
+
+    m_CbShapeSelector = ui_options.m_CbShapeSelector;
+    m_CbShapeSelector->addItems(QStringList() << "Line" << "QBezier" << "CBezier" << "SPline");
+
+    connect(m_CbShapeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onShapeSelectionChanged(int)));
 }
 
 void ControllerCutMeshLine::activate()
@@ -110,11 +144,33 @@ bool ControllerCutMeshLine::handleMouseMoveEvent(QMouseEvent* const event)
 
     m_CurrentPoint->setPosition(new_pos);
 
-    if(m_CurrentPointIdx == 0)
-        m_Line->setPoint(0, m_CurrentPoint->getPosition());
+    switch(m_CutMode)
+    {
+    case CMM_LINE:
+        {
+            m_Line->setPoint(m_CurrentPointIdx, m_CurrentPoint->getPosition());
 
-    if(m_CurrentPointIdx == 1)
-        m_Line->setPoint(1, m_CurrentPoint->getPosition());
+            break;
+        }
+    case CMM_QBEZIER:
+        {
+            m_QBezier->setPoint(m_CurrentPointIdx, m_CurrentPoint->getPosition());
+
+            break;
+        }
+    case CMM_CBEZIER:
+        {
+            m_CBezier->setPoint(m_CurrentPointIdx, m_CurrentPoint->getPosition());
+
+            break;
+        }
+    case CMM_SPLINE:
+        {
+            m_Spline->setPoint(m_CurrentPointIdx, m_CurrentPoint->getPosition());
+
+            break;
+        }
+    }
 
     cut();
 
@@ -155,28 +211,147 @@ bool ControllerCutMeshLine::handleMousePressEvent(QMouseEvent* const event)
     // if hit nothing and point size < 2 -> add
     if(m_CurrentPoint == nullptr)
     {
-        if(m_Points.size() >= 2)
+        switch(m_CutMode)
         {
-            m_MovePoint = false;
+        case CMM_LINE:
+            {
+                if(m_LinePoints.size() >= m_NumLinePoints)
+                {
+                    m_MovePoint = false;
 
-            return true;
+                    return true;
+                }
+
+                break;
+            }
+        case CMM_QBEZIER:
+            {
+                if(m_QBezierPoints.size() >= m_NumQBezierPoints)
+                {
+                    m_MovePoint = false;
+
+                    return true;
+                }
+
+                break;
+            }
+        case CMM_CBEZIER:
+            {
+                if(m_CBezierPoints.size() >= m_NumCBezierPoints)
+                {
+                    m_MovePoint = false;
+
+                    return true;
+                }
+
+                break;
+            }
+        case CMM_SPLINE:
+            {
+                if(m_SplinePoints.size() >= m_NumSplinePoints)
+                {
+                    m_MovePoint = false;
+
+                    return true;
+                }
+
+                break;
+            }
+        default:
+            {
+                m_MovePoint = false;
+
+                return true;
+            }
         }
 
         m_CurrentPoint = new Point();
         m_CurrentPoint->setPosition(invTrans(p_f));
 
-        m_CurrentPointIdx = m_Points.size();
-
-        m_Points.push_back(m_CurrentPoint);
-        m_Scene->addPoint(m_CurrentPoint);
-
-        if(m_CurrentPointIdx == 0)
-            m_Line->setPoint(0, m_CurrentPoint->getPosition());
-
-        if(m_CurrentPointIdx == 1)
+        switch(m_CutMode)
         {
-            m_Line->setPoint(1, m_CurrentPoint->getPosition());
-            m_Line->setVisible(true);
+        case CMM_LINE:
+            {
+                m_CurrentPointIdx = m_LinePoints.size();
+
+                m_LinePoints.push_back(m_CurrentPoint);
+                m_Scene->addPoint(m_CurrentPoint);
+
+                if(m_CurrentPointIdx == 0)
+                    m_Line->setPoint(0, m_CurrentPoint->getPosition());
+
+                if(m_CurrentPointIdx == 1)
+                {
+                    m_Line->setPoint(1, m_CurrentPoint->getPosition());
+                    m_Line->setVisible(true);
+                }
+
+                break;
+            }
+        case CMM_QBEZIER:
+            {
+                m_CurrentPointIdx = m_QBezierPoints.size();
+
+                m_QBezierPoints.push_back(m_CurrentPoint);
+                m_Scene->addPoint(m_CurrentPoint);
+
+                if(m_CurrentPointIdx == 0)
+                    m_QBezier->setPoint(0, m_CurrentPoint->getPosition());
+
+                if(m_CurrentPointIdx == 1)
+                    m_QBezier->setPoint(1, m_CurrentPoint->getPosition());
+
+                if(m_CurrentPointIdx == 2)
+                {
+                    m_QBezier->setPoint(2, m_CurrentPoint->getPosition());
+                    m_QBezier->setVisible(true);
+                }
+
+                break;
+            }
+        case CMM_CBEZIER:
+            {
+                m_CurrentPointIdx = m_CBezierPoints.size();
+
+                m_CBezierPoints.push_back(m_CurrentPoint);
+                m_Scene->addPoint(m_CurrentPoint);
+
+                if(m_CurrentPointIdx == 0)
+                    m_CBezier->setPoint(0, m_CurrentPoint->getPosition());
+
+                if(m_CurrentPointIdx == 1)
+                    m_CBezier->setPoint(1, m_CurrentPoint->getPosition());
+
+                if(m_CurrentPointIdx == 2)
+                    m_CBezier->setPoint(2, m_CurrentPoint->getPosition());
+
+                if(m_CurrentPointIdx == 3)
+                {
+                    m_CBezier->setPoint(3, m_CurrentPoint->getPosition());
+                    m_CBezier->setVisible(true);
+                }
+
+                break;
+            }
+        case CMM_SPLINE:
+            {
+                m_CurrentPointIdx = m_SplinePoints.size();
+
+                m_SplinePoints.push_back(m_CurrentPoint);
+                m_Scene->addPoint(m_CurrentPoint);
+
+                m_Spline->addPoint(m_CurrentPoint->getPosition());
+
+                if(m_SplinePoints.size() == 2)
+                    m_Spline->setVisible(true);
+
+                if(m_SplinePoints.size() > 2)
+                    m_Spline->setClosed(true);
+
+                break;
+            }
+        default:
+            break;
         }
     }
 
@@ -218,17 +393,52 @@ bool ControllerCutMeshLine::handleWheelEvent(QWheelEvent* const event)
 
 Point* const ControllerCutMeshLine::getPointAtPos(const Vec2f& pos, size_t* const idx) const
 {
-    if(m_Points.empty())
+    const std::vector<Point* const>* current_point_list = nullptr;
+
+    switch(m_CutMode)
+    {
+    case CMM_LINE:
+        {
+            current_point_list = &m_LinePoints;
+
+            break;
+        }
+    case CMM_QBEZIER:
+        {
+            current_point_list = &m_QBezierPoints;
+
+            break;
+        }
+    case CMM_CBEZIER:
+        {
+            current_point_list = &m_CBezierPoints;
+
+            break;
+        }
+    case CMM_SPLINE:
+        {
+            current_point_list = &m_SplinePoints;
+
+            break;
+        }
+    default:
+        return nullptr;
+    }
+
+    if(current_point_list == nullptr)
         return nullptr;
 
-    for(size_t i = 0; i < m_Points.size(); i++)
+    if(current_point_list->empty())
+        return nullptr;
+
+    for(size_t i = 0; i < current_point_list->size(); i++)
     {
-        if((m_Points[i]->getPosition() - pos).norm() >= m_Points[i]->getSize())
+        if(((*current_point_list)[i]->getPosition() - pos).norm() >= (*current_point_list)[i]->getSize())
             continue;
 
         *idx = i;
 
-        return m_Points[i];
+        return (*current_point_list)[i];
     }
 
     return nullptr;
@@ -312,11 +522,56 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
     m_Renderer->render();
 }
 
-void ControllerCutMeshLine::cut()
+void ControllerCutMeshLine::onShapeSelectionChanged(int value)
 {
-    if(m_Points.size() != 2)
+    if(value < 0 || value > 3)
         return;
 
+    bool show_line_points = value == 0;
+    bool show_qbez_points = value == 1;
+    bool show_cbez_points = value == 2;
+    bool show_spli_points = value == 3;
+
+    bool show_line = show_line_points && m_LinePoints.size() == m_NumLinePoints;
+    bool show_qbez = show_qbez_points && m_QBezierPoints.size() == m_NumQBezierPoints;
+    bool show_cbez = show_cbez_points && m_CBezierPoints.size() == m_NumCBezierPoints;
+    bool show_spli = show_spli_points && m_SplinePoints.size() == m_NumSplinePoints;
+
+    for(const auto& p : m_LinePoints)
+        p->setVisible(show_line_points);
+    m_Line->setVisible(show_line);
+
+    for(const auto& p : m_QBezierPoints)
+        p->setVisible(show_qbez_points);
+    m_QBezier->setVisible(show_qbez);
+
+    for(const auto& p : m_CBezierPoints)
+        p->setVisible(show_cbez_points);
+    m_CBezier->setVisible(show_cbez);
+
+    for(const auto& p : m_SplinePoints)
+        p->setVisible(show_spli_points);
+    m_Spline->setVisible(show_spli);
+
+    if(show_line_points)
+        m_CutMode = CMM_LINE;
+
+    if(show_qbez_points)
+        m_CutMode = CMM_QBEZIER;
+
+    if(show_cbez_points)
+        m_CutMode = CMM_CBEZIER;
+
+    if(show_spli_points)
+        m_CutMode = CMM_SPLINE;
+
+    cut();
+
+    m_Renderer->render();
+}
+
+void ControllerCutMeshLine::cut()
+{
     // clear and remove cut points
     for(const auto& p : m_CutPoints)
     {
@@ -326,17 +581,83 @@ void ControllerCutMeshLine::cut()
 
     m_CutPoints.clear();
 
+    switch(m_CutMode)
+    {
+    case CMM_LINE:
+        {
+            if(!m_Line->isVisible())
+                return;
+
+            break;
+        }
+    case CMM_QBEZIER:
+        {
+            if(!m_QBezier->isVisible())
+                return;
+
+            break;
+        }
+    case CMM_CBEZIER:
+        {
+            if(!m_CBezier->isVisible())
+                return;
+
+            break;
+        }
+    case CMM_SPLINE:
+        {
+            if(!m_Spline->isVisible())
+                return;
+
+            break;
+        }
+    default:
+        break;
+    }
+
     NSpline<float, 4> rgbg;
 
     rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
     rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    rgbg.addPoint(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
     rgbg.setClosed(false);
 
     // for each mesh cut
     for(const auto& m : m_Meshes)
     {
         HESMeshVector result;
-        bool cutted = m_MeshCutter->cutLine(m, m_Line, result);
+
+        bool cutted = false;
+
+        switch(m_CutMode)
+        {
+        case CMM_LINE:
+            {
+                cutted = m_MeshCutter->cutLine(m, m_Line, result);
+
+                break;
+            }
+        case CMM_QBEZIER:
+            {
+                //cutted = m_MeshCutter->cutQuadraticBezier(m, m_QBezier, result);
+
+                break;
+            }
+        case CMM_CBEZIER:
+            {
+                //cutted = m_MeshCutter->cutCubicBezier(m, m_CBezier, result);
+
+                break;
+            }
+        case CMM_SPLINE:
+            {
+                //cutted = m_MeshCutter->cutSpline(m, m_Spline, result);
+
+                break;
+            }
+        default:
+            break;
+        }
 
         if(!cutted)
             continue;
