@@ -1,6 +1,6 @@
-#include "HalfEdge2D/Controller/CutMeshLine/ControllerCutMeshLine.h"
+#include "HalfEdge2D/Controller/CutMesh/ControllerCutMesh.h"
 
-#include "HalfEdge2D/Controller/CutMeshLine/CutMeshLineOption_uic.h"
+#include "HalfEdge2D/Controller/CutMesh/CutMeshOption_uic.h"
 
 #include "HalfEdge2D/Rendering/Renderer.h"
 
@@ -27,13 +27,13 @@
 
 #include <QtGui/QMouseEvent>
 
-ControllerCutMeshLine::ControllerCutMeshLine()
+ControllerCutMesh::ControllerCutMesh()
 {
-    m_Name = "ControllerCutMeshLine";
+    m_Name = "ControllerCutMesh";
     m_CutMode = CMM_LINE;
 }
 
-ControllerCutMeshLine::~ControllerCutMeshLine()
+ControllerCutMesh::~ControllerCutMesh()
 {
     for(auto& m : m_Meshes)
         delete m;
@@ -62,7 +62,7 @@ ControllerCutMeshLine::~ControllerCutMeshLine()
     delete m_MeshBuilder;
 }
 
-void ControllerCutMeshLine::init()
+void ControllerCutMesh::init()
 {
     m_MeshCutter = new HESCutter();
     m_MeshBuilder = new HESBuilder();
@@ -96,7 +96,7 @@ void ControllerCutMeshLine::init()
     // init gui
     m_OptionWidget = new QWidget();
 
-    Ui_ControllerCutMeshLineOptionsWidget ui_options;
+    Ui_ControllerCutMeshOptionsWidget ui_options;
     ui_options.setupUi(m_OptionWidget);
 
     m_CbMeshSelector = ui_options.m_CbMeshSelector;
@@ -112,21 +112,21 @@ void ControllerCutMeshLine::init()
     connect(m_CbShapeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onShapeSelectionChanged(int)));
 }
 
-void ControllerCutMeshLine::activate()
+void ControllerCutMesh::activate()
 {
     m_Renderer->setRenderCoordianteAxis(false);
     m_Renderer->setRenderTriangles(false);
     m_Renderer->setRenderVertices(false);
 }
 
-void ControllerCutMeshLine::deactivate()
+void ControllerCutMesh::deactivate()
 {
     m_Renderer->setRenderCoordianteAxis(true);
     m_Renderer->setRenderTriangles(true);
     m_Renderer->setRenderVertices(true);
 }
 
-bool ControllerCutMeshLine::handleMouseMoveEvent(QMouseEvent* const event)
+bool ControllerCutMesh::handleMouseMoveEvent(QMouseEvent* const event)
 {
     if(m_RenderTarget == nullptr || m_ActiveViewPort == nullptr || m_ActiveCamera == nullptr)
         return false;
@@ -179,7 +179,7 @@ bool ControllerCutMeshLine::handleMouseMoveEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutMeshLine::handleMousePressEvent(QMouseEvent* const event)
+bool ControllerCutMesh::handleMousePressEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -365,7 +365,7 @@ bool ControllerCutMeshLine::handleMousePressEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutMeshLine::handleMouseReleaseEvent(QMouseEvent* const event)
+bool ControllerCutMesh::handleMouseReleaseEvent(QMouseEvent* const event)
 {
     if(m_Scene == nullptr)
         return false;
@@ -381,17 +381,17 @@ bool ControllerCutMeshLine::handleMouseReleaseEvent(QMouseEvent* const event)
     return true;
 }
 
-bool ControllerCutMeshLine::handleResizeEvent(QResizeEvent* const event)
+bool ControllerCutMesh::handleResizeEvent(QResizeEvent* const event)
 {
     return false;
 }
 
-bool ControllerCutMeshLine::handleWheelEvent(QWheelEvent* const event)
+bool ControllerCutMesh::handleWheelEvent(QWheelEvent* const event)
 {
     return false;
 }
 
-Point* const ControllerCutMeshLine::getPointAtPos(const Vec2f& pos, size_t* const idx) const
+Point* const ControllerCutMesh::getPointAtPos(const Vec2f& pos, size_t* const idx) const
 {
     const std::vector<Point* const>* current_point_list = nullptr;
 
@@ -444,7 +444,7 @@ Point* const ControllerCutMeshLine::getPointAtPos(const Vec2f& pos, size_t* cons
     return nullptr;
 }
 
-void ControllerCutMeshLine::onMeshSelectionChanged(int value)
+void ControllerCutMesh::onMeshSelectionChanged(int value)
 {
     HESMesh tmp_mesh;
 
@@ -522,7 +522,7 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
     m_Renderer->render();
 }
 
-void ControllerCutMeshLine::onShapeSelectionChanged(int value)
+void ControllerCutMesh::onShapeSelectionChanged(int value)
 {
     if(value < 0 || value > 3)
         return;
@@ -570,7 +570,7 @@ void ControllerCutMeshLine::onShapeSelectionChanged(int value)
     m_Renderer->render();
 }
 
-void ControllerCutMeshLine::cut()
+void ControllerCutMesh::cut()
 {
     // clear and remove cut points
     for(const auto& p : m_CutPoints)

@@ -18,7 +18,7 @@ class HESCheck;
 
 class QComboBox;
 
-class ControllerCutMeshLine : public QObject, public Controller
+class ControllerCutMesh : public QObject, public Controller
 {
     Q_OBJECT;
 
@@ -37,8 +37,8 @@ private:
     typedef std::vector<HESMesh*> HESMeshVector;
 
 public:
-    ControllerCutMeshLine();
-    virtual ~ControllerCutMeshLine();
+    ControllerCutMesh();
+    virtual ~ControllerCutMesh();
 
 protected:
     virtual void init() final override;
