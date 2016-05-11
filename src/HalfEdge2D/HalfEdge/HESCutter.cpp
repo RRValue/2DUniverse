@@ -10,6 +10,9 @@
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
+#include "HalfEdge2D/Renderables/QuadraticBezier.h"
+#include "HalfEdge2D/Renderables/CubicBezier.h"
+#include "HalfEdge2D/Renderables/Spline.h"
 
 #include <deque>
 
@@ -35,9 +38,72 @@ bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVect
 
     m_SourceMesh = sourceMesh;
 
+    // set line
+    m_Line = line;
+    m_ClosedCurve = false;
+
+    // set mode
+    m_CuttingMode = E_CM_LINE;
+
+    return cut(outMeshes);
+}
+
+bool HESCutter::cutQuadraticBezier(HESMesh* const sourceMesh, QuadraticBezier* const qezier, HESMeshVector& outMeshes)
+{
+    if(sourceMesh == nullptr || qezier == nullptr)
+        return false;
+
+    m_SourceMesh = sourceMesh;
+
+    // set line
+    m_QuadraticBezier = qezier;
+    m_ClosedCurve = false;
+
+    // set mode
+    m_CuttingMode = E_CM_QBEZIER;
+
+    return cut(outMeshes);
+}
+
+bool HESCutter::cutCubicBezier(HESMesh* const sourceMesh, CubicBezier* const cezier, HESMeshVector& outMeshes)
+{
+    if(sourceMesh == nullptr || cezier == nullptr)
+        return false;
+
+    m_SourceMesh = sourceMesh;
+
+    // set line
+    m_CubicBezier = cezier;
+    m_ClosedCurve = false;
+
+    // set mode
+    m_CuttingMode = E_CM_CBEZIER;
+
+    return cut(outMeshes);
+}
+
+bool HESCutter::cutSpline(HESMesh* const sourceMesh, Spline* const spline, HESMeshVector& outMeshes)
+{
+    if(sourceMesh == nullptr || spline == nullptr)
+        return false;
+
+    m_SourceMesh = sourceMesh;
+
+    // set line
+    m_Spline = spline;
+    m_ClosedCurve = m_Spline->isClosed();
+
+    // set mode
+    m_CuttingMode = E_CM_SPLINE;
+
+    return cut(outMeshes);
+}
+
+bool HESCutter::cut(HESMeshVector& outMeshes)
+{
     // reset
     m_CutPoints.clear();
-    
+
     // find cuts in border of mesh
     /// if we have no cutts -> the line cutts no parts of the mesh
     /// if we have a odd number of cutts -> the line cuts at one part of the mesh only one border of that part -> cut unfinished
@@ -75,7 +141,7 @@ bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVect
             cut_edge.setPoint(0, e->from()->getPosition());
             cut_edge.setPoint(1, e->to()->getPosition());
 
-            cur_cut_points = line->intersect(&cut_edge);
+            cur_cut_points = cutImpl(cut_edge);;
 
             if(cur_cut_points.empty())
                 continue;
@@ -124,7 +190,7 @@ bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVect
         if(current_face->visited())
             continue;
 
-        current_face->setVisited(true);        
+        current_face->setVisited(true);
         faces_visited.push_back(current_face);
 
         // cut with edges on face
@@ -147,13 +213,13 @@ bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVect
             cut_edge.setPoint(0, e->from()->getPosition());
             cut_edge.setPoint(1, e->to()->getPosition());
 
-            cur_cut_points = line->intersect(&cut_edge);
+            cur_cut_points = cutImpl(cut_edge);
 
             if(cur_cut_points.empty())
                 continue;
 
             faces_to_visit.push_back(e->opposite()->face());
-            
+
             for(const auto& ccp : cur_cut_points)
                 cut_point_map.insert(std::make_pair(ccp.m_Alpha, CutPoint(e, ccp.m_Point)));
         }
@@ -171,4 +237,23 @@ bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVect
         m_CutPoints.push_back(cp.second.m_Point);
 
     return true;
+}
+
+IntersectionVector HESCutter::cutImpl(const Line& line) const
+{
+    switch(m_CuttingMode)
+    {
+    case E_CM_LINE:
+            return m_Line->intersect(const_cast<Line* const>(&line));
+    case E_CM_QBEZIER:
+        return m_QuadraticBezier->intersect(const_cast<Line* const>(&line));
+    case E_CM_CBEZIER:
+        return m_CubicBezier->intersect(const_cast<Line* const>(&line));
+    case E_CM_SPLINE:
+        return m_Spline->intersect(const_cast<Line* const>(&line));
+    default:
+        return IntersectionVector();
+    }
+
+    return IntersectionVector();
 }

@@ -619,7 +619,6 @@ void ControllerCutMesh::cut()
 
     rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
     rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-    rgbg.addPoint(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
     rgbg.setClosed(false);
 
     // for each mesh cut
@@ -639,19 +638,19 @@ void ControllerCutMesh::cut()
             }
         case CMM_QBEZIER:
             {
-                //cutted = m_MeshCutter->cutQuadraticBezier(m, m_QBezier, result);
+                cutted = m_MeshCutter->cutQuadraticBezier(m, m_QBezier, result);
 
                 break;
             }
         case CMM_CBEZIER:
             {
-                //cutted = m_MeshCutter->cutCubicBezier(m, m_CBezier, result);
+                cutted = m_MeshCutter->cutCubicBezier(m, m_CBezier, result);
 
                 break;
             }
         case CMM_SPLINE:
             {
-                //cutted = m_MeshCutter->cutSpline(m, m_Spline, result);
+                cutted = m_MeshCutter->cutSpline(m, m_Spline, result);
 
                 break;
             }
