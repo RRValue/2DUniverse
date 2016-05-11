@@ -307,6 +307,8 @@ void ControllerCutMeshLine::onMeshSelectionChanged(int value)
 
     m_SceneChanges = true;
 
+    cut();
+
     m_Renderer->render();
 }
 
@@ -328,7 +330,6 @@ void ControllerCutMeshLine::cut()
 
     rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
     rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-    rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
     rgbg.setClosed(false);
 
     // for each mesh cut
@@ -351,7 +352,15 @@ void ControllerCutMeshLine::cut()
         {
             Point* cp = new Point();
             cp->setPosition(cp_vec[i]);
-            cp->setColour(rgbg.pointAt(t));
+
+            Vec4f c = rgbg.pointAt(t);
+
+            c(0) = std::max(0.0f, std::min(c(0), 1.0f));
+            c(1) = std::max(0.0f, std::min(c(1), 1.0f));
+            c(2) = std::max(0.0f, std::min(c(2), 1.0f));
+            c(3) = std::max(0.0f, std::min(c(3), 1.0f));
+
+            cp->setColour(c);
             cp->setSize(0.02f);
 
             m_CutPoints.push_back(cp);
