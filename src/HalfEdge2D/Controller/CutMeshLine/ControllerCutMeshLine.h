@@ -57,6 +57,7 @@ private:
     Vec2f m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
+    std::vector<Point* const> m_CutPoints;
     Line* m_Line;
 
     HESBuilder* m_MeshBuilder;

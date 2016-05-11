@@ -2,6 +2,8 @@
 
 #include "HalfEdge2D/Controller/CutMeshLine/CutMeshLineOption_uic.h"
 
+#include "HalfEdge2D/Base/Spline.h"
+
 #include "HalfEdge2D/Rendering/Renderer.h"
 
 #include "HalfEdge2D/Scene/Scene.h"
@@ -313,20 +315,52 @@ void ControllerCutMeshLine::cut()
     if(m_Points.size() != 2)
         return;
 
-    // remove cut points
-    for(const auto& p : m_MeshCutter->getCutPoints())
+    // clear and remove cut points
+    for(const auto& p : m_CutPoints)
+    {
         m_Scene->removePoint(p);
+        delete p;
+    }
 
+    m_CutPoints.clear();
+
+    NSpline<float, 4> rgbg;
+
+    rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+    rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+    rgbg.setClosed(false);
+
+    // for each mesh cut
     for(const auto& m : m_Meshes)
     {
         HESMeshVector result;
         bool cutted = m_MeshCutter->cutLine(m, m_Line, result);
 
-        //m->setVisible(!cutted);
-        //m_CutMesh->setVisible(cutted);
+        if(!cutted)
+            continue;
 
         // add cut points
-        for(const auto& p : m_MeshCutter->getCutPoints())
-            m_Scene->addPoint(p);
+        const CutPointVector& cp_vec = m_MeshCutter->getCutPoints();
+        const size_t& num_cp = cp_vec.size();
+        
+        float s = 1.0f / (float)(num_cp - 1);
+        float t = 0.0f;
+
+        for(size_t i = 0; i < num_cp; i++)
+        {
+            Point* cp = new Point();
+            cp->setPosition(cp_vec[i]);
+            cp->setColour(rgbg.pointAt(t));
+            cp->setSize(0.02f);
+
+            m_CutPoints.push_back(cp);
+
+            t += s;
+        }
     }
+
+    // add cut points to scene
+    for(const auto& p : m_CutPoints)
+        m_Scene->addPoint(p);
 }

@@ -13,6 +13,7 @@ class HESBuilder;
 class HESCheck;
 
 typedef std::vector<HESEdge* const> HESEdgeConstVector;
+typedef std::vector<HESFace* const> HESFaceConstVector;
 
 class HESMesh : public Mesh
 {
