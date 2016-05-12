@@ -6,7 +6,7 @@
 #include "HalfEdge2D/Renderables/RenderableLine.h"
 #include "HalfEdge2D/Renderables/Intersectable.h"
 
-class Spline : public Spline2F, public RenderableLine, public Intersectable
+class Spline : public Spline2D, public RenderableLine, public Intersectable
 {
 public:
     Spline();

@@ -5,7 +5,7 @@
 Circle::Circle()
 {
     m_Radius = 0.1f;
-    m_Position = Vec2f(0.0f, 0.0f);
+    m_Position = Vec2d(0.0, 0.0);
 }
 
 Circle::Circle(const Circle& other) : RenderableLine(other), m_Radius(other.m_Radius), m_Position(other.m_Position)
@@ -23,7 +23,7 @@ const float& Circle::getRadius() const
     return m_Radius;
 }
 
-const Vec2f& Circle::getPosition() const
+const Vec2d& Circle::getPosition() const
 {
     return m_Position;
 }
@@ -33,14 +33,14 @@ void Circle::setRadius(const float& radius)
     m_Radius = radius;
 }
 
-void Circle::setPosition(const Vec2f& pos)
+void Circle::setPosition(const Vec2d& pos)
 {
     m_Position = pos;
 }
 
-void Circle::transform(const Mat3f& mat)
+void Circle::transform(const Mat3d& mat)
 {
-    Vec3f c_t = mat * Vec3f(m_Position[0], m_Position[1], 1.0);
+    Vec3d c_t = mat * Vec3d(m_Position[0], m_Position[1], 1.0);
 
     m_Position(0) = c_t(0);
     m_Position(1) = c_t(1);

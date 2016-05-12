@@ -12,12 +12,12 @@ Line::Line()
 
 }
 
-Line::Line(const Line& other) : Line2F(other), RenderableLine(other)
+Line::Line(const Line& other) : Line2D(other), RenderableLine(other)
 {
 
 }
 
-Line::Line(Line&& other) : Line2F(std::move(other)), RenderableLine(std::move(other))
+Line::Line(Line&& other) : Line2D(std::move(other)), RenderableLine(std::move(other))
 {
 
 }
@@ -29,8 +29,8 @@ Line::~Line()
 
 bool Line::collinearTo(const Line& l) const
 {
-    Vec2f nf0 = (getPoint(1) - getPoint(0)).normalized();
-    Vec2f nf1 = (l.getPoint(1) - l.getPoint(0)).normalized();
+    Vec2d nf0 = (getPoint(1) - getPoint(0)).normalized();
+    Vec2d nf1 = (l.getPoint(1) - l.getPoint(0)).normalized();
 
     Vec2d n0((double)nf0[0], (double)nf0[1]);
     Vec2d n1((double)nf1[0], (double)nf1[1]);
@@ -40,52 +40,52 @@ bool Line::collinearTo(const Line& l) const
     return std::abs(1.0 - std::abs(res)) < 1e-5;
 }
 
-float Line::getLength() const
+double Line::getLength() const
 {
     return (getPoint(0) - getPoint(1)).norm();
 }
 
-Vec2f Line::getNormal() const
+Vec2d Line::getNormal() const
 {
     return (getPoint(0) - getPoint(1)).normalized();
 }
 
-Mat3f Line::getOrthoBaseMatrix() const
+Mat3d Line::getOrthoBaseMatrix() const
 {
-    Vec2f t = getPoint(0);
-    Vec2f p = getPoint(1) - t;
+    Vec2d t = getPoint(0);
+    Vec2d p = getPoint(1) - t;
 
-    float l = p.norm();
-    float a = std::asin(p.y() / l);
+    double l = p.norm();
+    double a = std::asin(p.y() / l);
 
-    if(p.x() < 0.0f)
+    if(p.x() < 0.0)
         a = PI_F - a;
 
-    if(a < 0.0f)
+    if(a < 0.0)
         a += PI2_F;
 
-    Mat3f m_r;
-    Mat3f m_t;
+    Mat3d m_r;
+    Mat3d m_t;
 
     m_r <<
-        std::cos(-a), -std::sin(-a), 0.0f,
-        std::sin(-a),  std::cos(-a), 0.0f,
-                0.0f,          0.0f, 1.0f;
+        std::cos(-a), -std::sin(-a), 0.0,
+        std::sin(-a),  std::cos(-a), 0.0,
+                 0.0,           0.0, 1.0;
 
     m_t <<
-        1.0f, 0.0f, -t[0],
-        0.0f, 1.0f, -t[1],
-        0.0f, 0.0f,  1.0f;
+        1.0, 0.0, -t[0],
+        0.0, 1.0, -t[1],
+        0.0, 0.0,   1.0;
 
     return m_r * m_t;
 }
 
 IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromIntersector) const
 {
-    Mat3f trans = getOrthoBaseMatrix();
-    Mat3f trans_inv = trans.inverse();
+    Mat3d trans = getOrthoBaseMatrix();
+    Mat3d trans_inv = trans.inverse();
 
-    float line_angle = -std::acos(trans(0, 0));
+    double line_angle = -std::acos(trans(0, 0));
 
     Circle t_circle(*c);
     Line t_line(*this);
@@ -94,28 +94,28 @@ IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromInters
     t_line.transform(trans);
 
     const float& r = t_circle.getRadius();
-    const Vec2f& p = t_circle.getPosition();
-    float l = t_line.getLength();
+    const Vec2d& p = t_circle.getPosition();
+    double l = t_line.getLength();
 
     IntersectionVector result;
 
     if(r < p.y())
         return result;
 
-    float length = getLength();
+    double length = getLength();
 
     if(r == p.y())
     {
         if(valuesFromIntersector)
-            result.push_back({-PIHALF_F, Vec2f(p.x(), 0.0f)});
+            result.push_back({-PIHALF_F, Vec2d(p.x(), 0.0)});
         else
-            result.push_back({p.x() / length, Vec2f(p.x(), 0.0f)});
+            result.push_back({p.x() / length, Vec2d(p.x(), 0.0)});
     }
     else //r > c.y()
     {
-        float a = std::sqrt(std::pow(r, 2.0f) - std::pow(p.y(), 2.0f));
+        double a = std::sqrt(std::pow(r, 2.0) - std::pow(p.y(), 2.0));
 
-        std::array<float, 2> cuts_x = 
+        std::array<double, 2> cuts_x = 
         {
             p.x() + a, 
             p.x() - a
@@ -123,28 +123,28 @@ IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromInters
 
         for(const auto& cut_x : cuts_x)
         {
-            if(cut_x < 0.0f || cut_x > l)
+            if(cut_x < 0.0 || cut_x > l)
                 continue;
             
             if(valuesFromIntersector)
             {
-                float angle = -PIHALF_F;
+                double angle = -PIHALF_F;
                 
                 if(cut_x > p.x())
                     angle += std::acos(p.y() / r);
                 else
                     angle -= std::acos(p.y() / r);
 
-                result.push_back({angle, Vec2f(cut_x, 0.0f)});
+                result.push_back({angle, Vec2d(cut_x, 0.0)});
             }
             else
-                result.push_back({cut_x / length, Vec2f(cut_x, 0.0f)});
+                result.push_back({cut_x / length, Vec2d(cut_x, 0.0)});
         }
     }
 
     for(auto& r : result)
     {
-        Vec3f re_t_r = trans_inv * Vec3f(r.m_Point(0), r.m_Point(1), 1.0f);
+        Vec3d re_t_r = trans_inv * Vec3d(r.m_Point(0), r.m_Point(1), 1.0);
 
         r.m_Point(0) = re_t_r(0);
         r.m_Point(1) = re_t_r(1);
@@ -168,7 +168,7 @@ IntersectionVector Line::intersect(Line* const l, const bool& valuesFromIntersec
     if(collinearTo(*l))
         return results;
 
-    Mat3f trans = getOrthoBaseMatrix();
+    Mat3d trans = getOrthoBaseMatrix();
 
     Line t_line(*l);
 
@@ -180,18 +180,18 @@ IntersectionVector Line::intersect(Line* const l, const bool& valuesFromIntersec
     if(root.empty())
         return results;
 
-    float alpha = root[0];
+    double alpha = root[0];
 
     // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
-    if(alpha < 0.0f || alpha > 1.0f)
+    if(alpha < 0.0 || alpha > 1.0)
         return results;
 
-    Vec2f cut_pos = t_line.pointAt(alpha);
+    Vec2d cut_pos = t_line.pointAt(alpha);
 
     // cut_pos.x must be between 0.0 and lenght of source line
-    float length = getLength();
+    double length = getLength();
 
-    if(cut_pos.x() < 0.0f || cut_pos.x() > length)
+    if(cut_pos.x() < 0.0 || cut_pos.x() > length)
         return results;
 
     if(valuesFromIntersector)
@@ -204,7 +204,7 @@ IntersectionVector Line::intersect(Line* const l, const bool& valuesFromIntersec
 
 IntersectionVector Line::intersect(QuadraticBezier* const b, const bool& valuesFromIntersector) const
 {
-    Mat3f trans = getOrthoBaseMatrix();
+    Mat3d trans = getOrthoBaseMatrix();
 
     QuadraticBezier t_bezier(*b);
 
@@ -218,20 +218,20 @@ IntersectionVector Line::intersect(QuadraticBezier* const b, const bool& valuesF
     if(roots.empty())
         return results;
 
-    float length = getLength();
+    double length = getLength();
 
     for(unsigned int i = 0; i < roots.m_Solutions; i++)
     {
-        float alpha = roots[i];
+        double alpha = roots[i];
 
         // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
-        if(alpha < 0.0f || alpha > 1.0f)
+        if(alpha < 0.0 || alpha > 1.0)
             continue;
 
-        Vec2f cut_pos = t_bezier.pointAt(alpha);
+        Vec2d cut_pos = t_bezier.pointAt(alpha);
 
         // cut_pos.x must be between 0.0 and lenght of source line
-        if(cut_pos.x() < 0.0f || cut_pos.x() > length)
+        if(cut_pos.x() < 0.0 || cut_pos.x() > length)
             continue;
 
         if(valuesFromIntersector)
@@ -245,7 +245,7 @@ IntersectionVector Line::intersect(QuadraticBezier* const b, const bool& valuesF
 
 IntersectionVector Line::intersect(CubicBezier* const b, const bool& valuesFromIntersector) const
 {
-    Mat3f trans = getOrthoBaseMatrix();
+    Mat3d trans = getOrthoBaseMatrix();
 
     CubicBezier t_bezier(*b);
     t_bezier.transform(trans);
@@ -257,20 +257,20 @@ IntersectionVector Line::intersect(CubicBezier* const b, const bool& valuesFromI
     if(roots.empty())
         return results;
 
-    float length = getLength();
+    double length = getLength();
 
     for(unsigned int i = 0; i < roots.m_Solutions; i++)
     {
-        float alpha = roots[i];
+        double alpha = roots[i];
 
         // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
-        if(alpha < 0.0f || alpha > 1.0f)
+        if(alpha < 0.0 || alpha > 1.0)
             continue;
 
-        Vec2f cut_pos = t_bezier.pointAt(alpha);
+        Vec2d cut_pos = t_bezier.pointAt(alpha);
 
         // cut_pos.x must be between 0.0 and lenght of source line
-        if(cut_pos.x() < 0.0f || cut_pos.x() > length)
+        if(cut_pos.x() < 0.0 || cut_pos.x() > length)
             continue;
 
         if(valuesFromIntersector)
@@ -284,8 +284,8 @@ IntersectionVector Line::intersect(CubicBezier* const b, const bool& valuesFromI
 
 IntersectionVector Line::intersect(Spline* const s, const bool& valuesFromIntersector) const
 {
-    Mat3f trans = getOrthoBaseMatrix();
-    Mat3f trans_inv = trans.inverse();
+    Mat3d trans = getOrthoBaseMatrix();
+    Mat3d trans_inv = trans.inverse();
 
     Spline t_spline(*s);
     t_spline.transform(trans);
@@ -294,7 +294,7 @@ IntersectionVector Line::intersect(Spline* const s, const bool& valuesFromInters
     const Spline::SegmentVector& segements = s->getSegements();
     const Spline::SegmentVector& t_segements = t_spline.getSegements();
 
-    float length = getLength();
+    double length = getLength();
 
     for(size_t i = 0; i < t_spline.getNumControllPoints(); i++)
     {
@@ -309,16 +309,16 @@ IntersectionVector Line::intersect(Spline* const s, const bool& valuesFromInters
 
         for(unsigned int j = 0; j < seg_roots.m_Solutions; j++)
         {
-            float alpha = seg_roots[j];
+            double alpha = seg_roots[j];
 
             // alpha must be between 0.0 and 1.0 -> we have a cut within the target line
-            if(alpha < 0.0f || alpha > 1.0f)
+            if(alpha < 0.0 || alpha > 1.0)
                 continue;
 
-            Vec2f cut_pos = t_segements[i].m_Bezier.pointAt(alpha);
+            Vec2d cut_pos = t_segements[i].m_Bezier.pointAt(alpha);
 
             // cut_pos.x must be between 0.0 and lenght of source line
-            if(cut_pos.x() < 0.0f || cut_pos.x() > getLength())
+            if(cut_pos.x() < 0.0 || cut_pos.x() > getLength())
                 continue;
 
             if(valuesFromIntersector)

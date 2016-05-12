@@ -135,8 +135,8 @@ bool ControllerSplineAt::handleMouseMoveEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i pos_in_vp = keepInViewPort(pos_global);
-    Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
-    Vec2f new_pos = invTrans(pos);
+    Vec2d pos = Vec2d((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
+    Vec2d new_pos = invTrans(pos);
 
     m_CurrentPoint->setPosition(new_pos);
 
@@ -174,7 +174,7 @@ bool ControllerSplineAt::handleMousePressEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i p = keepInViewPort(pos_global);
-    Vec2f p_f(p[0], p[1]);
+    Vec2d p_f(p[0], p[1]);
 
     m_CurrentPoint = getPointAtPos(invTrans(p_f), &m_CurrentPointIdx);
 
@@ -238,7 +238,7 @@ bool ControllerSplineAt::handleWheelEvent(QWheelEvent* const event)
     return false;
 }
 
-Point* const ControllerSplineAt::getPointAtPos(const Vec2f& pos, size_t* const idx) const
+Point* const ControllerSplineAt::getPointAtPos(const Vec2d& pos, size_t* const idx) const
 {
     if(m_Points.empty())
         return nullptr;
@@ -263,12 +263,12 @@ void ControllerSplineAt::updateData()
 
     float alpha = sliderValueToValue(m_ASlider, m_AMin, m_AMax);
 
-    Vec2f p_at0 = m_Spline->pointAt(alpha);
-    Vec2f p_at1 = m_Spline->pointAtL(alpha);
-    Vec2f t_at0 = m_Spline->tangentAt(alpha) / 10.0f;
-    Vec2f t_at1 = m_Spline->tangentAtL(alpha) / 10.0f;
-    Vec2f n_at0 = m_Spline->normalAt(alpha) / 10.0f;
-    Vec2f n_at1 = m_Spline->normalAtL(alpha) / 10.0f;
+    Vec2d p_at0 = m_Spline->pointAt(alpha);
+    Vec2d p_at1 = m_Spline->pointAtL(alpha);
+    Vec2d t_at0 = m_Spline->tangentAt(alpha) / 10.0;
+    Vec2d t_at1 = m_Spline->tangentAtL(alpha) / 10.0;
+    Vec2d n_at0 = m_Spline->normalAt(alpha) / 10.0;
+    Vec2d n_at1 = m_Spline->normalAtL(alpha) / 10.0;
 
     m_Point->setVisible(true);
     m_Point->setPosition(p_at0);

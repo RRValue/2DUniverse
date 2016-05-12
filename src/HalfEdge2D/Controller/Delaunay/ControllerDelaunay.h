@@ -15,6 +15,7 @@ class Line;
 class ControllerDelaunay : public Controller
 {
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     ControllerDelaunay();
     virtual ~ControllerDelaunay();
 
@@ -30,7 +31,7 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    Point* const getPointAtPos(const Vec2f& pos) const;
+    Point* const getPointAtPos(const Vec2d& pos) const;
     void updateCircumCircles();
     void updateCircumCircle(Circle* const circle, const std::array<Point* const, 3>& points);
     bool isPointInCircle(const std::array<Point* const, 3>& points, Point* const point);
@@ -40,7 +41,7 @@ private:
     bool m_MovePoint;
     
     Point* m_CurrentPoint;
-    Vec2f m_CurrentHitDistance;
+    Vec2d m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
     std::vector<Circle* const> m_CircumCircles;

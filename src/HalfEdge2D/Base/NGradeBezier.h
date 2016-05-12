@@ -49,6 +49,8 @@ public:
     static_assert(G <= 13, "13 Is max for NGradeBezier");
 
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
     NGradeBezier() : 
         m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
         m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
@@ -252,7 +254,7 @@ public:
         return solve(m_DerivedParams[0].row(c));
     }
 
-    void splitAt(const float& a, NGradeBezier& l, NGradeBezier& r)
+    void splitAt(const T& a, NGradeBezier& l, NGradeBezier& r)
     {
         splitAtImpl(m_Params, a, l.m_Params, r.m_Params);
         
@@ -433,7 +435,7 @@ private:
     }
 
     template<unsigned int DEV>
-    inline BezierPointType derived(const float& alpha) const
+    inline BezierPointType derived(const T& alpha) const
     {
         ComponentValuesType a_vec;
 

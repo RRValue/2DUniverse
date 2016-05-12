@@ -16,14 +16,14 @@ public:
 
     // getter
     const float& getRadius() const;
-    const Vec2f& getPosition() const;
+    const Vec2d& getPosition() const;
 
     //setter
     void setRadius(const float& radius);
-    void setPosition(const Vec2f& pos);
+    void setPosition(const Vec2d& pos);
 
     // tooling
-    void transform(const Mat3f& mat);
+    void transform(const Mat3d& mat);
 
 public:
     virtual IntersectionVector intersect(Circle* const c, const bool& valuesFromIntersector = false) const final override;
@@ -34,7 +34,7 @@ public:
 
 private:
     float m_Radius;
-    Vec2f m_Position;
+    Vec2d m_Position;
 };
 
 #endif //_RENDERABLE_CIRCLE_H_

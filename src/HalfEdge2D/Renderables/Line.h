@@ -9,7 +9,7 @@
 
 #include <vector>
 
-class Line : public Line2F, public RenderableLine, public Intersectable
+class Line : public Line2D, public RenderableLine, public Intersectable
 {
 public:
     Line();
@@ -20,8 +20,8 @@ public:
     
     // tooling
     bool collinearTo(const Line& l) const;
-    float getLength() const;
-    Vec2f getNormal() const;
+    double getLength() const;
+    Vec2d getNormal() const;
 
 public:
     virtual IntersectionVector intersect(Circle* const c, const bool& valuesFromIntersector = false) const final override;
@@ -31,7 +31,7 @@ public:
     virtual IntersectionVector intersect(Spline* const s, const bool& valuesFromIntersector = false) const final override;
 
 private:
-    Mat3f getOrthoBaseMatrix() const;
+    Mat3d getOrthoBaseMatrix() const;
 };
 
 #endif //_RENDERABLE_LINE_H_

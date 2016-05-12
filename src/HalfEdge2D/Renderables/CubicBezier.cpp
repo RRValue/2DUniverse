@@ -7,12 +7,12 @@ CubicBezier::CubicBezier()
 
 }
 
-CubicBezier::CubicBezier(const CubicBezier& other) : CBezier2F(other), RenderableLine(other)
+CubicBezier::CubicBezier(const CubicBezier& other) : CBezier2D(other), RenderableLine(other)
 {
 
 }
 
-CubicBezier::CubicBezier(CubicBezier&& other) : CBezier2F(std::move(other)), RenderableLine(std::move(other))
+CubicBezier::CubicBezier(CubicBezier&& other) : CBezier2D(std::move(other)), RenderableLine(std::move(other))
 {
 
 }

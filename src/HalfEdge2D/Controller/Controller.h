@@ -37,8 +37,8 @@ protected:
     Vec2i keepInViewPort(const Vec2i& point) const;
 
     void updateTransMatrix();
-    Vec2f trans(const Vec2f& point);
-    Vec2f invTrans(const Vec2f& point);
+    Vec2d trans(const Vec2d& point);
+    Vec2d invTrans(const Vec2d& point);
 
 protected:
     virtual void preSceneChanged();

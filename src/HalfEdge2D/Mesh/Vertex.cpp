@@ -1,8 +1,8 @@
 #include "HalfEdge2D/Mesh/Vertex.h"
 
 Vertex::Vertex() :
-    m_Position(Vec2f(0.0f, 0.0f)),
-    m_Normal(Vec2f(0.0f, 0.0f)),
+    m_Position(Vec2d(0.0, 0.0)),
+    m_Normal(Vec2d(0.0, 0.0)),
     m_Colour(Vec4f(0.0f, 0.0f, 0.0f, 1.0f))
 {
 
@@ -20,12 +20,12 @@ Vertex::~Vertex()
 
 }
 
-const Vec2f& Vertex::getPosition() const
+const Vec2d& Vertex::getPosition() const
 {
     return m_Position;
 }
 
-const Vec2f& Vertex::getNormal() const
+const Vec2d& Vertex::getNormal() const
 {
     return m_Normal;
 }
@@ -35,12 +35,12 @@ const Vec4f& Vertex::getColour() const
     return m_Colour;
 }
 
-void Vertex::setPosition(const Vec2f& position)
+void Vertex::setPosition(const Vec2d& position)
 {
     m_Position = position;
 }
 
-void Vertex::setNormal(const Vec2f& normal)
+void Vertex::setNormal(const Vec2d& normal)
 {
     m_Normal = normal;
 }

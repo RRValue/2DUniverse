@@ -9,12 +9,12 @@ Spline::Spline()
 
 }
 
-Spline::Spline(const Spline& other) : Spline2F(other), RenderableLine(other)
+Spline::Spline(const Spline& other) : Spline2D(other), RenderableLine(other)
 {
 
 }
 
-Spline::Spline(Spline&& other) : Spline2F(std::move(other)), RenderableLine(std::move(other))
+Spline::Spline(Spline&& other) : Spline2D(std::move(other)), RenderableLine(std::move(other))
 {
 
 }

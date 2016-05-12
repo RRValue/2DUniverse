@@ -8,6 +8,7 @@ class HESMesh;
 class ControllerBuildMesh : public Controller
 {
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     ControllerBuildMesh();
     virtual ~ControllerBuildMesh();
 
@@ -23,13 +24,13 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    int getPointAtPos(const Vec2f& pos) const;
+    int getPointAtPos(const Vec2d& pos) const;
 
 private:
     bool m_MovePoint;
     
     int m_CurrentIdx;
-    Vec2f m_CurrentHitDistance;
+    Vec2d m_CurrentHitDistance;
 
     HESMesh* m_Mesh;
 };

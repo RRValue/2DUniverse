@@ -6,7 +6,7 @@
 #include "HalfEdge2D/Renderables/RenderableLine.h"
 #include "HalfEdge2D/Renderables/Intersectable.h"
 
-class CubicBezier : public CBezier2F, public RenderableLine, public Intersectable
+class CubicBezier : public CBezier2D, public RenderableLine, public Intersectable
 {
 public:
     CubicBezier();

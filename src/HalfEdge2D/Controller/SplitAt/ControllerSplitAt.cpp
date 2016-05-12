@@ -120,8 +120,8 @@ bool ControllerSplitAt::handleMouseMoveEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i pos_in_vp = keepInViewPort(pos_global);
-    Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
-    Vec2f new_pos = invTrans(pos);
+    Vec2d pos = Vec2d((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
+    Vec2d new_pos = invTrans(pos);
 
     m_CurrentPoint->setPosition(new_pos);
 
@@ -193,9 +193,9 @@ bool ControllerSplitAt::handleMousePressEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i p = keepInViewPort(pos_global);
-    Vec2f p_f(p[0], p[1]);
+    Vec2d p_f(p[0], p[1]);
 
-    Vec2f pos = invTrans(p_f);
+    Vec2d pos = invTrans(p_f);
 
     m_CurrentPoint = getPointAtPos(pos, &m_CurrentPointIdx);
 
@@ -301,7 +301,7 @@ void ControllerSplitAt::setCBezVisible(const bool& visible)
     }
 }
 
-bool ControllerSplitAt::addPoint(const Vec2f& pos)
+bool ControllerSplitAt::addPoint(const Vec2d& pos)
 {
     if(m_CurrentNumPoints >= m_CurrentNumMaxPoints)
     {
@@ -405,7 +405,7 @@ bool ControllerSplitAt::handleWheelEvent(QWheelEvent* const event)
     return false;
 }
 
-Point* const ControllerSplitAt::getPointAtPos(const Vec2f& pos, size_t* const idx) const
+Point* const ControllerSplitAt::getPointAtPos(const Vec2d& pos, size_t* const idx) const
 {
     std::vector<Point* const> c_points;
 
@@ -462,7 +462,7 @@ void ControllerSplitAt::updateSplit()
 
             m_Line[0]->splitAt(s, *m_Line[1], *m_Line[2]);
 
-            Vec2f d(0.0f, 0.1f);
+            Vec2d d(0.0, 0.1);
 
             if(!m_Line[1]->isVisible() || !m_Line[2]->isVisible())
                 break;
@@ -484,10 +484,10 @@ void ControllerSplitAt::updateSplit()
             if(!m_QBezier[0]->isVisible())
                 break;;
 
-            m_QBezier[0]->getSection(*m_QBezier[1], 0.0f, s);
-            m_QBezier[0]->getSection(*m_QBezier[2], s, 1.0f);
+            m_QBezier[0]->getSection(*m_QBezier[1], 0.0, s);
+            m_QBezier[0]->getSection(*m_QBezier[2], s, 1.0);
 
-            Vec2f d(0.0f, 0.1f);
+            Vec2d d(0.0, 0.1);
 
             if(!m_QBezier[1]->isVisible() || !m_QBezier[2]->isVisible())
                 break;
@@ -509,10 +509,10 @@ void ControllerSplitAt::updateSplit()
             if(!m_CBezier[0]->isVisible())
                 break;
 
-            m_CBezier[0]->getSection(*m_CBezier[1], 0.0f, s);
-            m_CBezier[0]->getSection(*m_CBezier[2], s, 1.0f);
+            m_CBezier[0]->getSection(*m_CBezier[1], 0.0, s);
+            m_CBezier[0]->getSection(*m_CBezier[2], s, 1.0);
 
-            Vec2f d(0.0f, 0.1f);
+            Vec2d d(0.0, 0.1);
 
             if(!m_CBezier[1]->isVisible() || !m_CBezier[2]->isVisible())
                 break;

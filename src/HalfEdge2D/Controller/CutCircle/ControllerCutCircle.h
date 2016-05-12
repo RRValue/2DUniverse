@@ -23,6 +23,7 @@ class ControllerCutCircle : public QObject, public Controller
     Q_OBJECT;
 
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     ControllerCutCircle();
     virtual ~ControllerCutCircle();
 
@@ -41,7 +42,7 @@ private slots:
     void onRadiusSliderValueChanged(int value);
 
 private:
-    Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
+    Point* const getPointAtPos(const Vec2d& pos, size_t* const idx) const;
     void cut();
     void setSliderRadius(const float& radius);
     float sliderValueToRadius(const int& value);
@@ -52,7 +53,7 @@ private:
 
     Point* m_CurrentPoint;
     size_t m_CurrentPointIdx;
-    Vec2f m_CurrentHitDistance;
+    Vec2d m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
     Line* m_Line;

@@ -54,8 +54,8 @@ bool ControllerBuildMesh::handleMouseMoveEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i pos_in_vp = keepInViewPort(pos_global);
-    Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
-    Vec2f new_pos = invTrans(pos);
+    Vec2d pos = Vec2d((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
+    Vec2d new_pos = invTrans(pos);
     
     (*m_Scene->getMeshes().begin())->getVertices()[m_CurrentIdx]->setPosition(new_pos);
     
@@ -89,7 +89,7 @@ bool ControllerBuildMesh::handleMousePressEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i p = keepInViewPort(pos_global);
-    Vec2f p_f(p[0], p[1]);
+    Vec2d p_f(p[0], p[1]);
 
     int result = getPointAtPos(invTrans(p_f));
 
@@ -138,7 +138,7 @@ bool ControllerBuildMesh::handleWheelEvent(QWheelEvent* const event)
     return false;
 }
 
-int ControllerBuildMesh::getPointAtPos(const Vec2f& pos) const
+int ControllerBuildMesh::getPointAtPos(const Vec2d& pos) const
 {
     const std::vector<Vertex*>& vertices = m_Mesh->getVertices();
 

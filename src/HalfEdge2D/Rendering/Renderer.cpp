@@ -230,9 +230,9 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
         // paint traingles
         for(const auto& face : faces)
         {
-            Vec2f vp0 = vertices[face->getVertIdx(0)]->getPosition();
-            Vec2f vp1 = vertices[face->getVertIdx(1)]->getPosition();
-            Vec2f vp2 = vertices[face->getVertIdx(2)]->getPosition();
+            Vec2d vp0 = vertices[face->getVertIdx(0)]->getPosition();
+            Vec2d vp1 = vertices[face->getVertIdx(1)]->getPosition();
+            Vec2d vp2 = vertices[face->getVertIdx(2)]->getPosition();
 
             QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
             QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
@@ -259,9 +259,9 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
         // paint traingles edges
         for(const auto& face : faces)
         {
-            Vec2f vp0 = vertices[face->getVertIdx(0)]->getPosition();
-            Vec2f vp1 = vertices[face->getVertIdx(1)]->getPosition();
-            Vec2f vp2 = vertices[face->getVertIdx(2)]->getPosition();
+            Vec2d vp0 = vertices[face->getVertIdx(0)]->getPosition();
+            Vec2d vp1 = vertices[face->getVertIdx(1)]->getPosition();
+            Vec2d vp2 = vertices[face->getVertIdx(2)]->getPosition();
 
             QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
             QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
@@ -312,7 +312,7 @@ void Renderer::renderPoint(QPainter* const painter, Point* point)
 
     float point_size_px = std::sqrt((val.x() * val.x()) + (val.y() * val.y()));
 
-    const Vec2f& pos = point->getPosition();
+    const Vec2d& pos = point->getPosition();
     const Vec4f& col = point->getColour();
 
     QPointF vert_pos(pos[0], pos[1]);
@@ -341,7 +341,7 @@ void Renderer::renderCircle(QPainter* const painter, Circle* const circle)
     float radius_px = getPixelSize(circle->getRadius());
     float thickness_px = getPixelSize(circle->getThickness());
 
-    const Vec2f& pos = circle->getPosition();
+    const Vec2d& pos = circle->getPosition();
     const Vec4f& col = circle->getColour();
 
     QPointF circle_pos(pos[0], pos[1]);
@@ -378,10 +378,10 @@ void Renderer::renderLine(QPainter* const painter, Line* const line)
     painter->setPen(QPen(paint_color, thickness_px));
     painter->setBrush(Qt::BrushStyle::NoBrush);
 
-    renderLine(painter, *(Line2F*)line);
+    renderLine(painter, *(Line2D*)line);
 }
 
-void Renderer::renderLine(QPainter* const painter, const Line2F& line)
+void Renderer::renderLine(QPainter* const painter, const Line2D& line)
 {
     // get points
     const Line::BezierPointsType& points = line.getPoints();
@@ -420,10 +420,10 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, QuadraticBezier* c
     painter->setPen(QPen(paint_color, thickness_px));
     painter->setBrush(Qt::BrushStyle::NoBrush);
 
-    renderQuadraticBezier(painter, *(QBezier2F*)bezier);
+    renderQuadraticBezier(painter, *(QBezier2D*)bezier);
 }
 
-void Renderer::renderQuadraticBezier(QPainter* const painter, const QBezier2F& bezier)
+void Renderer::renderQuadraticBezier(QPainter* const painter, const QBezier2D& bezier)
 {
     // get points
     const QuadraticBezier::BezierPointsType& points = bezier.getPoints();
@@ -465,12 +465,12 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const QBezier2F& b
     // build lines
     QVector<QLineF> lines;
 
-    float alpha = 0.0;
+    double alpha = 0.0;
 
     for(unsigned int i = 0; i < num_lines; i++)
     {
-        Vec2f bp0 = bezier.pointAt(alpha);
-        Vec2f bp1 = bezier.pointAt(alpha + alpha_step);
+        Vec2d bp0 = bezier.pointAt(alpha);
+        Vec2d bp1 = bezier.pointAt(alpha + alpha_step);
 
         lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
 
@@ -506,10 +506,10 @@ void Renderer::renderCubicBezier(QPainter* const painter, CubicBezier* const bez
     painter->setPen(QPen(paint_color, thickness_px));
     painter->setBrush(Qt::BrushStyle::NoBrush);
 
-    renderCubicBezier(painter, *(CBezier2F*)bezier);
+    renderCubicBezier(painter, *(CBezier2D*)bezier);
 }
 
-void Renderer::renderCubicBezier(QPainter* const painter, const CBezier2F& bezier)
+void Renderer::renderCubicBezier(QPainter* const painter, const CBezier2D& bezier)
 {
     // get points
     const CubicBezier::BezierPointsType& points = bezier.getPoints();
@@ -551,12 +551,12 @@ void Renderer::renderCubicBezier(QPainter* const painter, const CBezier2F& bezie
     // build lines
     QVector<QLineF> lines;
 
-    float alpha = 0.0;
+    double alpha = 0.0;
 
     for(unsigned int i = 0; i < num_lines; i++)
     {
-        Vec2f bp0 = bezier.pointAt(alpha);
-        Vec2f bp1 = bezier.pointAt(alpha + alpha_step);
+        Vec2d bp0 = bezier.pointAt(alpha);
+        Vec2d bp1 = bezier.pointAt(alpha + alpha_step);
 
         lines.push_back(QLineF(trans(QPointF(bp0[0], bp0[1])), trans(QPointF(bp1[0], bp1[1]))));
 

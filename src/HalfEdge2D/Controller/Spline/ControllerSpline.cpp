@@ -89,8 +89,8 @@ bool ControllerSpline::handleMouseMoveEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i pos_in_vp = keepInViewPort(pos_global);
-    Vec2f pos = Vec2f((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
-    Vec2f new_pos = invTrans(pos);
+    Vec2d pos = Vec2d((float)pos_in_vp[0], (float)pos_in_vp[1]) + m_CurrentHitDistance;
+    Vec2d new_pos = invTrans(pos);
 
     m_CurrentPoint->setPosition(new_pos);
 
@@ -126,7 +126,7 @@ bool ControllerSpline::handleMousePressEvent(QMouseEvent* const event)
 
     Vec2i pos_global(event->pos().x(), event->pos().y());
     Vec2i p = keepInViewPort(pos_global);
-    Vec2f p_f(p[0], p[1]);
+    Vec2d p_f(p[0], p[1]);
 
     m_CurrentPoint = getPointAtPos(invTrans(p_f), &m_CurrentPointIdx);
 
@@ -188,7 +188,7 @@ bool ControllerSpline::handleWheelEvent(QWheelEvent* const event)
     return false;
 }
 
-Point* const ControllerSpline::getPointAtPos(const Vec2f& pos, size_t* const idx) const
+Point* const ControllerSpline::getPointAtPos(const Vec2d& pos, size_t* const idx) const
 {
     if(m_Points.empty())
         return nullptr;

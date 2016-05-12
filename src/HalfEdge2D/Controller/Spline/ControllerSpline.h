@@ -22,6 +22,7 @@ class ControllerSpline : public QObject, public Controller
     Q_OBJECT;
 
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     ControllerSpline();
     virtual ~ControllerSpline();
 
@@ -37,7 +38,7 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
+    Point* const getPointAtPos(const Vec2d& pos, size_t* const idx) const;
 
     void setSliderC(const float& c);
     void setSliderT(const float& t);
@@ -55,7 +56,7 @@ private:
 
     Point* m_CurrentPoint;
     size_t m_CurrentPointIdx;
-    Vec2f m_CurrentHitDistance;
+    Vec2d m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
     Spline* m_Spline;

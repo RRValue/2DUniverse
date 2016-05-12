@@ -12,18 +12,18 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // getter
-    const Vec2f& getPosition() const;
-    const Vec2f& getNormal() const;
+    const Vec2d& getPosition() const;
+    const Vec2d& getNormal() const;
     const Vec4f& getColour() const;
 
     // setter
-    void setPosition(const Vec2f& position);
-    void setNormal(const Vec2f& normal);
+    void setPosition(const Vec2d& position);
+    void setNormal(const Vec2d& normal);
     void setColour(const Vec4f& colour);
 
 private:
-    Vec2f m_Position;
-    Vec2f m_Normal;
+    Vec2d m_Position;
+    Vec2d m_Normal;
     Vec4f m_Colour;
 };
 

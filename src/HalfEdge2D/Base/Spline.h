@@ -231,7 +231,7 @@ public:
             return SplinePointType();
 
         unsigned int s = 0;
-        float a = alpha;
+        T a = alpha;
 
         getSegmentAndFraction(s, a);
 
@@ -257,7 +257,7 @@ public:
             return SplinePointType();
 
         unsigned int s = 0;
-        float a = alpha;
+        T a = alpha;
 
         getSegmentAndFraction(s, a);
 
@@ -283,7 +283,7 @@ public:
             return SplinePointType();
 
         unsigned int s = 0;
-        float a = alpha;
+        T a = alpha;
 
         getSegmentAndFraction(s, a);
 
@@ -309,7 +309,7 @@ public:
             return T(0);
 
         unsigned int s = 0;
-        float a = alpha;
+        T a = alpha;
 
         getSegmentAndFraction(s, a);
 
@@ -352,9 +352,9 @@ private:
     void getSegmentAndFraction(unsigned int& seg, T& alpha) const
     {
         if(m_Closed)
-            alpha *= (float)m_Segments.size();
+            alpha *= (T)m_Segments.size();
         else
-            alpha *= (float)(m_Segments.size() - 1);
+            alpha *= (T)(m_Segments.size() - 1);
 
         T c = std::floor(alpha);
         

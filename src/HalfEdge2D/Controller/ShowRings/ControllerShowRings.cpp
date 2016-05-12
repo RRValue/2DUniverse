@@ -395,7 +395,7 @@ void ControllerShowRings::onMeshSelectionChanged(int value)
     }
 
     for(size_t i = 0; i < float_array.size(); i += 2)
-        m_Mesh->addVertex(Vec2f(float_array[i], float_array[i + 1]));
+        m_Mesh->addVertex(Vec2d(float_array[i], float_array[i + 1]));
 
     for(size_t i = 0; i < idx_array.size(); i += 3)
         m_Mesh->addFace({idx_array[i], idx_array[i + 1], idx_array[i + 2]});

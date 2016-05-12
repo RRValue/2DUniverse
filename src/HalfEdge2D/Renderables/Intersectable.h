@@ -13,8 +13,8 @@ class Spline;
 
 struct Intersection
 {
-    float m_Alpha;
-    Vec2f m_Point;
+    double m_Alpha;
+    Vec2d m_Point;
 };
 
 typedef std::vector<Intersection, Eigen::aligned_allocator<Intersection>> IntersectionVector;

@@ -52,7 +52,7 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
+    Point* const getPointAtPos(const Vec2d& pos, size_t* const idx) const;
 
     void setSliderSplit(const float& s);
     
@@ -60,7 +60,7 @@ private:
     int valueToSliderValue(const float& value, QSlider* const sld, const float& min, const float& max);
 
 private slots:
-    bool addPoint(const Vec2f& pos);
+    bool addPoint(const Vec2d& pos);
 
     void updateVisibility();
 
@@ -78,7 +78,7 @@ private:
 
     Point* m_CurrentPoint;
     size_t m_CurrentPointIdx;
-    Vec2f m_CurrentHitDistance;
+    Vec2d m_CurrentHitDistance;
 
     PointVector m_LinePoints[3];
     PointVector m_QBezierPoints[3];

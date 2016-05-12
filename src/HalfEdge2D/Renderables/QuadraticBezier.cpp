@@ -7,12 +7,12 @@ QuadraticBezier::QuadraticBezier()
 
 }
 
-QuadraticBezier::QuadraticBezier(const QuadraticBezier& other) : QBezier2F(other), RenderableLine(other)
+QuadraticBezier::QuadraticBezier(const QuadraticBezier& other) : QBezier2D(other), RenderableLine(other)
 {
 
 }
 
-QuadraticBezier::QuadraticBezier(QuadraticBezier&& other) : QBezier2F(std::move(other)), RenderableLine(std::move(other))
+QuadraticBezier::QuadraticBezier(QuadraticBezier&& other) : QBezier2D(std::move(other)), RenderableLine(std::move(other))
 {
 
 }

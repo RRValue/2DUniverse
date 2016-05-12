@@ -16,7 +16,7 @@ class CubicBezier;
 class Spline;
 class Point;
 
-typedef std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> CutPointVector;
+typedef std::vector<Vec2d, Eigen::aligned_allocator<Vec2d>> CutPointVector;
 typedef std::vector<HESMesh*> HESMeshVector;
 
 class HESCutter
@@ -36,17 +36,17 @@ private:
     struct CutPoint
     {
         CutPoint() = delete;
-        CutPoint(HESEdge* const e, const Vec2f& p)
+        CutPoint(HESEdge* const e, const Vec2d& p)
         {
             m_Edge = e;
             m_Point = p;
         }
 
         HESEdge* m_Edge;
-        Vec2f m_Point;
+        Vec2d m_Point;
     };
 
-    typedef std::map<float, CutPoint, std::less<float>, Eigen::aligned_allocator<std::pair<float, CutPoint>>> CutPointMap;
+    typedef std::map<double, CutPoint, std::less<double>, Eigen::aligned_allocator<std::pair<double, CutPoint>>> CutPointMap;
 
 public:
     HESCutter();

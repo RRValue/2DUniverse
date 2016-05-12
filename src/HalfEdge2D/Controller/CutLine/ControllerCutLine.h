@@ -14,6 +14,7 @@ class Line;
 class ControllerCutLine : public Controller
 {
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     ControllerCutLine();
     virtual ~ControllerCutLine();
 
@@ -29,7 +30,7 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
+    Point* const getPointAtPos(const Vec2d& pos, size_t* const idx) const;
     void cut();
 
 private:
@@ -37,7 +38,7 @@ private:
 
     Point* m_CurrentPoint;
     size_t m_CurrentPointIdx;
-    Vec2f m_CurrentHitDistance;
+    Vec2d m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
     Line* m_Line0;

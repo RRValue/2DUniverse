@@ -127,16 +127,16 @@ void Controller::updateTransMatrix()
     m_InvTransMat = m_TransMat.inverse();
 }
 
-Vec2f Controller::trans(const Vec2f& point)
+Vec2d Controller::trans(const Vec2d& point)
 {
     Vec3f trans_p = m_TransMat * Vec3f(point[0], point[1], 1.0f);
 
-    return Vec2f(trans_p[0], trans_p[1]);
+    return Vec2d(trans_p[0], trans_p[1]);
 }
 
-Vec2f Controller::invTrans(const Vec2f& point)
+Vec2d Controller::invTrans(const Vec2d& point)
 {
     Vec3f trans_p = m_InvTransMat * Vec3f(point[0], point[1], 1.0f);
 
-    return Vec2f(trans_p[0], trans_p[1]);
+    return Vec2d(trans_p[0], trans_p[1]);
 }

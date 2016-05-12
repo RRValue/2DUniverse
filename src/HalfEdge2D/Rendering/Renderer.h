@@ -74,15 +74,15 @@ private:
 
     void renderLines(QPainter* const painter, const std::set<Line* const>& lines);
     void renderLine(QPainter* const painter, Line* const line);
-    void renderLine(QPainter* const painter, const Line2F& line);
+    void renderLine(QPainter* const painter, const Line2D& line);
     
     void renderQuadraticBeziers(QPainter* const painter, const std::set<QuadraticBezier* const>& beziers);
     void renderQuadraticBezier(QPainter* const painter, QuadraticBezier* const bezier);
-    void renderQuadraticBezier(QPainter* const painter, const QBezier2F& bezier);
+    void renderQuadraticBezier(QPainter* const painter, const QBezier2D& bezier);
 
     void renderCubicBeziers(QPainter* const painter, const std::set<CubicBezier* const>& beziers);
     void renderCubicBezier(QPainter* const painter, CubicBezier* const bezier);
-    void renderCubicBezier(QPainter* const painter, const CBezier2F& bezier);
+    void renderCubicBezier(QPainter* const painter, const CBezier2D& bezier);
 
     void renderSplines(QPainter* const painter, const std::set<Spline* const>& splines);
     void renderSpline(QPainter* const painter, Spline* const spline);

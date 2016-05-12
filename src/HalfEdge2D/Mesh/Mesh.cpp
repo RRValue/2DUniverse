@@ -122,7 +122,7 @@ void Mesh::addVertex(const Vertex& vertex)
     setDirty();
 }
 
-void Mesh::addVertex(const Vec2f& pos)
+void Mesh::addVertex(const Vec2d& pos)
 {
     Vertex* new_vertex = allocateVertex();
     new_vertex->setPosition(pos);
@@ -132,7 +132,7 @@ void Mesh::addVertex(const Vec2f& pos)
     setDirty();
 }
 
-void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
+void Mesh::addVertex(const Vec2d& pos, const Vec2d& normal)
 {
     Vertex* new_vertex = allocateVertex();
     new_vertex->setPosition(pos);
@@ -143,7 +143,7 @@ void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal)
     setDirty();
 }
 
-void Mesh::addVertex(const Vec2f& pos, const Vec2f& normal, const Vec4f& color)
+void Mesh::addVertex(const Vec2d& pos, const Vec2d& normal, const Vec4f& color)
 {
     Vertex* new_vertex = allocateVertex();
     new_vertex->setPosition(pos);

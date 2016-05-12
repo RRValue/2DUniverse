@@ -12,19 +12,19 @@ public:
 
     // getter
     const float& getSize() const;
-    const Vec2f& getPosition() const;
+    const Vec2d& getPosition() const;
     const Vec4f& getColour() const;
     const bool& isVisible() const;
 
     //setter
     void setSize(const float& size);
-    void setPosition(const Vec2f& pos);
+    void setPosition(const Vec2d& pos);
     void setColour(const Vec4f& colour);
     void setVisible(const bool& visible);
 
 private:
     float m_Size;
-    Vec2f m_Position;
+    Vec2d m_Position;
     Vec4f m_Colour;
     bool m_Visible;
 };

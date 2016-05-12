@@ -14,6 +14,7 @@ class QuadraticBezier;
 class ControllerQuadraticBezier : public Controller
 {
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     ControllerQuadraticBezier();
     virtual ~ControllerQuadraticBezier();
 
@@ -29,14 +30,14 @@ protected:
     virtual bool handleWheelEvent(QWheelEvent* const event) final override;
 
 private:
-    Point* const getPointAtPos(const Vec2f& pos, size_t* const idx) const;
+    Point* const getPointAtPos(const Vec2d& pos, size_t* const idx) const;
 
 private:
     bool m_MovePoint;
 
     Point* m_CurrentPoint;
     size_t m_CurrentPointIdx;
-    Vec2f m_CurrentHitDistance;
+    Vec2d m_CurrentHitDistance;
 
     std::vector<Point* const> m_Points;
     QuadraticBezier* m_Bezier;

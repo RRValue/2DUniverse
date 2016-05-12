@@ -33,9 +33,9 @@ public:
     // vertices
     void addVertex();
     void addVertex(const Vertex& vertex);
-    void addVertex(const Vec2f& pos);
-    void addVertex(const Vec2f& pos, const Vec2f& normal);
-    void addVertex(const Vec2f& pos, const Vec2f& normal, const Vec4f& color);
+    void addVertex(const Vec2d& pos);
+    void addVertex(const Vec2d& pos, const Vec2d& normal);
+    void addVertex(const Vec2d& pos, const Vec2d& normal, const Vec4f& color);
     void removeVertex(const size_t& idx);
 
     // triangles
