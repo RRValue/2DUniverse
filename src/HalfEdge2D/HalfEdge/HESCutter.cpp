@@ -166,9 +166,55 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
         border_cuts.push_back(cur_num_border_cuts);
     }
 
-    // if no cuts -> we have no valid cut -> return false
-    if(border_cut_points.empty())
-        return false;
+    // check if border cut edges is empty
+    if(border_cut_edges.empty())
+    {
+        // if no cuts with a non closed curve-> we have no valid cut -> return false
+        if(!m_ClosedCurve)
+            return false;
+
+        // find at least one edge
+        size_t num_mesh_edges = m_SourceMesh->getNumEdges();
+        HESEdge* current_edge;
+        for(size_t i = 0; i < num_mesh_edges; i++)
+        {
+            current_edge = m_SourceMesh->getHESEdge(i);
+
+            if(current_edge->visited())
+                continue;
+
+            current_edge->setVisited(true);
+            edges_visited.push_back(current_edge);
+
+            if(current_edge->opposite() != nullptr)
+            {
+                current_edge->opposite()->setVisited(true);
+                edges_visited.push_back(current_edge->opposite());
+            }
+
+            cut_edge.setPoint(0, current_edge->from()->getPosition());
+            cut_edge.setPoint(1, current_edge->to()->getPosition());
+
+            cur_cut_points = cutImpl(cut_edge);;
+
+            if(cur_cut_points.empty())
+                continue;
+
+            for(const auto& ccp : cur_cut_points)
+                cut_point_map.insert(std::make_pair(ccp.m_Alpha, CutPoint(current_edge, ccp.m_Point)));
+
+            if(cur_cut_points.size() == 0)
+                continue;
+            
+            border_cut_edges.push_back(current_edge);
+
+            break;
+        }
+
+        // if we still have no edge -> we have no cut
+        if(border_cut_edges.empty())
+            return false;
+    }
 
     // if number of cuts on one border is odd -> we have no valid cut -> return false
     for(const auto& bce : border_cuts)
@@ -180,7 +226,12 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
     std::deque<HESFace* const> faces_to_visit;
 
     for(const auto& e : border_cut_edges)
+    {
         faces_to_visit.push_back(e->face());
+
+        if(e->opposite() != nullptr)
+            faces_to_visit.push_back(e->opposite()->face());
+    }
 
     HESFace* current_face;
 
