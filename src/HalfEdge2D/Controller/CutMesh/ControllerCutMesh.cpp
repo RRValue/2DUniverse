@@ -73,19 +73,19 @@ void ControllerCutMesh::init()
 
     m_Line = new Line();
     m_Line->setVisible(false);
-    m_Line->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_Line->setColour(Vec4f(0.33f, 0.33f, 0.33f, 0.333f));
 
     m_QBezier = new QuadraticBezier();
     m_QBezier->setVisible(false);
-    m_QBezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_QBezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 0.333f));
 
     m_CBezier = new CubicBezier();
     m_CBezier->setVisible(false);
-    m_CBezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_CBezier->setColour(Vec4f(0.33f, 0.33f, 0.33f, 0.333f));
 
     m_Spline = new Spline();
     m_Spline->setVisible(false);
-    m_Spline->setColour(Vec4f(0.33f, 0.33f, 0.33f, 1.0f));
+    m_Spline->setColour(Vec4f(0.33f, 0.33f, 0.33f, 0.333f));
 
     // add to scene
     m_Scene->addLine(m_Line);
@@ -619,8 +619,8 @@ void ControllerCutMesh::cut()
 
     NSpline<float, 4> rgbg;
 
-    rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
-    rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+    rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 0.333f));
+    rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 0.333f));
     rgbg.setClosed(false);
 
     // for each mesh cut
@@ -696,56 +696,8 @@ void ControllerCutMesh::cut()
         m_Scene->addPoint(p);
 }
 
-#include <qdebug.h>
-
-QString getVecString(const Vec2d& v)
-{
-    return QString::number(v.x(), 'f', 12) + " , " + QString::number(v.y(), 'f', 12);
-}
-
 void ControllerCutMesh::onCutPressed()
 {
-    switch(m_CutMode)
-    {
-    case CMM_LINE:
-        {
-            qDebug() << 
-                getVecString(m_Line->getPoint(0)) << "\n" <<
-                getVecString(m_Line->getPoint(1));
-
-            break;
-        }
-    case CMM_QBEZIER:
-        {
-            qDebug() <<
-                getVecString(m_QBezier->getPoint(0)) << "\n" <<
-                getVecString(m_QBezier->getPoint(1)) << "\n" <<
-                getVecString(m_QBezier->getPoint(2));
-
-            break;
-        }
-    case CMM_CBEZIER:
-        {
-            qDebug() <<
-                getVecString(m_CBezier->getPoint(0)) << "\n" <<
-                getVecString(m_CBezier->getPoint(1)) << "\n" <<
-                getVecString(m_CBezier->getPoint(2)) << "\n" <<
-                getVecString(m_CBezier->getPoint(3));
-
-            break;
-        }
-    case CMM_SPLINE:
-        {
-            qDebug() <<
-                getVecString(m_Line->getPoint(0)) << "\n" <<
-                getVecString(m_Line->getPoint(1));
-
-            break;
-        }
-    default:
-        break;
-    }
-
     cut();
 
     m_Renderer->render();
