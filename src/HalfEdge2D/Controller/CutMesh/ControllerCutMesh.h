@@ -58,6 +58,7 @@ private:
 private slots:
     void onMeshSelectionChanged(int value);
     void onShapeSelectionChanged(int value);
+    void onCutPressed();
 
 private:
     QComboBox* m_CbMeshSelector;

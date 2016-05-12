@@ -110,6 +110,8 @@ void ControllerCutMesh::init()
     m_CbShapeSelector->addItems(QStringList() << "Line" << "QBezier" << "CBezier" << "SPline");
 
     connect(m_CbShapeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onShapeSelectionChanged(int)));
+
+    connect(ui_options.m_BtnCut, &QPushButton::pressed, this, &ControllerCutMesh::onCutPressed);
 }
 
 void ControllerCutMesh::activate()
@@ -692,4 +694,11 @@ void ControllerCutMesh::cut()
     // add cut points to scene
     for(const auto& p : m_CutPoints)
         m_Scene->addPoint(p);
+}
+
+void ControllerCutMesh::onCutPressed()
+{
+    cut();
+
+    m_Renderer->render();
 }

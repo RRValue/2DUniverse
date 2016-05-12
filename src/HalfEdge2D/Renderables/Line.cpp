@@ -163,6 +163,11 @@ IntersectionVector Line::intersect(Circle* const c, const bool& valuesFromInters
 
 IntersectionVector Line::intersect(Line* const l, const bool& valuesFromIntersector) const
 {
+    IntersectionVector results;
+
+    if(collinearTo(*l))
+        return results;
+
     Mat3f trans = getOrthoBaseMatrix();
 
     Line t_line(*l);
@@ -170,8 +175,6 @@ IntersectionVector Line::intersect(Line* const l, const bool& valuesFromIntersec
     t_line.transform(trans);
 
     // find root y compontent (cuts with x axis)
-
-    IntersectionVector results;
     Line::Roots root = t_line.componentRoots(1);
 
     if(root.empty())

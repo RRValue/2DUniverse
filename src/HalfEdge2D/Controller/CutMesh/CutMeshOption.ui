@@ -36,6 +36,13 @@
     <widget class="QComboBox" name="m_CbShapeSelector"/>
    </item>
    <item>
+    <widget class="QPushButton" name="m_BtnCut">
+     <property name="text">
+      <string>Cut</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

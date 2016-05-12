@@ -128,13 +128,14 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
     Line cut_edge;
     IntersectionVector cur_cut_points;
     IntersectionVector border_cut_points;
-    std::vector<HESEdgeConstVector> border_cut_edges;
+    std::vector<size_t> border_cuts;
+    HESEdgeConstVector border_cut_edges;
 
     CutPointMap cut_point_map;
 
     for(const auto& b : boundaries)
     {
-        HESEdgeConstVector cur_border_cut_edges;
+        size_t cur_num_border_cuts = 0;
 
         for(const auto& e : b)
         {
@@ -153,14 +154,16 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
                 cut_point_map.insert(std::make_pair(ccp.m_Alpha, CutPoint(e, ccp.m_Point)));
             }
 
-            cur_border_cut_edges.push_back(e);
+            if(cur_cut_points.size() > 0)
+                border_cut_edges.push_back(e);
+
+            cur_num_border_cuts += cur_cut_points.size();
 
             e->setVisited(true);
             edges_visited.push_back(e);
         }
-
-        if(!cur_border_cut_edges.empty())
-            border_cut_edges.push_back(cur_border_cut_edges);
+        
+        border_cuts.push_back(cur_num_border_cuts);
     }
 
     // if no cuts -> we have no valid cut -> return false
@@ -168,17 +171,16 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
         return false;
 
     // if number of cuts on one border is odd -> we have no valid cut -> return false
-    for(const auto& bce : border_cut_edges)
-        if(bce.size() % 2 != 0)
+    for(const auto& bce : border_cuts)
+        if(bce % 2 != 0)
             return false;
 
     // get cut points from edges
     HESFaceConstVector faces_visited;
     std::deque<HESFace* const> faces_to_visit;
 
-    for(const auto& bce : border_cut_edges)
-        for(const auto& e : bce)
-            faces_to_visit.push_back(e->face());
+    for(const auto& e : border_cut_edges)
+        faces_to_visit.push_back(e->face());
 
     HESFace* current_face;
 
