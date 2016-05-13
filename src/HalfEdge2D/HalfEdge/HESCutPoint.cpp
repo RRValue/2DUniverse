@@ -1,4 +1,4 @@
-#include "HalfEdge2D/HalfEdge/HESCut.h"
+#include "HalfEdge2D/HalfEdge/HESCutPoint.h"
 
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESVertex.h"
@@ -20,20 +20,25 @@ void HESCutPoint::checkOnVertex()
     Vec2d p1 = v1->getPosition();
 
     double d0 = (p0 - m_Point).norm();
-    double d1 = (p0 - m_Point).norm();
+    double d1 = (p1 - m_Point).norm();
 
-    if(d0 > m_VertexDistanceThreshold || d1 > m_VertexDistanceThreshold)
-    {
+    if(d0 > m_VertexDistanceThreshold && d1 > m_VertexDistanceThreshold)
         m_IsOnVertex = false;
-        m_NearestVertex = nullptr;
-
-        return;
-    }
-
-    m_IsOnVertex = true;
+    else
+        m_IsOnVertex = true;
 
     if(d0 < d1)
         m_NearestVertex = v0;
     else
         m_NearestVertex = v1;
+}
+
+HESCutPoint& HESCutPoint::operator=(const HESCutPoint& other)
+{
+    m_Edge = other.m_Edge;
+    m_Point = other.m_Point;
+    m_NearestVertex = other.m_NearestVertex;
+    m_IsOnVertex = other.m_IsOnVertex;
+
+    return *this;
 }

@@ -1,5 +1,5 @@
-#ifndef _HALFEDGESTRUCTURE_CUT_H_
-#define _HALFEDGESTRUCTURE_CUT_H_
+#ifndef _HALFEDGESTRUCTURE_CUTPOINT_H_
+#define _HALFEDGESTRUCTURE_CUTPOINT_H_
 
 #include "HalfEdge2D/Base/Vector.h"
 
@@ -15,6 +15,8 @@ public:
     HESCutPoint() = delete;
     HESCutPoint(HESEdge* const e, const Vec2d& p);
 
+    HESCutPoint& operator=(const HESCutPoint& other);
+
 private:
     void checkOnVertex();
 
@@ -24,10 +26,10 @@ public:
     HESVertex* m_NearestVertex;
     bool m_IsOnVertex;
 
-    const double m_VertexDistanceThreshold = 0.001f;
+    const double m_VertexDistanceThreshold = 0.001;
 };
 
 typedef std::map<double, HESCutPoint, std::less<double>, Eigen::aligned_allocator<std::pair<double, HESCutPoint>>> HESCutMap;
 typedef std::vector<HESCutPoint, Eigen::aligned_allocator<HESCutPoint>> HESCutVector;
 
-#endif //_HALFEDGESTRUCTURE_CUT_H_
+#endif //_HALFEDGESTRUCTURE_CUTPOINT_H_

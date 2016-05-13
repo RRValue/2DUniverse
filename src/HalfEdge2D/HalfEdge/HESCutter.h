@@ -12,6 +12,7 @@
 
 class HESEdge;
 class HESVertex;
+class HESCutPoint;
 
 class Line;
 class QuadraticBezier;
@@ -34,7 +35,7 @@ private:
         void* operator new(size_t size) = delete;
         void* operator new[](size_t size) = delete;
         void operator delete(void* ptr) = delete;
-        void operator delete[](void* ptr) = delete;
+        void operator delete[](void* ptr)  = delete;
 
     private:
         HESCutter* const m_Cutter;
@@ -66,6 +67,8 @@ private:
     bool cut(HESMeshVector& outMeshes);
 
     IntersectionVector cutImpl(const Line& line) const;
+
+    bool canSnapToCut(HESCutPoint* const reverenceCut, HESCutPoint* const cut);
 
 private:
     HESMesh* m_SourceMesh;

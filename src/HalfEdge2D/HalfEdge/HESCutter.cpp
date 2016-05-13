@@ -6,7 +6,7 @@
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
 
-#include "HalfEdge2D/HalfEdge/HESCut.h"
+#include "HalfEdge2D/HalfEdge/HESCutPoint.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
@@ -302,13 +302,75 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
 
     // transform to cut_point_map to vector
     HESCutVector cut_point_vector;
+    size_t idx = 0;
     for(const auto& cp : cut_point_map)
         cut_point_vector.push_back(cp.second);
 
     cut_point_map.clear();
 
     // check if a cut point is on a vertex -> if yes move adjacent CutPoint to this point
+    HESCutVector::iterator cut_iter = cut_point_vector.begin();
+    size_t cut_idx = 0;
 
+    while(cut_iter != cut_point_vector.end())
+    {
+        if(!cut_iter->m_IsOnVertex)
+        {
+            cut_iter++;
+            cut_idx++;
+
+            continue;
+        }
+
+        HESCutVector::iterator group_iter_0 = cut_iter;
+        HESCutVector::iterator group_iter_1 = cut_iter;
+
+        // search for start group iter
+        while(true)
+        {
+            if(group_iter_0 == cut_point_vector.begin())
+                break;
+
+            group_iter_0--;
+            cut_idx--;
+
+            if(!canSnapToCut(&*cut_iter, &*group_iter_0))
+            {
+                group_iter_0++;
+                cut_idx++;
+
+                break;
+            }
+        }
+
+        // search for end group iter
+        while(true)
+        {
+            group_iter_1++;
+
+            if(group_iter_1 == cut_point_vector.end())
+                break;
+
+            if(!canSnapToCut(&*cut_iter, &*group_iter_1))
+                break;
+        }
+
+        // delete everthing exept the first one
+        if(group_iter_0 != cut_iter)
+        {
+            *group_iter_0 = *cut_iter;
+
+            group_iter_0->m_Point = cut_iter->m_NearestVertex->getPosition();
+        }
+        else
+            group_iter_0->m_Point = group_iter_0->m_NearestVertex->getPosition();
+
+        group_iter_0++;
+        cut_idx++;
+        cut_point_vector.erase(group_iter_0, group_iter_1);
+
+        cut_iter = cut_point_vector.begin() + cut_idx;
+    }
 
     // set cut points
     for(const auto& cp : cut_point_vector)
@@ -334,4 +396,13 @@ IntersectionVector HESCutter::cutImpl(const Line& line) const
     }
 
     return IntersectionVector();
+}
+
+bool HESCutter::canSnapToCut(HESCutPoint* const reverenceCut, HESCutPoint* const cut)
+{
+    // if we dont share a vertex -> no snapping
+    if(reverenceCut->m_NearestVertex != cut->m_NearestVertex)
+        return false;
+
+    return true;
 }
