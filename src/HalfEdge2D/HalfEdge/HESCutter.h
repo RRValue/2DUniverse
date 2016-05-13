@@ -5,11 +5,14 @@
 
 #include "HalfEdge2D/Renderables/Intersectable.h"
 
+#include "HalfEdge2D/HalfEdge/HESMesh.h"
+
 #include <vector>
 #include <map>
 
-class HESMesh;
 class HESEdge;
+class HESVertex;
+
 class Line;
 class QuadraticBezier;
 class CubicBezier;
@@ -22,6 +25,22 @@ typedef std::vector<HESMesh*> HESMeshVector;
 class HESCutter
 {
 private:
+    class HESCutterCleanGuard
+    {
+    public:
+        HESCutterCleanGuard(HESCutter* const cutter);
+        ~HESCutterCleanGuard();
+
+        void* operator new(size_t size) = delete;
+        void* operator new[](size_t size) = delete;
+        void operator delete(void* ptr) = delete;
+        void operator delete[](void* ptr) = delete;
+
+    private:
+        HESCutter* const m_Cutter;
+    };
+
+private:
     enum CuttingMode
     {
         E_CM_FIRST,
@@ -31,22 +50,6 @@ private:
         E_CM_SPLINE,
         E_CM_LAST,
     };
-
-private:
-    struct CutPoint
-    {
-        CutPoint() = delete;
-        CutPoint(HESEdge* const e, const Vec2d& p)
-        {
-            m_Edge = e;
-            m_Point = p;
-        }
-
-        HESEdge* m_Edge;
-        Vec2d m_Point;
-    };
-
-    typedef std::map<double, CutPoint, std::less<double>, Eigen::aligned_allocator<std::pair<double, CutPoint>>> CutPointMap;
 
 public:
     HESCutter();
@@ -74,6 +77,10 @@ private:
     QuadraticBezier* m_QuadraticBezier;
     CubicBezier* m_CubicBezier;
     Spline* m_Spline;
+
+    // visited
+    HESEdgeConstVector m_VisitedEdges;
+    HESFaceConstVector m_VisitedFaces;
 
     bool m_ClosedCurve;
 

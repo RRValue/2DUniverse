@@ -6,7 +6,7 @@
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
 
-#include "HalfEdge2D/HalfEdge/HESMesh.h"
+#include "HalfEdge2D/HalfEdge/HESCut.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
@@ -15,6 +15,28 @@
 #include "HalfEdge2D/Renderables/Spline.h"
 
 #include <deque>
+
+HESCutter::HESCutterCleanGuard::HESCutterCleanGuard(HESCutter* const cutter) : m_Cutter(cutter)
+{
+
+}
+
+HESCutter::HESCutterCleanGuard::~HESCutterCleanGuard()
+{
+    if(m_Cutter == nullptr)
+        return;
+
+    // set everything to unvisit
+    for(const auto& e : m_Cutter->m_VisitedEdges)
+        e->setVisited(false);
+
+    m_Cutter->m_VisitedEdges.clear();
+
+    for(const auto& f : m_Cutter->m_VisitedFaces)
+        f->setVisited(false);
+
+    m_Cutter->m_VisitedFaces.clear();
+}
 
 HESCutter::HESCutter() : m_SourceMesh(nullptr)
 {
@@ -101,6 +123,9 @@ bool HESCutter::cutSpline(HESMesh* const sourceMesh, Spline* const spline, HESMe
 
 bool HESCutter::cut(HESMeshVector& outMeshes)
 {
+    // set clean up guard
+    HESCutterCleanGuard clean_guard(this);
+
     // reset
     m_CutPoints.clear();
 
@@ -123,15 +148,13 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
     if(boundaries.empty())
         return false;
 
-    HESEdgeConstVector edges_visited;
-
     Line cut_edge;
     IntersectionVector cur_cut_points;
     IntersectionVector border_cut_points;
     std::vector<size_t> border_cuts;
     HESEdgeConstVector border_cut_edges;
 
-    CutPointMap cut_point_map;
+    HESCutMap cut_point_map;
 
     for(const auto& b : boundaries)
     {
@@ -151,7 +174,7 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
             {
                 border_cut_points.push_back(ccp);
 
-                cut_point_map.insert(std::make_pair(ccp.m_Alpha, CutPoint(e, ccp.m_Point)));
+                cut_point_map.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point)));
             }
 
             if(cur_cut_points.size() > 0)
@@ -160,7 +183,7 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
             cur_num_border_cuts += cur_cut_points.size();
 
             e->setVisited(true);
-            edges_visited.push_back(e);
+            m_VisitedEdges.push_back(e);
         }
         
         border_cuts.push_back(cur_num_border_cuts);
@@ -184,12 +207,12 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
                 continue;
 
             current_edge->setVisited(true);
-            edges_visited.push_back(current_edge);
+            m_VisitedEdges.push_back(current_edge);
 
             if(current_edge->opposite() != nullptr)
             {
                 current_edge->opposite()->setVisited(true);
-                edges_visited.push_back(current_edge->opposite());
+                m_VisitedEdges.push_back(current_edge->opposite());
             }
 
             cut_edge.setPoint(0, current_edge->from()->getPosition());
@@ -201,7 +224,7 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
                 continue;
 
             for(const auto& ccp : cur_cut_points)
-                cut_point_map.insert(std::make_pair(ccp.m_Alpha, CutPoint(current_edge, ccp.m_Point)));
+                cut_point_map.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(current_edge, ccp.m_Point)));
 
             if(cur_cut_points.size() == 0)
                 continue;
@@ -222,7 +245,6 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
             return false;
 
     // get cut points from edges
-    HESFaceConstVector faces_visited;
     std::deque<HESFace* const> faces_to_visit;
 
     for(const auto& e : border_cut_edges)
@@ -244,7 +266,7 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
             continue;
 
         current_face->setVisited(true);
-        faces_visited.push_back(current_face);
+        m_VisitedFaces.push_back(current_face);
 
         // cut with edges on face
         for(const auto& e : current_face->getEdges())
@@ -254,12 +276,12 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
 
             // add to visited
             e->setVisited(true);
-            edges_visited.push_back(e);
+            m_VisitedEdges.push_back(e);
 
             if(e->opposite() != nullptr)
             {
                 e->opposite()->setVisited(true);
-                edges_visited.push_back(e->opposite());
+                m_VisitedEdges.push_back(e->opposite());
             }
 
             // try a cut with line
@@ -274,20 +296,23 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
             faces_to_visit.push_back(e->opposite()->face());
 
             for(const auto& ccp : cur_cut_points)
-                cut_point_map.insert(std::make_pair(ccp.m_Alpha, CutPoint(e, ccp.m_Point)));
+                cut_point_map.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point)));
         }
     }
 
-    // set everythinf to unvisit
-    for(const auto& e : edges_visited)
-        e->setVisited(false);
+    // transform to cut_point_map to vector
+    HESCutVector cut_point_vector;
+    for(const auto& cp : cut_point_map)
+        cut_point_vector.push_back(cp.second);
 
-    for(const auto& f : faces_visited)
-        f->setVisited(false);
+    cut_point_map.clear();
+
+    // check if a cut point is on a vertex -> if yes move adjacent CutPoint to this point
+
 
     // set cut points
-    for(const auto& cp : cut_point_map)
-        m_CutPoints.push_back(cp.second.m_Point);
+    for(const auto& cp : cut_point_vector)
+        m_CutPoints.push_back(cp.m_Point);
 
     return true;
 }
