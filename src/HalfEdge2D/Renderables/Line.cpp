@@ -322,7 +322,7 @@ IntersectionVector Line::intersect(Spline* const s, const bool& valuesFromInters
                 continue;
 
             if(valuesFromIntersector)
-                results.push_back({alpha, segements[i].m_Bezier.pointAt(alpha)});
+                results.push_back({t_spline.alphaFromSegmentAlpha(i, alpha), segements[i].m_Bezier.pointAt(alpha)});
             else
                 results.push_back({cut_pos.x() / length, segements[i].m_Bezier.pointAt(alpha)});
         }

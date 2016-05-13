@@ -337,6 +337,11 @@ public:
         m_LengthDirty = true;
     }
 
+    T alphaFromSegmentAlpha(unsigned int& seg, T& alpha) const
+    {
+        return ((T)seg * m_SegmentAlphaStep) + (alpha * m_SegmentAlphaStep);
+    }
+
 private:
     void updateTangentFactors()
     {
@@ -364,6 +369,7 @@ private:
         if(m_Closed && seg == m_Segments.size())
             seg = 0;
     }
+
     void getSegmentAndFractionL(unsigned int& seg, T& alpha)
     {
         if(m_LengthDirty)
@@ -402,6 +408,8 @@ private:
     }
     void update()
     {
+        m_SegmentAlphaStep = T(0);
+
         if(m_Segments.empty())
             return;
 
@@ -417,6 +425,12 @@ private:
         // if num_seg <= 1 -> no spline is defined
         if(num_seg <= 1)
             return;
+
+        // update segement alpha step
+        if(num_seg > 1 && !m_Closed)
+            m_SegmentAlphaStep = T(1) / (T)(num_seg - 1);
+        else
+            m_SegmentAlphaStep = T(1) / (T)num_seg;
 
         // set endpoints
         for(size_t i = 0; i < num_seg; i++)
@@ -487,6 +501,7 @@ private:
 private:
     SegmentVector m_Segments;
     bool m_Closed;
+    T m_SegmentAlphaStep;
     T m_Tension;
     T m_Continuity;
     T m_Bias;

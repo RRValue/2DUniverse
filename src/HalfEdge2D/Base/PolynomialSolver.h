@@ -91,6 +91,17 @@ private:
     {
         Result result;
 
+        if(std::abs(coef[0]) < T(1e-10))
+        {
+            CoefVec new_vec;
+            new_vec.setZero();
+
+            for(size_t i = 1; i < G; i++)
+                new_vec(i - 1) = coef(i);
+            
+            return solveImpl<1>(new_vec);
+        }
+
         T a = coef[1] / coef[0];
         T b = coef[2] / coef[0];
 
@@ -122,12 +133,23 @@ private:
         // algorithmic source: http://www.1728.org/cubic2.htm
 
         Result result;
-
+        
         // solce cubic
         const T& a = coef[0];
         const T& b = coef[1];
         const T& c = coef[2];
         const T& d = coef[3];
+
+        if(std::abs(coef[0]) < T(1e-10))
+        {
+            CoefVec new_vec;
+            new_vec.setZero();
+
+            for(size_t i = 0; i < G; i++)
+                new_vec(i) = coef(i + 1);
+
+            return solveImpl<2>(new_vec);
+        }
 
         T a2 = a * a;
         T a3 = a2 * a;
