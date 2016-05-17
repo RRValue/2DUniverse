@@ -66,19 +66,21 @@ public:
 
 private:
     bool cut(HESMeshVector& outMeshes);
+    bool cut(HESMeshVector& outMeshes, HESMesh* const mesh);
 
     IntersectionVector cutImpl(const Line& line) const;
 
-    void findMeshBoundaries();
+    void findMeshBoundaries(HESMesh* const mesh);
     void findBoundaryCuts();
-    void findOneMeshCut();
+    void findOneMeshCut(HESMesh* const mesh);
     void findCutPoints();
     void mergeSameCutPoints();
+    void createCutVertices(HESMesh* const mesh);
 
 private:
     // meshes
     HESMesh* m_SourceMesh;
-    HESMesh* m_TargetMesh;
+    HESMeshVector m_TargetMeshes;
 
     // mode
     CuttingMode m_CuttingMode;
@@ -99,11 +101,10 @@ private:
 
     // intermediate objects
     std::vector<HESEdgeConstVector> m_MeshBoundaries;
-    HESCutMap m_CutPointMap;
-    HESCutVector m_CutPointVector;
     std::vector<size_t> m_BorderCuts;
     HESEdgeConstVector m_BorderCutEdges;
-
+    HESCutMap m_CutPointMap;
+    HESCutVector m_CutPointVector;
 };
 
 #endif //_HALFEDGESTRUCTURE_CUTTER_H_

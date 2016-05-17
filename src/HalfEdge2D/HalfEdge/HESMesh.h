@@ -35,7 +35,6 @@ public:
     HESVertex* getHESVertex(const size_t& idx) const;
     HESFace* getHESFace(const size_t& idx) const;
     const std::vector<HESEdge*>& getEdges() const;
-    const bool& hasChanged() const;
     const bool& isChecked() const;
     bool isManifold() const;
     const bool& isValid() const;
@@ -44,6 +43,7 @@ public:
 
     // tooling
     bool walkBoundary(HESEdge* const edge, HESEdgeConstVector& boundary);
+    HESVertex* const splitEdgeAtPoint(HESEdge* const splitEdge, const Vec2d& splitPoint);
 
 protected:
     // setter
@@ -51,6 +51,9 @@ protected:
     void addBoundaryStartEdge(HESEdge* const edge);
     void setChecked(const bool& checked);
     void setValid(const bool& valid);
+
+    // tooling
+    HESEdge* const insertVertexOnEdge(HESVertex* vertex, const size_t& vertexId, HESEdge* const edge);
 
 protected:
     virtual Vertex* allocateVertex();

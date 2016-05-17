@@ -5,6 +5,7 @@
 #include "HalfEdge2D/HalfEdge/HESVertex.h"
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESFace.h"
+#include "HalfEdge2D/HalfEdge/HESCheck.h"
 
 #include "HalfEdge2D/Renderables/Point.h"
 #include "HalfEdge2D/Renderables/Line.h"
@@ -34,6 +35,12 @@ HESCutter::HESCutterCleanGuard::~HESCutterCleanGuard()
         f->setVisited(false);
 
     m_Cutter->m_VisitedFaces.clear();
+
+    // delete processing mesh
+    for(const auto& m : m_Cutter->m_TargetMeshes)
+        delete m;
+
+    m_Cutter->m_TargetMeshes.clear();
 }
 
 HESCutter::HESCutter() : m_SourceMesh(nullptr)
@@ -124,15 +131,43 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
     // set clean up guard
     HESCutterCleanGuard clean_guard(this);
 
-    // reset result and intermediate objects
-    m_CutPoints.clear();
-    m_CutPointMap.clear();
-    m_CutPointVector.clear();
-    m_BorderCutEdges.clear();
-    m_BorderCuts.clear();
+    // setup target meshes
+    HESCheck source_mesh_checker;
+    source_mesh_checker.run(m_SourceMesh);
 
+    m_TargetMeshes = source_mesh_checker.getMeshes();
+
+    for(const auto& m : m_TargetMeshes)
+    {
+        // reset result and intermediate objects
+        m_CutPoints.clear();
+        m_CutPointMap.clear();
+        m_CutPointVector.clear();
+        m_BorderCutEdges.clear();
+        m_BorderCuts.clear();
+
+        // cut current mesh
+        HESMeshVector current_cut_meshes;
+
+        bool cutted = cut(current_cut_meshes, m);
+
+        if(!cutted)
+        {
+            outMeshes.clear();
+
+            return false;
+        }
+
+        outMeshes.insert(outMeshes.end(), current_cut_meshes.begin(), current_cut_meshes.end());
+    }
+
+    return true;
+}
+
+bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
+{
     // find cuts in border of mesh
-    findMeshBoundaries();
+    findMeshBoundaries(mesh);
 
     // if we have no boundaries -> a (opend or closed) line can not cut a manifold without border -> return false
     if(m_MeshBoundaries.empty())
@@ -149,7 +184,7 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
             return false;
         else
         {
-            findOneMeshCut();
+            findOneMeshCut(mesh);
 
             // if we still have cut -> we have no cut at all
             if(m_BorderCuts.empty())
@@ -172,17 +207,23 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
     for(const auto& cp : m_CutPointVector)
         m_CutPoints.push_back(cp.m_Point);
 
-    return true;
+    // create cut vertices
+    createCutVertices(mesh);
+
+    HESCheck checker;
+    checker.run(mesh);
+
+    outMeshes = checker.getMeshes();
 }
 
-void HESCutter::findMeshBoundaries()
+void HESCutter::findMeshBoundaries(HESMesh* const mesh)
 {
     m_MeshBoundaries.clear();
 
-    for(const auto& e : m_SourceMesh->getBoundaryStartEdges())
+    for(const auto& e : mesh->getBoundaryStartEdges())
     {
         HESEdgeConstVector boundary;
-        m_SourceMesh->walkBoundary(e, boundary);
+        mesh->walkBoundary(e, boundary);
 
         m_MeshBoundaries.push_back(boundary);
     }
@@ -228,17 +269,17 @@ void HESCutter::findBoundaryCuts()
     }
 }
 
-void HESCutter::findOneMeshCut()
+void HESCutter::findOneMeshCut(HESMesh* const mesh)
 {
     Line cut_edge;
     IntersectionVector cur_cut_points;
 
     // find at least one cut edge
-    size_t num_mesh_edges = m_SourceMesh->getNumEdges();
+    size_t num_mesh_edges = mesh->getNumEdges();
     HESEdge* current_edge;
     for(size_t i = 0; i < num_mesh_edges; i++)
     {
-        current_edge = m_SourceMesh->getHESEdge(i);
+        current_edge = mesh->getHESEdge(i);
 
         if(current_edge->visited())
             continue;
@@ -369,7 +410,7 @@ void HESCutter::mergeSameCutPoints()
             group_iter_0--;
             cut_idx--;
 
-            if(!cut_iter->hasSameNearestVertex(*group_iter_0))
+            if(!cut_iter->hasSameVertex(*group_iter_0))
             {
                 group_iter_0++;
                 cut_idx++;
@@ -386,7 +427,7 @@ void HESCutter::mergeSameCutPoints()
             if(group_iter_1 == m_CutPointVector.end())
                 break;
 
-            if(!cut_iter->hasSameNearestVertex(*group_iter_1))
+            if(!cut_iter->hasSameVertex(*group_iter_1))
                 break;
         }
 
@@ -395,16 +436,31 @@ void HESCutter::mergeSameCutPoints()
         {
             *group_iter_0 = *cut_iter;
 
-            group_iter_0->m_Point = cut_iter->m_NearestVertex->getPosition();
+            group_iter_0->m_Point = cut_iter->m_Vertex->getPosition();
         }
         else
-            group_iter_0->m_Point = group_iter_0->m_NearestVertex->getPosition();
+            group_iter_0->m_Point = group_iter_0->m_Vertex->getPosition();
 
         group_iter_0++;
         cut_idx++;
         m_CutPointVector.erase(group_iter_0, group_iter_1);
 
         cut_iter = m_CutPointVector.begin() + cut_idx;
+    }
+}
+
+void HESCutter::createCutVertices(HESMesh* const mesh)
+{
+    for(auto& cp : m_CutPointVector)
+    {
+        if(cp.m_IsOnVertex)
+            continue;
+
+        HESVertex* const new_vertex = mesh->splitEdgeAtPoint(cp.m_Edge, cp.m_Point);
+
+        cp.m_IsOnVertex = true;
+        cp.m_Vertex = new_vertex;
+        cp.m_Edge = nullptr;
     }
 }
 

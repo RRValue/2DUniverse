@@ -205,3 +205,83 @@ bool HESMesh::walkBoundary(HESEdge* const edge, HESEdgeConstVector& boundary)
     // return boundary
     return true;
 }
+
+HESVertex* const HESMesh::splitEdgeAtPoint(HESEdge* const splitEdge, const Vec2d& splitPoint)
+{
+    HESVertex* new_vertex = new HESVertex();
+    new_vertex->setPosition(splitPoint);
+    
+    size_t new_vertex_idx = m_Vertices.size();
+    m_Vertices.push_back(new_vertex);
+
+    // get opposite edge
+    HESEdge* opp_split_edge = splitEdge->opposite();
+
+    // insert vertex on splitedge
+    HESEdge* const new_edge = insertVertexOnEdge(new_vertex, new_vertex_idx, splitEdge);
+
+    // if we have no opposite -> nothing to do here -> return new vertex
+    if(opp_split_edge == nullptr)
+        return new_vertex;
+
+    // insert vertex on opposite splitedge
+    HESEdge* const new_opp_edge = insertVertexOnEdge(new_vertex, new_vertex_idx, opp_split_edge);
+
+    // set opposites on edges
+    splitEdge->setOpposite(new_opp_edge);
+    new_opp_edge->setOpposite(splitEdge);
+
+    opp_split_edge->setOpposite(new_edge);
+    new_edge->setOpposite(opp_split_edge);
+
+    // return new vertex
+    return new_vertex;
+}
+
+HESEdge* const HESMesh::insertVertexOnEdge(HESVertex* vertex, const size_t& vertexId, HESEdge* const edge)
+{
+    HESEdge* new_edge = new HESEdge();
+
+    // set vertices on edges
+    new_edge->setFrom(vertex);
+    new_edge->setTo(edge->to());
+
+    edge->setTo(vertex);
+
+    // set edges on edges
+    new_edge->setNext(edge->next());
+    edge->next()->setPrev(new_edge);
+
+    edge->setNext(new_edge);
+    new_edge->setPrev(edge);
+
+    // set edges on faces
+    edge->face()->addEdge(new_edge);
+
+    // set faces on edges
+    new_edge->setFace(edge->face());
+
+    // set edges on vertices
+    vertex->addEdge(new_edge);
+
+    // set opposites to nullptr
+    edge->setOpposite(nullptr);
+    new_edge->setOpposite(nullptr);
+
+    // add idx on face
+    const std::vector<size_t>& idxs = edge->face()->getVertIds();
+    std::vector<size_t> new_idxs;
+
+    for(const auto& idx : idxs)
+    {
+        new_idxs.push_back(idx);
+
+        if(getHESVertex(idx) == edge->from())
+            new_idxs.push_back(vertexId);
+    }
+
+    edge->face()->setVertIdx(new_idxs);
+
+    // return the new edge
+    return new_edge;
+}

@@ -24,6 +24,7 @@
 #include "HalfEdge2D/Mesh/TestMesh04.h"
 #include "HalfEdge2D/Mesh/TestMesh05.h"
 #include "HalfEdge2D/Mesh/TestMesh06.h"
+#include "HalfEdge2D/Mesh/TestMesh07.h"
 
 #include <QtGui/QMouseEvent>
 
@@ -100,7 +101,7 @@ void ControllerCutMesh::init()
     ui_options.setupUi(m_OptionWidget);
 
     m_CbMeshSelector = ui_options.m_CbMeshSelector;
-    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Parts" << "Parts2" << "Hole" << "Clear");
+    m_CbMeshSelector->addItems(QStringList() << "Low" << "Mid" << "High" << "Parts" << "Parts2" << "Hole" << "Triangle" << "Clear");
 
     connect(m_CbMeshSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onMeshSelectionChanged(int)));
 
@@ -118,7 +119,7 @@ void ControllerCutMesh::activate()
 {
     m_Renderer->setRenderCoordianteAxis(false);
     m_Renderer->setRenderTriangles(false);
-    m_Renderer->setRenderVertices(false);
+    m_Renderer->setRenderVertices(true);
 }
 
 void ControllerCutMesh::deactivate()
@@ -450,7 +451,7 @@ void ControllerCutMesh::onMeshSelectionChanged(int value)
 {
     HESMesh tmp_mesh;
 
-    if(value < 0 || value >= 6)
+    if(value < 0 || value >= 7)
     {
         m_Renderer->render();
 
@@ -494,6 +495,12 @@ void ControllerCutMesh::onMeshSelectionChanged(int value)
     {
         float_array = testVertices06;
         idx_array = testTriangles06;
+    }
+
+    if(value == 6)
+    {
+        float_array = testVertices07;
+        idx_array = testTriangles07;
     }
 
     for(size_t i = 0; i < float_array.size(); i += 2)
@@ -583,6 +590,15 @@ void ControllerCutMesh::cut()
 
     m_CutPoints.clear();
 
+    // clear and remove cut meshes
+    for(const auto& m : m_CutMeshes)
+    {
+        m_Scene->removeMesh(m);
+        delete m;
+    }
+
+    m_CutMeshes.clear();
+
     switch(m_CutMode)
     {
     case CMM_LINE:
@@ -663,6 +679,8 @@ void ControllerCutMesh::cut()
         if(!cutted)
             continue;
 
+        m_CutMeshes.insert(m_CutMeshes.end(), result.begin(), result.end());
+
         // add cut points
         const CutPointVector& cp_vec = m_MeshCutter->getCutPoints();
         const size_t& num_cp = cp_vec.size();
@@ -694,6 +712,18 @@ void ControllerCutMesh::cut()
     // add cut points to scene
     for(const auto& p : m_CutPoints)
         m_Scene->addPoint(p);
+
+    bool show_source_meshes = m_CutMeshes.empty();
+    bool show_cut_meshes = m_CutMeshes.empty();
+
+    for(const auto& sm : m_Meshes)
+        sm->setVisible(show_source_meshes);
+
+    // add cut meshes to scene
+    for(const auto& m : m_CutMeshes)
+        m_Scene->addMesh(m);
+
+    m_Renderer->render();
 }
 
 void ControllerCutMesh::onCutPressed()
