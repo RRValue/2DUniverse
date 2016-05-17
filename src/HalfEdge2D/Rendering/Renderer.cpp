@@ -227,27 +227,34 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
 
     if(m_RenderTriangles)
     {
+        Vec2d vp, vps;
+        QPointF p, ps;
+
         // paint traingles
         for(const auto& face : faces)
         {
-            Vec2d vp0 = vertices[face->getVertIdx(0)]->getPosition();
-            Vec2d vp1 = vertices[face->getVertIdx(1)]->getPosition();
-            Vec2d vp2 = vertices[face->getVertIdx(2)]->getPosition();
-
-            QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
-            QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
-            QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
-
             // fill triangle
             const Vec4f& tris_color = face->getColour();
             paint_color = QColor::fromRgbF(tris_color[0], tris_color[1], tris_color[2], tris_color[3]);
 
             QPainterPath path;
 
-            path.moveTo(p0);
-            path.lineTo(p1);
-            path.lineTo(p2);
-            path.lineTo(p0);
+            const std::vector<size_t>& idxs = face->getVertIds();
+
+            vps = vertices[face->getVertIdx(0)]->getPosition();
+            ps = trans(QPointF(vps.x(), vps.y()));
+
+            path.moveTo(ps);
+            
+            for(size_t i = 1; i < idxs.size(); i++)
+            {
+                vp = vertices[face->getVertIdx(i)]->getPosition();
+                p = trans(QPointF(vp.x(), vp.y()));
+
+                path.lineTo(p);
+            }
+
+            path.lineTo(ps);
 
             painter->setPen(Qt::NoPen);
             painter->fillPath(path, QBrush(paint_color));
@@ -256,22 +263,28 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
 
     if(m_RenderTrianglesEdges)
     {
+        Vec2d vp0, vp1;
+        QPointF p0, p1;
+
         // paint traingles edges
         for(const auto& face : faces)
         {
-            Vec2d vp0 = vertices[face->getVertIdx(0)]->getPosition();
-            Vec2d vp1 = vertices[face->getVertIdx(1)]->getPosition();
-            Vec2d vp2 = vertices[face->getVertIdx(2)]->getPosition();
-
-            QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
-            QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
-            QPointF p2 = trans(QPointF(vp2.x(), vp2.y()));
-
             painter->setPen(Qt::SolidLine);
             painter->setPen(Qt::black);
-            painter->drawLine(p0, p1);
-            painter->drawLine(p1, p2);
-            painter->drawLine(p2, p0);
+
+            const std::vector<size_t>& idxs = face->getVertIds();
+            size_t num_idxs = idxs.size();
+
+            for(size_t i = 0; i < num_idxs; i++)
+            {
+                Vec2d vp0 = vertices[face->getVertIdx(i)]->getPosition();
+                Vec2d vp1 = vertices[face->getVertIdx((i + 1) % num_idxs)]->getPosition();
+
+                QPointF p0 = trans(QPointF(vp0.x(), vp0.y()));
+                QPointF p1 = trans(QPointF(vp1.x(), vp1.y()));
+
+                painter->drawLine(p0, p1);
+            }
         }
     }
 

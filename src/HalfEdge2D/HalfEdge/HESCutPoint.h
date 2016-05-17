@@ -17,7 +17,7 @@ public:
 
     HESCutPoint& operator=(const HESCutPoint& other);
 
-    bool hasSameNearestVertex(const HESCutPoint& cutPoint) const;
+    bool hasSameVertex(const HESCutPoint& cutPoint) const;
 
 private:
     void checkOnVertex();
@@ -25,7 +25,7 @@ private:
 public:
     HESEdge* m_Edge;
     Vec2d m_Point;
-    HESVertex* m_NearestVertex;
+    HESVertex* m_Vertex;
     bool m_IsOnVertex;
 
     const double m_VertexDistanceThreshold = 0.001;

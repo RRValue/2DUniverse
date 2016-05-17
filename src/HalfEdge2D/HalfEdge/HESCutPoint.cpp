@@ -28,22 +28,22 @@ void HESCutPoint::checkOnVertex()
         m_IsOnVertex = true;
 
     if(d0 < d1)
-        m_NearestVertex = v0;
+        m_Vertex = v0;
     else
-        m_NearestVertex = v1;
+        m_Vertex = v1;
 }
 
 HESCutPoint& HESCutPoint::operator=(const HESCutPoint& other)
 {
     m_Edge = other.m_Edge;
     m_Point = other.m_Point;
-    m_NearestVertex = other.m_NearestVertex;
+    m_Vertex = other.m_Vertex;
     m_IsOnVertex = other.m_IsOnVertex;
 
     return *this;
 }
 
-bool HESCutPoint::hasSameNearestVertex(const HESCutPoint& cutPoint) const
+bool HESCutPoint::hasSameVertex(const HESCutPoint& cutPoint) const
 {
-    return m_NearestVertex == cutPoint.m_NearestVertex;
+    return m_Vertex == cutPoint.m_Vertex;
 }

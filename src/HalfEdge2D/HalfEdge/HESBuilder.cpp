@@ -38,65 +38,62 @@ bool HESBuilder::build()
     // iterate over all Triangles and build basis triangles
     for(const auto& f : m_Mesh->getFaces())
     {
-        HESVertex* const v0 = m_Mesh->getHESVertex(f->getVertIdx(0));
-        HESVertex* const v1 = m_Mesh->getHESVertex(f->getVertIdx(1));
-        HESVertex* const v2 = m_Mesh->getHESVertex(f->getVertIdx(2));
+        const std::vector<size_t> face_idxs = f->getVertIds();
+        std::vector<HESVertex* const> vertices;
 
-        HESEdge* e0 = new HESEdge();
-        HESEdge* e1 = new HESEdge();
-        HESEdge* e2 = new HESEdge();
+        for(const auto& idx : face_idxs)
+            vertices.push_back(m_Mesh->getHESVertex(idx));
+
+        std::vector<HESEdge* const> edges(vertices.size());
+
+        for(auto& e : edges)
+        {
+            e = new HESEdge();
+            m_Mesh->addEdge(e);
+        }
         
-        m_Mesh->addEdge(e0);
-        m_Mesh->addEdge(e1);
-        m_Mesh->addEdge(e2);
-
-        buildFace({v0, v1, v2}, {e0, e1, e2}, dynamic_cast<HESFace*>(f));
-        connectEdges({e0, e1, e2});
+        buildFace(vertices, edges, dynamic_cast<HESFace*>(f));
+        connectEdges(edges);
     }
 
     return true;
 }
 
-void HESBuilder::buildFace(const std::array<HESVertex* const, 3>& vertices, const std::array<HESEdge* const, 3>& edges, HESFace* const face)
+void HESBuilder::buildFace(const std::vector<HESVertex* const>& vertices, const std::vector<HESEdge* const>& edges, HESFace* const face)
 {
+    size_t num_vertices = vertices.size();
+
     // on edges
     //// set prev and next
-    edges[0]->setNext(edges[1]);
-    edges[1]->setNext(edges[2]);
-    edges[2]->setNext(edges[0]);
-
-    edges[0]->setPrev(edges[2]);
-    edges[1]->setPrev(edges[0]);
-    edges[2]->setPrev(edges[1]);
+    for(size_t i = 0; i < num_vertices; i++)
+    {
+        edges[i]->setNext(edges[(i + 1) % num_vertices]);
+        edges[i]->setPrev(edges[(i - 1 + num_vertices) % num_vertices]);
+    }
 
     // set faces
-    edges[0]->setFace(face);
-    edges[1]->setFace(face);
-    edges[2]->setFace(face);
+    for(const auto& e : edges)
+        e->setFace(face);
 
     // set from and to vertices
-    edges[0]->setFrom(vertices[0]);
-    edges[1]->setFrom(vertices[1]);
-    edges[2]->setFrom(vertices[2]);
-
-    edges[0]->setTo(vertices[1]);
-    edges[1]->setTo(vertices[2]);
-    edges[2]->setTo(vertices[0]);
+    for(size_t i = 0; i < num_vertices; i++)
+    {
+        edges[i]->setFrom(vertices[i]);
+        edges[i]->setTo(vertices[(i + 1) % num_vertices]);
+    }
 
     // on faces
     //// set bound edges
-    face->addEdge(edges[0]);
-    face->addEdge(edges[1]);
-    face->addEdge(edges[2]);
-
+    for(const auto& e : edges)
+        face->addEdge(e);
+    
     // on vertices
     //// set outgoing edges
-    vertices[0]->addEdge(edges[0]);
-    vertices[1]->addEdge(edges[1]);
-    vertices[2]->addEdge(edges[2]);
+    for(size_t i = 0; i < num_vertices; i++)
+        vertices[i]->addEdge(edges[i]);
 }
 
-void HESBuilder::connectEdges(const std::initializer_list<HESEdge* const>& edges)
+void HESBuilder::connectEdges(const std::vector<HESEdge* const>& edges)
 {
     // check if one of the edges of to has from from
     for(const auto& e : edges)

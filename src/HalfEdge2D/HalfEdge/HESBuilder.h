@@ -1,8 +1,7 @@
 #ifndef _HALFEDGESTRUCTURE_BUILDER_H_
 #define _HALFEDGESTRUCTURE_BUILDER_H_
 
-#include <array>
-#include <initializer_list>
+#include <vector>
 
 class HESMesh;
 class HESEdge;
@@ -20,8 +19,8 @@ public:
     bool build(HESMesh* const mesh);
 
 private:
-    void buildFace(const std::array<HESVertex* const, 3>& vertices, const std::array<HESEdge* const, 3>& edges, HESFace* const face);
-    void connectEdges(const std::initializer_list<HESEdge* const>& edges);
+    void buildFace(const std::vector<HESVertex* const>& vertices, const std::vector<HESEdge* const>& edges, HESFace* const face);
+    void connectEdges(const std::vector<HESEdge* const>& edges);
 
 private:
     HESMesh* m_Mesh;
