@@ -42,3 +42,8 @@ HESCutPoint& HESCutPoint::operator=(const HESCutPoint& other)
 
     return *this;
 }
+
+bool HESCutPoint::hasSameNearestVertex(const HESCutPoint& cutPoint) const
+{
+    return m_NearestVertex == cutPoint.m_NearestVertex;
+}

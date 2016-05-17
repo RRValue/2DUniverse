@@ -6,6 +6,7 @@
 #include "HalfEdge2D/Renderables/Intersectable.h"
 
 #include "HalfEdge2D/HalfEdge/HESMesh.h"
+#include "HalfEdge2D/HalfEdge/HESCutPoint.h"
 
 #include <vector>
 #include <map>
@@ -68,26 +69,41 @@ private:
 
     IntersectionVector cutImpl(const Line& line) const;
 
-    bool canSnapToCut(HESCutPoint* const reverenceCut, HESCutPoint* const cut);
+    void findMeshBoundaries();
+    void findBoundaryCuts();
+    void findOneMeshCut();
+    void findCutPoints();
+    void mergeSameCutPoints();
 
 private:
+    // meshes
     HESMesh* m_SourceMesh;
     HESMesh* m_TargetMesh;
 
+    // mode
     CuttingMode m_CuttingMode;
 
+    // cut objects and properties
     Line* m_Line;
     QuadraticBezier* m_QuadraticBezier;
     CubicBezier* m_CubicBezier;
     Spline* m_Spline;
 
+    bool m_ClosedCurve;
+
     // visited
     HESEdgeConstVector m_VisitedEdges;
     HESFaceConstVector m_VisitedFaces;
 
-    bool m_ClosedCurve;
-
     CutPointVector m_CutPoints;
+
+    // intermediate objects
+    std::vector<HESEdgeConstVector> m_MeshBoundaries;
+    HESCutMap m_CutPointMap;
+    HESCutVector m_CutPointVector;
+    std::vector<size_t> m_BorderCuts;
+    HESEdgeConstVector m_BorderCutEdges;
+
 };
 
 #endif //_HALFEDGESTRUCTURE_CUTTER_H_

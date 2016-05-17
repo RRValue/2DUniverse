@@ -17,6 +17,8 @@ public:
 
     HESCutPoint& operator=(const HESCutPoint& other);
 
+    bool hasSameNearestVertex(const HESCutPoint& cutPoint) const;
+
 private:
     void checkOnVertex();
 
