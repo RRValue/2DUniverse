@@ -75,6 +75,7 @@ private:
     void findOneMeshCut(HESMesh* const mesh);
     void findCutPoints();
     void mergeSameCutPoints();
+    void eliminateUnusedEdgeCutPoints();
     void createCutVertices(HESMesh* const mesh);
 
 private:

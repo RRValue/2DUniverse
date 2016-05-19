@@ -18,6 +18,8 @@ public:
     HESCutPoint& operator=(const HESCutPoint& other);
 
     bool hasSameVertex(const HESCutPoint& cutPoint) const;
+    bool alignedOnBorder(const HESCutPoint& cutPoint) const;
+    bool shareSameEdge(const HESCutPoint& cutPoint) const;
 
 private:
     void checkOnVertex();
@@ -27,8 +29,9 @@ public:
     Vec2d m_Point;
     HESVertex* m_Vertex;
     bool m_IsOnVertex;
+    bool m_IsOnBorder;
 
-    const double m_VertexDistanceThreshold = 0.001;
+    const double m_VertexDistanceThreshold = 0.05;
 };
 
 typedef std::map<double, HESCutPoint, std::less<double>, Eigen::aligned_allocator<std::pair<double, HESCutPoint>>> HESCutMap;

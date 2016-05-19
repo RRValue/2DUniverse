@@ -599,33 +599,31 @@ void ControllerCutMesh::cut()
 
     m_CutMeshes.clear();
 
+    bool can_cut = true;
+
     switch(m_CutMode)
     {
     case CMM_LINE:
         {
-            if(!m_Line->isVisible())
-                return;
+            can_cut = m_Line->isVisible();
 
             break;
         }
     case CMM_QBEZIER:
         {
-            if(!m_QBezier->isVisible())
-                return;
+            can_cut = m_QBezier->isVisible();
 
             break;
         }
     case CMM_CBEZIER:
         {
-            if(!m_CBezier->isVisible())
-                return;
+            can_cut = m_CBezier->isVisible();
 
             break;
         }
     case CMM_SPLINE:
         {
-            if(!m_Spline->isVisible())
-                return;
+            can_cut = m_Spline->isVisible();
 
             break;
         }
@@ -633,79 +631,82 @@ void ControllerCutMesh::cut()
         break;
     }
 
-    NSpline<float, 4> rgbg;
-
-    rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 0.333f));
-    rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 0.333f));
-    rgbg.setClosed(false);
-
-    // for each mesh cut
-    for(const auto& m : m_Meshes)
+    if(can_cut)
     {
-        HESMeshVector result;
+        NSpline<float, 4> rgbg;
 
-        bool cutted = false;
+        rgbg.addPoint(Vec4f(0.0f, 0.0f, 1.0f, 0.333f));
+        rgbg.addPoint(Vec4f(1.0f, 0.0f, 0.0f, 0.333f));
+        rgbg.setClosed(false);
 
-        switch(m_CutMode)
+        // for each mesh cut
+        for(const auto& m : m_Meshes)
         {
-        case CMM_LINE:
-            {
-                cutted = m_MeshCutter->cutLine(m, m_Line, result);
+            HESMeshVector result;
 
+            bool cutted = false;
+
+            switch(m_CutMode)
+            {
+            case CMM_LINE:
+                {
+                    cutted = m_MeshCutter->cutLine(m, m_Line, result);
+
+                    break;
+                }
+            case CMM_QBEZIER:
+                {
+                    cutted = m_MeshCutter->cutQuadraticBezier(m, m_QBezier, result);
+
+                    break;
+                }
+            case CMM_CBEZIER:
+                {
+                    cutted = m_MeshCutter->cutCubicBezier(m, m_CBezier, result);
+
+                    break;
+                }
+            case CMM_SPLINE:
+                {
+                    cutted = m_MeshCutter->cutSpline(m, m_Spline, result);
+
+                    break;
+                }
+            default:
                 break;
             }
-        case CMM_QBEZIER:
+
+            if(!cutted)
+                continue;
+
+            m_CutMeshes.insert(m_CutMeshes.end(), result.begin(), result.end());
+
+            // add cut points
+            const CutPointVector& cp_vec = m_MeshCutter->getCutPoints();
+            const size_t& num_cp = cp_vec.size();
+
+            float s = 1.0f / (float)(num_cp - 1);
+            float t = 0.0f;
+
+            for(size_t i = 0; i < num_cp; i++)
             {
-                cutted = m_MeshCutter->cutQuadraticBezier(m, m_QBezier, result);
+                Point* cp = new Point();
+                cp->setPosition(cp_vec[i]);
 
-                break;
+                Vec4f c = rgbg.pointAt(t);
+
+                c(0) = std::max(0.0f, std::min(c(0), 1.0f));
+                c(1) = std::max(0.0f, std::min(c(1), 1.0f));
+                c(2) = std::max(0.0f, std::min(c(2), 1.0f));
+                c(3) = std::max(0.0f, std::min(c(3), 1.0f));
+
+                cp->setColour(c);
+                cp->setSize(0.02f);
+
+                m_CutPoints.push_back(cp);
+
+                t += s;
             }
-        case CMM_CBEZIER:
-            {
-                cutted = m_MeshCutter->cutCubicBezier(m, m_CBezier, result);
-
-                break;
-            }
-        case CMM_SPLINE:
-            {
-                cutted = m_MeshCutter->cutSpline(m, m_Spline, result);
-
-                break;
-            }
-        default:
-            break;
-        }
-
-        if(!cutted)
-            continue;
-
-        m_CutMeshes.insert(m_CutMeshes.end(), result.begin(), result.end());
-
-        // add cut points
-        const CutPointVector& cp_vec = m_MeshCutter->getCutPoints();
-        const size_t& num_cp = cp_vec.size();
-        
-        float s = 1.0f / (float)(num_cp - 1);
-        float t = 0.0f;
-
-        for(size_t i = 0; i < num_cp; i++)
-        {
-            Point* cp = new Point();
-            cp->setPosition(cp_vec[i]);
-
-            Vec4f c = rgbg.pointAt(t);
-
-            c(0) = std::max(0.0f, std::min(c(0), 1.0f));
-            c(1) = std::max(0.0f, std::min(c(1), 1.0f));
-            c(2) = std::max(0.0f, std::min(c(2), 1.0f));
-            c(3) = std::max(0.0f, std::min(c(3), 1.0f));
-
-            cp->setColour(c);
-            cp->setSize(0.02f);
-
-            m_CutPoints.push_back(cp);
-
-            t += s;
         }
     }
 
@@ -714,7 +715,6 @@ void ControllerCutMesh::cut()
         m_Scene->addPoint(p);
 
     bool show_source_meshes = m_CutMeshes.empty();
-    bool show_cut_meshes = m_CutMeshes.empty();
 
     for(const auto& sm : m_Meshes)
         sm->setVisible(show_source_meshes);

@@ -39,11 +39,35 @@ HESCutPoint& HESCutPoint::operator=(const HESCutPoint& other)
     m_Point = other.m_Point;
     m_Vertex = other.m_Vertex;
     m_IsOnVertex = other.m_IsOnVertex;
+    m_IsOnBorder = other.m_IsOnBorder;
 
     return *this;
 }
 
 bool HESCutPoint::hasSameVertex(const HESCutPoint& cutPoint) const
 {
-    return m_Vertex == cutPoint.m_Vertex;
+    return m_IsOnVertex && cutPoint.m_IsOnVertex && m_Vertex == cutPoint.m_Vertex;
+}
+
+bool HESCutPoint::alignedOnBorder(const HESCutPoint& cutPoint) const
+{
+    return m_IsOnBorder && cutPoint.m_IsOnBorder && shareSameEdge(cutPoint);
+}
+
+bool HESCutPoint::shareSameEdge(const HESCutPoint& cutPoint) const
+{
+    if(!m_IsOnVertex && !cutPoint.m_IsOnVertex)
+        return m_Edge == cutPoint.m_Edge;
+    else if(!m_IsOnVertex && cutPoint.m_IsOnVertex)
+        return m_Edge->from() == cutPoint.m_Vertex || m_Edge->to() == cutPoint.m_Vertex;
+    else if(m_IsOnVertex && !cutPoint.m_IsOnVertex)
+        return cutPoint.m_Edge->from() == m_Vertex || cutPoint.m_Edge->to() == m_Vertex;
+    else if(m_IsOnVertex && cutPoint.m_IsOnVertex)
+    {
+        for(const auto& e : m_Vertex->getEdges())
+            if(e->to() == cutPoint.m_Vertex)
+                return true;
+    }
+
+    return false;
 }

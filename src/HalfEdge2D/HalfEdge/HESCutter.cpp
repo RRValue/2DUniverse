@@ -177,7 +177,7 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     findBoundaryCuts();
 
     // if we have no border cuts
-    if(m_BorderCuts.empty())
+    if(m_BorderCutEdges.empty())
     {
         // if we have no closed curve -> no cutting possible
         if(!m_ClosedCurve)
@@ -186,8 +186,8 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
         {
             findOneMeshCut(mesh);
 
-            // if we still have cut -> we have no cut at all
-            if(m_BorderCuts.empty())
+            // if we still have no cut -> we have no cut at all
+            if(m_BorderCutEdges.empty())
                 return false;
         }
     }
@@ -203,6 +203,9 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     // merge same cut points
     mergeSameCutPoints();
 
+    // eliminate cuts on edges and borders
+    eliminateUnusedEdgeCutPoints();
+
     // set cut points
     for(const auto& cp : m_CutPointVector)
         m_CutPoints.push_back(cp.m_Point);
@@ -214,6 +217,8 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     checker.run(mesh);
 
     outMeshes = checker.getMeshes();
+
+    return true;
 }
 
 void HESCutter::findMeshBoundaries(HESMesh* const mesh)
@@ -264,7 +269,7 @@ void HESCutter::findBoundaryCuts()
             e->setVisited(true);
             m_VisitedEdges.push_back(e);
         }
-
+        
         m_BorderCuts.push_back(cur_num_border_cuts);
     }
 }
@@ -447,6 +452,160 @@ void HESCutter::mergeSameCutPoints()
 
         cut_iter = m_CutPointVector.begin() + cut_idx;
     }
+}
+
+void HESCutter::eliminateUnusedEdgeCutPoints()
+{
+    if(m_CutPointVector.empty())
+        return;
+
+    // check if cut point is on a border
+    for(auto& cp : m_CutPointVector)
+    {
+        cp.m_IsOnBorder = false;
+
+        if(cp.m_IsOnVertex)
+        {
+            for(const auto& e : cp.m_Vertex->getEdges())
+            {
+                if(e->opposite() != nullptr)
+                    continue;
+
+                cp.m_IsOnBorder = true;
+
+                break;
+            }
+        }
+        else
+            cp.m_IsOnBorder = cp.m_Edge->opposite() == nullptr;
+    }
+
+    // remove unnecessary border cuts    
+    if(m_CutPointVector.size() == 2)
+        if(m_CutPointVector[0].alignedOnBorder(m_CutPointVector[1]))
+            m_CutPointVector.clear();
+
+    if(m_CutPointVector.empty())
+        return;
+
+    // remove cut points if more than two lay on a edge
+    HESCutVector::const_iterator istart = m_CutPointVector.begin();
+    HESCutVector::const_iterator iend = istart + 1;
+    size_t idx = 0;
+
+    HESCutVector::const_iterator del_iter_0;
+    HESCutVector::const_iterator del_iter_1;
+
+    while(true)
+    {
+        while(istart != m_CutPointVector.end())
+        {
+            if(istart->shareSameEdge(*iend))
+                break;
+
+            istart++;
+            iend++;
+
+            idx++;
+
+            if(iend == m_CutPointVector.end())
+                break;
+        }
+
+        if(iend == m_CutPointVector.end())
+            break;
+
+        del_iter_0 = istart;
+
+        while(iend != m_CutPointVector.end())
+        {
+            istart++;
+            iend++;
+
+            if(iend == m_CutPointVector.end())
+                break;
+
+            if(!istart->shareSameEdge(*iend))
+                break;
+        }
+
+        del_iter_0 = del_iter_0 + 1;
+        del_iter_1 = iend - 1;
+        idx++;
+
+        m_CutPointVector.erase(del_iter_0, del_iter_1);
+
+        istart = m_CutPointVector.begin() + idx;        
+        iend = istart + 1;
+
+        if(iend == m_CutPointVector.end())
+            break;
+    }
+
+    // remove cut points on border edges
+    istart = m_CutPointVector.begin();
+    idx = 0;
+
+    while(true)
+    {
+        while(istart != m_CutPointVector.end())
+        {
+            if(istart->m_IsOnBorder)
+                break;
+
+            istart++;
+            idx++;
+        }
+
+        if(istart == m_CutPointVector.end())
+            break;
+
+        iend = istart + 1;
+
+        if(iend == m_CutPointVector.end())
+            break;
+
+        if(istart->alignedOnBorder(*iend))
+        {
+            del_iter_0 = istart;
+
+            while(iend != m_CutPointVector.end())
+            {
+                istart++;
+                iend++;
+
+                if(iend == m_CutPointVector.end())
+                    break;
+
+                if(!istart->alignedOnBorder(*iend))
+                    break;
+            }
+
+            if(del_iter_0 != m_CutPointVector.begin() && !del_iter_0->m_IsOnVertex)
+            {
+                del_iter_0 = del_iter_0 + 1;
+                idx++;
+            }
+            
+            del_iter_1 = iend;
+
+            if(del_iter_1 != m_CutPointVector.end() && !del_iter_1->m_IsOnVertex)
+                del_iter_1 = iend - 1;
+
+            if(del_iter_0 != del_iter_1)
+                m_CutPointVector.erase(del_iter_0, del_iter_1);
+
+            istart = m_CutPointVector.begin() + idx;
+        }
+        else
+        {
+            istart++;
+            idx++;
+        }
+    }
+
+    if(m_CutPointVector.size() < 2)
+        m_CutPointVector.clear();
 }
 
 void HESCutter::createCutVertices(HESMesh* const mesh)
