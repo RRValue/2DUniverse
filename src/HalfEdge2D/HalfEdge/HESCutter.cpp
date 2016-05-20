@@ -265,7 +265,7 @@ void HESCutter::findBoundaryCuts()
             {
                 border_cut_points.push_back(ccp);
 
-                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point, true)));
+                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point, true, ccp.m_Alpha)));
             }
 
             if(cur_cut_points.size() > 0)
@@ -315,7 +315,7 @@ void HESCutter::findOneMeshCut(HESMesh* const mesh)
             continue;
 
         for(const auto& ccp : cur_cut_points)
-            m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(current_edge, ccp.m_Point, false)));
+            m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(current_edge, ccp.m_Point, false, ccp.m_Alpha)));
 
         if(cur_cut_points.size() == 0)
             continue;
@@ -383,7 +383,7 @@ void HESCutter::findCutPoints()
             faces_to_visit.push_back(e->opposite()->face());
 
             for(const auto& ccp : cur_cut_points)
-                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point, false)));
+                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point, false, ccp.m_Alpha)));
         }
     }
 

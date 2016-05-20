@@ -3,11 +3,12 @@
 #include "HalfEdge2D/HalfEdge/HESEdge.h"
 #include "HalfEdge2D/HalfEdge/HESVertex.h"
 
-HESCutPoint::HESCutPoint(HESEdge* const e, const Vec2d& p, const bool& border)
+HESCutPoint::HESCutPoint(HESEdge* const e, const Vec2d& p, const bool& border, const double& alpha)
 {
     m_Edge = e;
     m_Point = p;
     m_IsOnBorder = border;
+    m_Alpha = alpha;
 
     checkOnVertex();
 }
@@ -19,6 +20,7 @@ HESCutPoint::HESCutPoint(const HESCutPoint& other)
     m_Vertex = other.m_Vertex;
     m_IsOnVertex = other.m_IsOnVertex;
     m_IsOnBorder = other.m_IsOnBorder;
+    m_Alpha = other.m_Alpha;
 }
 
 void HESCutPoint::checkOnVertex()
@@ -50,6 +52,7 @@ HESCutPoint& HESCutPoint::operator=(HESCutPoint& other)
     m_Vertex = other.m_Vertex;
     m_IsOnVertex = other.m_IsOnVertex;
     m_IsOnBorder = other.m_IsOnBorder;
+    m_Alpha = other.m_Alpha;
 
     return *this;
 }

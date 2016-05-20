@@ -13,7 +13,7 @@ class HESCutPoint
 {
 public:
     HESCutPoint() = delete;
-    HESCutPoint(HESEdge* const e, const Vec2d& p, const bool& border);
+    HESCutPoint(HESEdge* const e, const Vec2d& p, const bool& border, const double& alpha);
     HESCutPoint(const HESCutPoint& other);
 
     HESCutPoint& operator=(HESCutPoint& other);
@@ -29,6 +29,7 @@ public:
     HESVertex* m_Vertex;
     bool m_IsOnVertex;
     bool m_IsOnBorder;
+    double m_Alpha;
 
     const double m_VertexDistanceThreshold = 0.05;
 };

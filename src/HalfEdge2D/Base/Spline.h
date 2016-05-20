@@ -64,6 +64,7 @@ public:
         m_TangentFactors = TangentFactorsType(T(0.5), T(0.5), T(0.5), T(0.5));
         m_Closed = false;
         m_LengthDirty = true;
+        m_SegmentAlphaStep = T(0);
     }
     NSpline(const NSpline& other)
     {
@@ -73,6 +74,7 @@ public:
         m_Segments = other.m_Segments;
         m_Closed = other.m_Closed;
         m_LengthDirty = true;
+        m_SegmentAlphaStep = other.m_SegmentAlphaStep;
     }
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
