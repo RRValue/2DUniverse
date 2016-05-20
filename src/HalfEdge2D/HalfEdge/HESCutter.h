@@ -75,8 +75,9 @@ private:
     void findBoundaryCuts();
     void findOneMeshCut(HESMesh* const mesh);
     void findCutPoints();
-    void separateCutPoints();
+    void makeCutLines();
     void mergeSameCutPoints();
+    void cleanUpCutLines();
     void createCutVertices(HESMesh* const mesh);
 
 private:
@@ -107,7 +108,7 @@ private:
     HESEdgeConstVector m_BorderCutEdges;
     HESCutMap m_CutPointMap;
     HESCutVector m_CutPointVector;
-    std::vector<HESCutVector> m_CutsVector;
+    std::vector<HESCutVector> m_CutLines;
 };
 
 #endif //_HALFEDGESTRUCTURE_CUTTER_H_
