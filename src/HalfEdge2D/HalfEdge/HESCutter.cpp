@@ -140,6 +140,7 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
     for(const auto& m : m_TargetMeshes)
     {
         // reset result and intermediate objects
+        m_MeshBoundaries.clear();
         m_PointCuts.clear();
         m_CutPointMap.clear();
         m_CutPointVector.clear();
@@ -219,20 +220,18 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     }
 
     // create cut vertices
-    createCutVertices(mesh);
+    /*createCutVertices(mesh);
 
     HESCheck checker;
     checker.run(mesh);
 
-    outMeshes = checker.getMeshes();
+    outMeshes = checker.getMeshes();*/
 
     return true;
 }
 
 void HESCutter::findMeshBoundaries(HESMesh* const mesh)
 {
-    m_MeshBoundaries.clear();
-
     for(const auto& e : mesh->getBoundaryStartEdges())
     {
         HESEdgeConstVector boundary;

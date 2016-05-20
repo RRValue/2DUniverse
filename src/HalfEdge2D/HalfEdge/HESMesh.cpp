@@ -22,7 +22,8 @@ HESMesh::HESMesh(const HESMesh& other)
 
 HESMesh::~HESMesh()
 {
-
+    for(auto& e : m_Edges)
+        delete e;
 }
 
 void HESMesh::clear()
