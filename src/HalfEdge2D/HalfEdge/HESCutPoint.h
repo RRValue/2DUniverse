@@ -19,6 +19,7 @@ public:
     HESCutPoint& operator=(HESCutPoint& other);
 
     bool hasSameVertex(const HESCutPoint& cutPoint) const;
+    bool cutsTriangle(const HESCutPoint& cutPoint) const;
 
 private:
     void checkOnVertex();

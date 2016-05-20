@@ -434,12 +434,6 @@ void HESCutter::makeCutLines()
         tmp_cut_vec.clear();
     }
 
-    // check cut triangle
-    auto border_points_cuts_triangle = [](const HESCutPoint& p0, const HESCutPoint& p1)
-    {
-        return p0.m_Edge != p1.m_Edge && p0.m_Edge->face() == p1.m_Edge->face();
-    };
-
     // find first two cut points which make a true cut
     i0 = m_CutPointVector.begin();
     i1 = i0;
@@ -450,7 +444,7 @@ void HESCutter::makeCutLines()
         if(i2 == m_CutPointVector.end())
             break;
 
-        if(i1->m_IsOnBorder && i2->m_IsOnBorder && !border_points_cuts_triangle(*i1, *i2))
+        if(i1->m_IsOnBorder && i2->m_IsOnBorder && !i1->cutsTriangle(*i2))
         {
             i1++;
             i2++;
@@ -493,7 +487,7 @@ void HESCutter::makeCutLines()
 
     while(cvi0 != m_CutLines.end())
     {
-        if(cvi0->size() == 2 && !border_points_cuts_triangle((*cvi0)[0], (*cvi0)[1]))
+        if(cvi0->size() == 2 && !(*cvi0)[0].cutsTriangle((*cvi0)[1]))
         {
             m_CutLines.erase(cvi0);
             cvi0 = m_CutLines.begin() + idx;
@@ -663,23 +657,35 @@ void HESCutter::cleanUpSnapedCutLines()
 
     while(cv_iter != m_CutLines.end())
     {
+        bool del = false;
+
         if(cv_iter->size() <= 1)
+            del = true;
+        if(cv_iter->size() == 2)
+        {
+            HESCutVector::const_iterator i0 = cv_iter->begin();
+            HESCutVector::const_iterator i1 = i0 + 1;
+
+            if(i0->m_IsOnVertex && !i1->m_IsOnVertex)
+                del = i1->m_Edge->from() == i0->m_Vertex || i1->m_Edge->to() == i0->m_Vertex;
+            else if(!i0->m_IsOnVertex && i1->m_IsOnVertex)
+                del = i0->m_Edge->from() == i1->m_Vertex || i0->m_Edge->to() == i1->m_Vertex;
+            else if(i0->m_IsOnVertex && i1->m_IsOnVertex)
+                del = true;
+            else
+                del = !i0->cutsTriangle(*i1);
+        }
+
+        if(del)
         {
             m_CutLines.erase(cv_iter);
             cv_iter = m_CutLines.begin() + idx;
-
-            continue;
         }
-        if(cv_iter->size() == 2 && (*cv_iter)[0].m_IsOnBorder || (*cv_iter)[1].m_IsOnBorder)
+        else
         {
-            m_CutLines.erase(cv_iter);
-            cv_iter = m_CutLines.begin() + idx;
-
-            continue;
+            cv_iter++;
+            idx++;
         }
-
-        cv_iter++;
-        idx++;
     }
 }
 

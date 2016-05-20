@@ -61,3 +61,8 @@ bool HESCutPoint::hasSameVertex(const HESCutPoint& cutPoint) const
 {
     return m_IsOnVertex && cutPoint.m_IsOnVertex && m_Vertex == cutPoint.m_Vertex;
 }
+
+bool HESCutPoint::cutsTriangle(const HESCutPoint& cutPoint) const
+{
+    return m_Edge != cutPoint.m_Edge && m_Edge->face() == cutPoint.m_Edge->face();
+}
