@@ -87,6 +87,7 @@ private:
     static const size_t m_NumSplinePoints = 10;
 
     std::vector<Point* const> m_CutPoints;
+    std::vector<Line* const> m_CutLines;
 
     Line* m_Line;
     QuadraticBezier* m_QBezier;

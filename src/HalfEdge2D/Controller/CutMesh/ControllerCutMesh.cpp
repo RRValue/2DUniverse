@@ -590,6 +590,15 @@ void ControllerCutMesh::cut()
 
     m_CutPoints.clear();
 
+    // clear and remove cut lines
+    for(const auto& l : m_CutLines)
+    {
+        m_Scene->removeLine(l);
+        delete l;
+    }
+
+    m_CutLines.clear();
+
     // clear and remove cut meshes
     for(const auto& m : m_CutMeshes)
     {
@@ -682,11 +691,19 @@ void ControllerCutMesh::cut()
             m_CutMeshes.insert(m_CutMeshes.end(), result.begin(), result.end());
 
             // add cut points
-            const CutPointVector& cp_vec = m_MeshCutter->getCutPoints();
+            CutPointVector cp_vec;
+
+            for(const auto& cv : m_MeshCutter->getPointCuts())
+                for(const auto& cp : cv)
+                    cp_vec.push_back(cp);
+
             const size_t& num_cp = cp_vec.size();
 
-            float s = 1.0f / (float)(num_cp - 1);
+            float s = (num_cp < 2) ? (1.0f) : (1.0f / (float)(num_cp - 1));
             float t = 0.0f;
+
+            rgbg.setPoint(0, Vec4f(0.0f, 0.0f, 1.0f, 0.333f));
+            rgbg.setPoint(1, Vec4f(1.0f, 0.0f, 0.0f, 0.333f));
 
             for(size_t i = 0; i < num_cp; i++)
             {
@@ -707,12 +724,50 @@ void ControllerCutMesh::cut()
 
                 t += s;
             }
+
+            // add cut lines
+            const PointCutsVector& cps_vec = m_MeshCutter->getPointCuts();
+            const size_t& num_cps = cps_vec.size();
+
+            s = (num_cps < 2) ? (1.0f) : (1.0f / (float)(num_cps - 1));
+            t = 0.0f;
+
+            rgbg.setPoint(0, Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+            rgbg.setPoint(1, Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+
+            for(size_t i = 0; i < num_cps; i++)
+            {
+                Vec4f c = rgbg.pointAt(t);
+
+                c(0) = std::max(0.0f, std::min(c(0), 1.0f));
+                c(1) = std::max(0.0f, std::min(c(1), 1.0f));
+                c(2) = std::max(0.0f, std::min(c(2), 1.0f));
+                c(3) = std::max(0.0f, std::min(c(3), 1.0f));
+
+                size_t num_cp = cps_vec[i].size();
+
+                for(size_t j = 0; j < num_cp - 1; j++)
+                {
+                    Line* cl = new Line();
+                    cl->setPoint(0, cps_vec[i][j]);
+                    cl->setPoint(1, cps_vec[i][j + 1]);
+                    cl->setColour(c);
+
+                    m_CutLines.push_back(cl);
+                }
+
+                t += s;
+            }
         }
     }
 
     // add cut points to scene
     for(const auto& p : m_CutPoints)
         m_Scene->addPoint(p);
+
+    // add cut lines to scene
+    for(const auto& l : m_CutLines)
+        m_Scene->addLine(l);
 
     bool show_source_meshes = m_CutMeshes.empty();
 

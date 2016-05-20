@@ -22,6 +22,7 @@ class Spline;
 class Point;
 
 typedef std::vector<Vec2d, Eigen::aligned_allocator<Vec2d>> CutPointVector;
+typedef std::vector<CutPointVector> PointCutsVector;
 typedef std::vector<HESMesh*> HESMeshVector;
 
 class HESCutter
@@ -57,7 +58,7 @@ public:
     HESCutter();
     ~HESCutter();
 
-    const CutPointVector& getCutPoints() const;
+    const PointCutsVector& getPointCuts() const;
 
     bool cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVector& outMeshes);
     bool cutQuadraticBezier(HESMesh* const sourceMesh, QuadraticBezier* const qezier, HESMeshVector& outMeshes);
@@ -74,8 +75,8 @@ private:
     void findBoundaryCuts();
     void findOneMeshCut(HESMesh* const mesh);
     void findCutPoints();
+    void separateCutPoints();
     void mergeSameCutPoints();
-    void eliminateUnusedEdgeCutPoints();
     void createCutVertices(HESMesh* const mesh);
 
 private:
@@ -98,7 +99,7 @@ private:
     HESEdgeConstVector m_VisitedEdges;
     HESFaceConstVector m_VisitedFaces;
 
-    CutPointVector m_CutPoints;
+    PointCutsVector m_PointCuts;
 
     // intermediate objects
     std::vector<HESEdgeConstVector> m_MeshBoundaries;
@@ -106,6 +107,7 @@ private:
     HESEdgeConstVector m_BorderCutEdges;
     HESCutMap m_CutPointMap;
     HESCutVector m_CutPointVector;
+    std::vector<HESCutVector> m_CutsVector;
 };
 
 #endif //_HALFEDGESTRUCTURE_CUTTER_H_

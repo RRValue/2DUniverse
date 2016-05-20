@@ -13,13 +13,12 @@ class HESCutPoint
 {
 public:
     HESCutPoint() = delete;
-    HESCutPoint(HESEdge* const e, const Vec2d& p);
+    HESCutPoint(HESEdge* const e, const Vec2d& p, const bool& border);
+    HESCutPoint(const HESCutPoint& other);
 
-    HESCutPoint& operator=(const HESCutPoint& other);
+    HESCutPoint& operator=(HESCutPoint& other);
 
     bool hasSameVertex(const HESCutPoint& cutPoint) const;
-    bool alignedOnBorder(const HESCutPoint& cutPoint) const;
-    bool shareSameEdge(const HESCutPoint& cutPoint) const;
 
 private:
     void checkOnVertex();

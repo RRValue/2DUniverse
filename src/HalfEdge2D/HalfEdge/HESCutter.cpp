@@ -53,9 +53,9 @@ HESCutter::~HESCutter()
 
 }
 
-const CutPointVector& HESCutter::getCutPoints() const
+const PointCutsVector& HESCutter::getPointCuts() const
 {
-    return m_CutPoints;
+    return m_PointCuts;
 }
 
 bool HESCutter::cutLine(HESMesh* const sourceMesh, Line* const line, HESMeshVector& outMeshes)
@@ -140,9 +140,10 @@ bool HESCutter::cut(HESMeshVector& outMeshes)
     for(const auto& m : m_TargetMeshes)
     {
         // reset result and intermediate objects
-        m_CutPoints.clear();
+        m_PointCuts.clear();
         m_CutPointMap.clear();
         m_CutPointVector.clear();
+        m_CutsVector.clear();
         m_BorderCutEdges.clear();
         m_BorderCuts.clear();
 
@@ -200,15 +201,22 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     // get cut points
     findCutPoints();
 
-    // merge same cut points
-    mergeSameCutPoints();
+    // seperate point cuts
+    separateCutPoints();
 
-    // eliminate cuts on edges and borders
-    eliminateUnusedEdgeCutPoints();
+    // merge same cut points
+    //mergeSameCutPoints();
 
     // set cut points
-    for(const auto& cp : m_CutPointVector)
-        m_CutPoints.push_back(cp.m_Point);
+    for(const auto& cpv : m_CutsVector)
+    {
+        CutPointVector cur_cps;
+
+        for(const auto& cp : cpv)
+            cur_cps.push_back(cp.m_Point);
+
+        m_PointCuts.push_back(cur_cps);
+    }
 
     // create cut vertices
     createCutVertices(mesh);
@@ -258,7 +266,7 @@ void HESCutter::findBoundaryCuts()
             {
                 border_cut_points.push_back(ccp);
 
-                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point)));
+                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point, true)));
             }
 
             if(cur_cut_points.size() > 0)
@@ -270,7 +278,8 @@ void HESCutter::findBoundaryCuts()
             m_VisitedEdges.push_back(e);
         }
         
-        m_BorderCuts.push_back(cur_num_border_cuts);
+        if(cur_num_border_cuts > 0)
+            m_BorderCuts.push_back(cur_num_border_cuts);
     }
 }
 
@@ -307,7 +316,7 @@ void HESCutter::findOneMeshCut(HESMesh* const mesh)
             continue;
 
         for(const auto& ccp : cur_cut_points)
-            m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(current_edge, ccp.m_Point)));
+            m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(current_edge, ccp.m_Point, false)));
 
         if(cur_cut_points.size() == 0)
             continue;
@@ -375,7 +384,7 @@ void HESCutter::findCutPoints()
             faces_to_visit.push_back(e->opposite()->face());
 
             for(const auto& ccp : cur_cut_points)
-                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point)));
+                m_CutPointMap.insert(std::make_pair(ccp.m_Alpha, HESCutPoint(e, ccp.m_Point, false)));
         }
     }
 
@@ -387,239 +396,222 @@ void HESCutter::findCutPoints()
     m_CutPointMap.clear();
 }
 
+void HESCutter::separateCutPoints()
+{
+    if(m_CutPointVector.empty())
+        return;
+
+    if(m_BorderCuts.empty())
+    {
+        m_CutsVector.push_back(m_CutPointVector);
+        m_CutPointVector.clear();
+
+        return;
+    }
+
+    // check cut triangle
+    auto border_points_cuts_triangle = [](const HESCutPoint& p0, const HESCutPoint& p1)
+    {
+        return p0.m_Edge != p1.m_Edge && p0.m_Edge->face() == p1.m_Edge->face();
+    };
+
+    // set variables
+    HESCutVector tmp_cut_vec;
+
+    HESCutVector::const_iterator i0;
+    HESCutVector::const_iterator i1;
+    HESCutVector::const_iterator i2;
+
+    // if we start with non border cuts move them to the end of the vector
+    // e.g. cccbbbbcccbbcc -> bcccbbbbcccccb
+    i0 = m_CutPointVector.begin();
+
+    if(!i0->m_IsOnBorder)
+    {
+        i1 = i0 + 1;
+
+        while(!i1->m_IsOnBorder)
+            i1++;
+
+        i1++;
+
+        tmp_cut_vec.insert(tmp_cut_vec.begin(), i0, i1);
+        m_CutPointVector.erase(i0, i1);
+        m_CutPointVector.insert(m_CutPointVector.end(), tmp_cut_vec.begin(), tmp_cut_vec.end());
+        tmp_cut_vec.clear();
+    }
+
+    // find first two cut points which make a true cut
+    i0 = m_CutPointVector.begin();
+    i1 = i0;
+    i2 = i1 + 1;
+
+    while(true)
+    {
+        if(i2 == m_CutPointVector.end())
+            break;
+
+        if(i1->m_IsOnBorder && i2->m_IsOnBorder && !border_points_cuts_triangle(*i1, *i2))
+        {
+            i1++;
+            i2++;
+        }
+        else
+        {
+            tmp_cut_vec.insert(tmp_cut_vec.begin(), i0, i1);
+            m_CutPointVector.erase(i0, i1);
+            m_CutPointVector.insert(m_CutPointVector.end(), tmp_cut_vec.begin(), tmp_cut_vec.end());
+            tmp_cut_vec.clear();
+
+            break;
+        }
+    }
+
+    // separate
+    i0 = m_CutPointVector.begin();
+
+    while(i0 != m_CutPointVector.end())
+    {
+        i1 = i0 + 1;
+
+        if(i1 == m_CutPointVector.end())
+            break;
+
+        while(!i1->m_IsOnBorder)
+            i1++;
+
+        if(i1 != m_CutPointVector.end())
+            i1++;
+
+        tmp_cut_vec.insert(tmp_cut_vec.begin(), i0, i1);
+        m_CutPointVector.erase(i0, i1);
+        m_CutsVector.push_back(tmp_cut_vec);
+        tmp_cut_vec.clear();
+
+        i0 = m_CutPointVector.begin();
+    }
+
+    // check on seperated cuts if two cuts are on the same edge (if yes remove)
+    std::vector<HESCutVector>::const_iterator cvi0 = m_CutsVector.begin();
+    size_t idx = 0;
+
+    while(cvi0 != m_CutsVector.end())
+    {
+        if(cvi0->size() == 2 && !border_points_cuts_triangle((*cvi0)[0], (*cvi0)[1]))
+        {
+            m_CutsVector.erase(cvi0);
+            cvi0 = m_CutsVector.begin() + idx;
+        }
+        else
+        {
+            cvi0++;
+            idx++;
+        }
+    }
+}
+
 void HESCutter::mergeSameCutPoints()
 {
-    // check if a cut point is on a vertex -> if yes move adjacent CutPoint to this point
-    HESCutVector::iterator cut_iter = m_CutPointVector.begin();
-    size_t cut_idx = 0;
-
-    while(cut_iter != m_CutPointVector.end())
+    for(auto& cv : m_CutsVector)
     {
-        if(!cut_iter->m_IsOnVertex)
+        // check if a cut point is on a vertex -> if yes move adjacent CutPoint to this point
+        HESCutVector::iterator cut_iter = cv.begin();
+        size_t cut_idx = 0;
+
+        while(cut_iter != cv.end())
         {
-            cut_iter++;
+            if(!cut_iter->m_IsOnVertex)
+            {
+                cut_iter++;
+                cut_idx++;
+
+                continue;
+            }
+
+            HESCutVector::iterator group_iter_0 = cut_iter;
+            HESCutVector::iterator group_iter_1 = cut_iter;
+
+            // search for start group iter
+            while(true)
+            {
+                if(group_iter_0 == cv.begin())
+                    break;
+
+                group_iter_0--;
+                cut_idx--;
+
+                if(!cut_iter->hasSameVertex(*group_iter_0))
+                {
+                    group_iter_0++;
+                    cut_idx++;
+
+                    break;
+                }
+            }
+
+            // search for end group iter
+            while(true)
+            {
+                group_iter_1++;
+
+                if(group_iter_1 == cv.end())
+                    break;
+
+                if(!cut_iter->hasSameVertex(*group_iter_1))
+                    break;
+            }
+
+            // delete everthing exept the first one
+            if(group_iter_0 != cut_iter)
+            {
+                *group_iter_0 = *cut_iter;
+
+                group_iter_0->m_Point = cut_iter->m_Vertex->getPosition();
+            }
+            else
+                group_iter_0->m_Point = group_iter_0->m_Vertex->getPosition();
+
+            group_iter_0++;
             cut_idx++;
+            cv.erase(group_iter_0, group_iter_1);
+
+            cut_iter = cv.begin() + cut_idx;
+        }
+    }
+
+    std::vector<HESCutVector>::const_iterator cv_iter = m_CutsVector.begin();
+    size_t idx = 0;
+
+    while(cv_iter != m_CutsVector.end())
+    {
+        if(cv_iter->size() <= 1)
+        {
+            m_CutsVector.erase(cv_iter);
+            cv_iter = m_CutsVector.begin() + idx;
 
             continue;
         }
 
-        HESCutVector::iterator group_iter_0 = cut_iter;
-        HESCutVector::iterator group_iter_1 = cut_iter;
-
-        // search for start group iter
-        while(true)
-        {
-            if(group_iter_0 == m_CutPointVector.begin())
-                break;
-
-            group_iter_0--;
-            cut_idx--;
-
-            if(!cut_iter->hasSameVertex(*group_iter_0))
-            {
-                group_iter_0++;
-                cut_idx++;
-
-                break;
-            }
-        }
-
-        // search for end group iter
-        while(true)
-        {
-            group_iter_1++;
-
-            if(group_iter_1 == m_CutPointVector.end())
-                break;
-
-            if(!cut_iter->hasSameVertex(*group_iter_1))
-                break;
-        }
-
-        // delete everthing exept the first one
-        if(group_iter_0 != cut_iter)
-        {
-            *group_iter_0 = *cut_iter;
-
-            group_iter_0->m_Point = cut_iter->m_Vertex->getPosition();
-        }
-        else
-            group_iter_0->m_Point = group_iter_0->m_Vertex->getPosition();
-
-        group_iter_0++;
-        cut_idx++;
-        m_CutPointVector.erase(group_iter_0, group_iter_1);
-
-        cut_iter = m_CutPointVector.begin() + cut_idx;
-    }
-}
-
-void HESCutter::eliminateUnusedEdgeCutPoints()
-{
-    if(m_CutPointVector.empty())
-        return;
-
-    // check if cut point is on a border
-    for(auto& cp : m_CutPointVector)
-    {
-        cp.m_IsOnBorder = false;
-
-        if(cp.m_IsOnVertex)
-        {
-            for(const auto& e : cp.m_Vertex->getEdges())
-            {
-                if(e->opposite() != nullptr)
-                    continue;
-
-                cp.m_IsOnBorder = true;
-
-                break;
-            }
-        }
-        else
-            cp.m_IsOnBorder = cp.m_Edge->opposite() == nullptr;
-    }
-
-    // remove unnecessary border cuts    
-    if(m_CutPointVector.size() == 2)
-        if(m_CutPointVector[0].alignedOnBorder(m_CutPointVector[1]))
-            m_CutPointVector.clear();
-
-    if(m_CutPointVector.empty())
-        return;
-
-    // remove cut points if more than two lay on a edge
-    HESCutVector::const_iterator istart = m_CutPointVector.begin();
-    HESCutVector::const_iterator iend = istart + 1;
-    size_t idx = 0;
-
-    HESCutVector::const_iterator del_iter_0;
-    HESCutVector::const_iterator del_iter_1;
-
-    while(true)
-    {
-        while(istart != m_CutPointVector.end())
-        {
-            if(istart->shareSameEdge(*iend))
-                break;
-
-            istart++;
-            iend++;
-
-            idx++;
-
-            if(iend == m_CutPointVector.end())
-                break;
-        }
-
-        if(iend == m_CutPointVector.end())
-            break;
-
-        del_iter_0 = istart;
-
-        while(iend != m_CutPointVector.end())
-        {
-            istart++;
-            iend++;
-
-            if(iend == m_CutPointVector.end())
-                break;
-
-            if(!istart->shareSameEdge(*iend))
-                break;
-        }
-
-        del_iter_0 = del_iter_0 + 1;
-        del_iter_1 = iend - 1;
+        cv_iter++;
         idx++;
-
-        m_CutPointVector.erase(del_iter_0, del_iter_1);
-
-        istart = m_CutPointVector.begin() + idx;        
-        iend = istart + 1;
-
-        if(iend == m_CutPointVector.end())
-            break;
     }
-
-    // remove cut points on border edges
-    istart = m_CutPointVector.begin();
-    idx = 0;
-
-    while(true)
-    {
-        while(istart != m_CutPointVector.end())
-        {
-            if(istart->m_IsOnBorder)
-                break;
-
-            istart++;
-            idx++;
-        }
-
-        if(istart == m_CutPointVector.end())
-            break;
-
-        iend = istart + 1;
-
-        if(iend == m_CutPointVector.end())
-            break;
-
-        if(istart->alignedOnBorder(*iend))
-        {
-            del_iter_0 = istart;
-
-            while(iend != m_CutPointVector.end())
-            {
-                istart++;
-                iend++;
-
-                if(iend == m_CutPointVector.end())
-                    break;
-
-                if(!istart->alignedOnBorder(*iend))
-                    break;
-            }
-
-            if(del_iter_0 != m_CutPointVector.begin() && !del_iter_0->m_IsOnVertex)
-            {
-                del_iter_0 = del_iter_0 + 1;
-                idx++;
-            }
-            
-            del_iter_1 = iend;
-
-            if(del_iter_1 != m_CutPointVector.end() && !del_iter_1->m_IsOnVertex)
-                del_iter_1 = iend - 1;
-
-            if(del_iter_0 != del_iter_1)
-                m_CutPointVector.erase(del_iter_0, del_iter_1);
-
-            istart = m_CutPointVector.begin() + idx;
-        }
-        else
-        {
-            istart++;
-            idx++;
-        }
-    }
-
-    if(m_CutPointVector.size() < 2)
-        m_CutPointVector.clear();
 }
 
 void HESCutter::createCutVertices(HESMesh* const mesh)
 {
-    for(auto& cp : m_CutPointVector)
+    for(auto& cv : m_CutsVector)
     {
-        if(cp.m_IsOnVertex)
-            continue;
+        for(auto& cp : cv)
+        {
+            if(cp.m_IsOnVertex)
+                continue;
 
-        HESVertex* const new_vertex = mesh->splitEdgeAtPoint(cp.m_Edge, cp.m_Point);
+            HESVertex* const new_vertex = mesh->splitEdgeAtPoint(cp.m_Edge, cp.m_Point);
 
-        cp.m_IsOnVertex = true;
-        cp.m_Vertex = new_vertex;
-        cp.m_Edge = nullptr;
+            cp.m_IsOnVertex = true;
+            cp.m_Vertex = new_vertex;
+            cp.m_Edge = nullptr;
+        }
     }
 }
 
