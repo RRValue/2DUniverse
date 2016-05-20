@@ -206,7 +206,12 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     makeCutLines();
 
     // snap same cut points
+    for(auto& cv : m_CutLines)
+        for(auto& cp : cv)
+            cp.snapToVertex();
+
     snapCutLines();
+    cleanUpSnapedCutLines();
 
     // set cut points
     for(const auto& cpv : m_CutLines)
@@ -220,12 +225,12 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     }
 
     // create cut vertices
-    /*createCutVertices(mesh);
+    createCutVertices(mesh);
 
     HESCheck checker;
     checker.run(mesh);
 
-    outMeshes = checker.getMeshes();*/
+    outMeshes = checker.getMeshes();
 
     return true;
 }
@@ -568,9 +573,6 @@ void HESCutter::snapCutLines()
             cut_iter = cv.begin() + cut_idx;
         }
     }
-
-    // clean up cut lines
-    cleanUpSnapedCutLines();
 }
 
 void HESCutter::cleanUpSnapedCutLines()

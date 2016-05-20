@@ -18,11 +18,9 @@ public:
 
     HESCutPoint& operator=(HESCutPoint& other);
 
+    void snapToVertex();
     bool hasSameVertex(const HESCutPoint& cutPoint) const;
     bool cutsTriangle(const HESCutPoint& cutPoint) const;
-
-private:
-    void checkOnVertex();
 
 public:
     HESEdge* m_Edge;

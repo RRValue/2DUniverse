@@ -9,8 +9,8 @@ HESCutPoint::HESCutPoint(HESEdge* const e, const Vec2d& p, const bool& border, c
     m_Point = p;
     m_IsOnBorder = border;
     m_Alpha = alpha;
-
-    checkOnVertex();
+    m_IsOnVertex = false;
+    m_Vertex = nullptr;
 }
 
 HESCutPoint::HESCutPoint(const HESCutPoint& other)
@@ -23,7 +23,7 @@ HESCutPoint::HESCutPoint(const HESCutPoint& other)
     m_Alpha = other.m_Alpha;
 }
 
-void HESCutPoint::checkOnVertex()
+void HESCutPoint::snapToVertex()
 {
     HESVertex* const v0 = m_Edge->from();
     HESVertex* const v1 = m_Edge->to();
