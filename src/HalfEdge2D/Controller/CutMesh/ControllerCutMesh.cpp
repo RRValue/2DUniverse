@@ -544,7 +544,7 @@ void ControllerCutMesh::onShapeSelectionChanged(int value)
     bool show_line = show_line_points && m_LinePoints.size() == m_NumLinePoints;
     bool show_qbez = show_qbez_points && m_QBezierPoints.size() == m_NumQBezierPoints;
     bool show_cbez = show_cbez_points && m_CBezierPoints.size() == m_NumCBezierPoints;
-    bool show_spli = show_spli_points && m_SplinePoints.size() == m_NumSplinePoints;
+    bool show_spli = show_spli_points && m_SplinePoints.size() > 1;
 
     for(const auto& p : m_LinePoints)
         p->setVisible(show_line_points);
