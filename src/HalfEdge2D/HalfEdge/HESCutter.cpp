@@ -205,8 +205,8 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     // seperate point cuts
     makeCutLines();
 
-    // merge same cut points
-    mergeSameCutPoints();
+    // snap same cut points
+    snapCutLines();
 
     // set cut points
     for(const auto& cpv : m_CutLines)
@@ -506,7 +506,7 @@ void HESCutter::makeCutLines()
     }
 }
 
-void HESCutter::mergeSameCutPoints()
+void HESCutter::snapCutLines()
 {
     for(auto& cv : m_CutLines)
     {
@@ -575,11 +575,11 @@ void HESCutter::mergeSameCutPoints()
         }
     }
 
-    // dlean up cut lines
-    cleanUpCutLines();
+    // clean up cut lines
+    cleanUpSnapedCutLines();
 }
 
-void HESCutter::cleanUpCutLines()
+void HESCutter::cleanUpSnapedCutLines()
 {
     // check if element in cutline is on border
     for(auto& cl : m_CutLines)
