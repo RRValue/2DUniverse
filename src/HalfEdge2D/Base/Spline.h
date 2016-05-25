@@ -83,6 +83,7 @@ public:
     const T& getContinuity() const { return m_Continuity; }
     const T& getBias() const { return m_Bias; }
     const SegmentVector& getSegements() const { return m_Segments; }
+    SegmentVector& getSegements() { return m_Segments; }
     const bool& isClosed() const { return m_Closed; }
     size_t getNumControllPoints() const { return m_Segments.size(); }
 
