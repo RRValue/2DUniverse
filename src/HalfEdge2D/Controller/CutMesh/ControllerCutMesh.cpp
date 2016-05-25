@@ -112,6 +112,7 @@ void ControllerCutMesh::init()
 
     connect(m_CbShapeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onShapeSelectionChanged(int)));
 
+    connect(ui_options.m_cbSmallTrianglePrevention, &QCheckBox::stateChanged, this, &ControllerCutMesh::onSmallTrianglePreventionChanged);
     connect(ui_options.m_BtnCut, &QPushButton::pressed, this, &ControllerCutMesh::onCutPressed);
 }
 
@@ -525,6 +526,15 @@ void ControllerCutMesh::onMeshSelectionChanged(int value)
         m_Scene->addMesh(m);
 
     m_SceneChanges = true;
+
+    cut();
+
+    m_Renderer->render();
+}
+
+void ControllerCutMesh::onSmallTrianglePreventionChanged(int state)
+{
+    m_MeshCutter->enableSmallTrianglePrevention(state == Qt::Checked);
 
     cut();
 

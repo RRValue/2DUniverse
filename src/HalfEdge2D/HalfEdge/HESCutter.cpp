@@ -17,7 +17,7 @@
 
 HESCutter::HESCutterCleanGuard::HESCutterCleanGuard(HESCutter* const cutter) : m_Cutter(cutter)
 {
-
+    
 }
 
 HESCutter::HESCutterCleanGuard::~HESCutterCleanGuard()
@@ -43,7 +43,7 @@ HESCutter::HESCutterCleanGuard::~HESCutterCleanGuard()
     m_Cutter->m_TargetMeshes.clear();
 }
 
-HESCutter::HESCutter() : m_SourceMesh(nullptr)
+HESCutter::HESCutter() : m_SourceMesh(nullptr), m_SmallTrianglePrevention(false)
 {
 
 }
@@ -51,6 +51,11 @@ HESCutter::HESCutter() : m_SourceMesh(nullptr)
 HESCutter::~HESCutter()
 {
 
+}
+
+void HESCutter::enableSmallTrianglePrevention(const bool& enable)
+{
+    m_SmallTrianglePrevention = enable;
 }
 
 const PointCutsVector& HESCutter::getPointCuts() const
@@ -205,13 +210,16 @@ bool HESCutter::cut(HESMeshVector& outMeshes, HESMesh* const mesh)
     // seperate point cuts
     makeCutLines();
 
-    // snap same cut points
-    for(auto& cv : m_CutLines)
-        for(auto& cp : cv)
-            cp.snapToVertex();
+    if(m_SmallTrianglePrevention)
+    {
+        // snap same cut points
+        for(auto& cv : m_CutLines)
+            for(auto& cp : cv)
+                cp.snapToVertex();
 
-    snapCutLines();
-    cleanUpSnapedCutLines();
+        snapCutLines();
+        cleanUpSnapedCutLines();
+    }
 
     // set cut points
     for(const auto& cpv : m_CutLines)

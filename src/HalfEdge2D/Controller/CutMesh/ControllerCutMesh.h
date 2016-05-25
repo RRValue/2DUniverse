@@ -59,6 +59,7 @@ private:
 private slots:
     void onMeshSelectionChanged(int value);
     void onShapeSelectionChanged(int value);
+    void onSmallTrianglePreventionChanged(int state);
     void onCutPressed();
 
 private:

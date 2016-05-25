@@ -65,6 +65,8 @@ public:
     bool cutCubicBezier(HESMesh* const sourceMesh, CubicBezier* const cezier, HESMeshVector& outMeshes);
     bool cutSpline(HESMesh* const sourceMesh, Spline* const spline, HESMeshVector& outMeshes);
 
+    void enableSmallTrianglePrevention(const bool& enable);
+
 private:
     bool cut(HESMeshVector& outMeshes);
     bool cut(HESMeshVector& outMeshes, HESMesh* const mesh);
@@ -95,6 +97,7 @@ private:
     Spline* m_Spline;
 
     bool m_ClosedCurve;
+    bool m_SmallTrianglePrevention;
 
     // visited
     HESEdgeConstVector m_VisitedEdges;
