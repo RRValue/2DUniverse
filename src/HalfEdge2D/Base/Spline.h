@@ -71,6 +71,7 @@ public:
         m_Tension = other.m_Tension;
         m_Continuity = other.m_Continuity;
         m_Bias = other.m_Bias;
+        m_TangentFactors = other.m_TangentFactors;
         m_Segments = other.m_Segments;
         m_Closed = other.m_Closed;
         m_LengthDirty = true;
