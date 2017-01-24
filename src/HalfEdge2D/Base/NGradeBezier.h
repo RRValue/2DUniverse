@@ -1,14 +1,14 @@
 #ifndef _BASE_NGRADEBEZIER_H_
 #define _BASE_NGRADEBEZIER_H_
 
-#include "HalfEdge2D/Base/Vector.h"
-
-#include "HalfEdge2D/Base/GroupElements.h"
+#include "HalfEdge2D/Base/Identities.h"
 #include "HalfEdge2D/Base/PolynomialSolver.h"
-#include "HalfEdge2D/Base/BernsteinMatrix.h"
+#include "HalfEdge2D/Base/BezierParameter.h"
 
 #include <map>
 #include <vector>
+#include <array>
+#include <algorithm>
 
 template<typename T>
 struct NGradeBezierLengthErrorTolerance
@@ -19,15 +19,14 @@ struct NGradeBezierLengthErrorTolerance
 template<> float NGradeBezierLengthErrorTolerance<float>::m_Epsilon = 1e-05f;
 template<> double NGradeBezierLengthErrorTolerance<double>::m_Epsilon = 1e-05;
 
-template <typename T, unsigned int G, unsigned int D, unsigned N = G + 1>
-class NGradeBezier : PolynomialSolver<T, G>, public BernsteinMatrix<T, G>
+template <typename T, unsigned int G, unsigned int D>
+class NGradeBezier : PolynomialSolver<T, G>, public BezierParameter<T, G, D>
 {
 private:
     NGradeBezierLengthErrorTolerance<T> m_LengthError;
 
 private:
-    // typedefs
-    typedef Eigen::Matrix<T, D, N> BezierParamType;
+    typedef Eigen::Matrix<T, D, G + 1> BezierParamType;
     typedef Eigen::Matrix<T, D, 1> BezierPointType;
     typedef Eigen::Matrix<T, D + 1, 1> TransformPointType;
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
@@ -38,28 +37,16 @@ private:
     typedef typename std::vector<T> LengthVectoeType;
 
 public:
-    typedef Eigen::Matrix<T, N, 1> ComponentValuesType;
-    typedef Eigen::Matrix<T, 1, N> RowValuesType;
-    typedef Eigen::Matrix<T, N, N> ParamTransformMatrixType;
-
-public:
     typedef BezierParamType BezierPointsType;
     typedef Result Roots;
 
     static_assert(G <= 13, "13 Is max for NGradeBezier");
 
 public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
     NGradeBezier() : 
         m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
         m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
     {
-        m_Params.setZero();
-        m_DerivedParams[0].setZero();
-        m_DerivedParams[1].setZero();
-        m_DerivedParams[2].setZero();
-
         m_LengthDirty = true;
     }
 
@@ -93,39 +80,37 @@ public:
 
     BezierPointType getPoint(const size_t& idx) const
     {
-        return m_Params.col(idx);
+        return get(idx);
     }
 
     const BezierPointsType& getPoints() const
     {
-        return m_Params;
+        return m_Parameter;
     }
 
     void setPoint(const size_t& idx, const BezierPointType& p)
     {
-        m_Params.col(idx) = p;
-
-        updateParams();
+        set(idx, p);
 
         m_LengthDirty = true;
     }
 
     BezierPointType pointAt(const T& alpha) const
     {
-        return derived<0>(alpha);
+        return get(0, alpha);
     }
 
-    BezierPointType pointAtL(const T& alpha) const
+    BezierPointType pointAtL(const T& alpha)
     {
         if(m_LengthDirty)
             updateLength();
 
-        return pointAt(getAlphaAtLength(alpha * m_Length));
+        return get(0, getAlphaAtLength(alpha * m_Length));
     }
 
     BezierPointType tangentAt(const T& alpha) const
     {
-        return derived<1>(alpha).normalized();
+        return get(1, alpha).normalized();
     }
 
     BezierPointType tangentAtL(const T& alpha) const
@@ -153,8 +138,8 @@ public:
     template<>
     BezierPointType normalAt<3>(const T& alpha) const
     {
-        BezierPointType der1 = derived<1>(alpha);
-        BezierPointType der2 = derived<2>(alpha);
+        BezierPointType der1 = get(1, alpha);
+        BezierPointType der2 = get(2, alpha);
 
         return der1.cross(der2).cross(der1).normalized();
     }
@@ -176,8 +161,8 @@ public:
     template<>
     BezierPointType biNormalAt<3>(const T& alpha) const
     {
-        BezierPointType der1 = derived<1>(alpha);
-        BezierPointType der2 = derived<1>(alpha);
+        BezierPointType der1 = get(1, alpha);
+        BezierPointType der2 = get(1, alpha);
 
         return der1.cross(der2).normalized();
     }
@@ -190,6 +175,40 @@ public:
         return biNormalAt<D>(getAlphaAtLength(alpha * m_Length));
     }
 
+    template<size_t Derivation, unsigned int Dim = D>
+    BezierPointType getFrenetVector(const T& alpha) const
+    {
+        static_assert(Derivation < m_NumParams, "Not defined for this derivation");
+
+        BezierPointType der_low = getFrenetVector<Derivation - 1>(alpha);
+        BezierPointType der = get(Derivation + 1, alpha);
+
+        return (der - (der.dot(der_low) * der_low)).normalized();
+    }
+
+    template<>
+    BezierPointType getFrenetVector<0>(const T& alpha) const
+    {
+        return get(1, alpha).normalized();
+    }
+
+    template<>
+    BezierPointType getFrenetVector<1, 2>(const T& alpha) const
+    {
+        BezierPointType tangent = getFrenetVector<0>(alpha);
+
+        return BezierPointType(-tangent(1), tangent(0));
+    }
+
+    template<size_t Derivation>
+    BezierPointType getFrenetVectorAtL(const T& alpha)
+    {
+        if(m_LengthDirty)
+            updateLength();
+
+        return getFrenetVector<Derivation>(getAlphaAtLength(alpha * m_Length));
+    }
+
     template<unsigned int Dim = D>
     T curvationAt(const T& alpha) const
     {
@@ -199,8 +218,8 @@ public:
     template<>
     T curvationAt<2>(const T& alpha) const
     {
-        BezierPointType der1 = derived<1>(alpha);
-        BezierPointType der2 = derived<2>(alpha);
+        BezierPointType der1 = get(1, alpha);
+        BezierPointType der2 = get(2, alpha);
 
         T a = (der1(0) * der2(1)) - (der1(1) * der2(0));
         T b = (der1(0) * der1(0)) + (der2(0) * der2(0));
@@ -213,13 +232,13 @@ public:
     template<>
     T curvationAt<3>(const T& alpha) const
     {
-        BezierPointType der1 = derived<1>(alpha);
-        BezierPointType der2 = derived<2>(alpha);
+        BezierPointType der1 = get(1, alpha);
+        BezierPointType der2 = get(2, alpha);
 
         return der1.cross(der2).norm() / std::pow(der1.norm(), T(3));
     }
 
-    T curvationAtL(const T& alpha) const
+    T curvationAtL(const T& alpha)
     {
         if(m_LengthDirty)
             updateLength();
@@ -231,35 +250,35 @@ public:
     {
         TransformPointType p;
 
-        for(size_t i = 0; i < N; i++)
+        for(size_t i = 0; i <= G; i++)
         {
             for(size_t j = 0; j < D; j++)
-                p(j) = m_Params(j, i);
+                p(j) = m_Parameter(j, i);
 
             p(D) = Identities.identityMult<T>();
 
             p = m * p;
 
             for(size_t j = 0; j < D; j++)
-                m_Params(j, i) = p(j);
+                m_Parameter(j, i) = p(j);
         }
 
-        updateParams();
+        updateParameter();
 
         m_LengthDirty = true;
     }
 
     Roots componentRoots(const size_t& c) const
     {
-        return solve(m_DerivedParams[0].row(c));
+        return solve(m_DerivedParameter[0].row(c));
     }
 
-    void splitAt(const T& a, NGradeBezier& l, NGradeBezier& r)
+    void splitAt(const float& a, NGradeBezier& l, NGradeBezier& r)
     {
-        splitAtImpl(m_Params, a, l.m_Params, r.m_Params);
+        splitAtImpl(m_Parameter, a, l.m_Parameter, r.m_Parameter);
         
-        l.updateParams();
-        r.updateParams();
+        l.updateParameter();
+        r.updateParameter();
 
         l.m_LengthDirty = true;
         r.m_LengthDirty = true;
@@ -338,7 +357,7 @@ public:
         T length = it0->second;
 
         BezierParamType l, r;
-        BezierParamType o = sectionImpl(m_Params, it0->first, it1->first);
+        BezierParamType o = sectionImpl(m_Parameter, it0->first, it1->first);
         
         bool add = true;
 
@@ -382,21 +401,19 @@ public:
     void getSection(NGradeBezier& b, const T& from, const T& to)
     {
         if(from < to)
-            b.m_Params = sectionImpl(m_Params, from, to);
+            b.m_Parameter = sectionImpl(m_Parameter, from, to);
         else
-            b.m_Params = m_Params;
+            b.m_Parameter = m_Parameter;
 
-        b.updateParams();
+        b.updateParameter();
         b.m_LengthDirty = true;
     }
 
 private:
     void copy(const NGradeBezier& from, NGradeBezier& to)
     {
-        m_Params = from.m_Params;
-        m_DerivedParams[0] = from.m_DerivedParams[0];
-        m_DerivedParams[1] = from.m_DerivedParams[1];
-        m_DerivedParams[2] = from.m_DerivedParams[2];
+        m_Parameter = from.m_Parameter;
+        m_DerivedParameter = from.m_DerivedParameter;
         m_RangeLengthMap = from.m_RangeLengthMap;
         m_LengthVector = from.m_LengthVector;
         m_Length = from.m_Length;
@@ -405,10 +422,8 @@ private:
     }
     void swap(NGradeBezier& from, NGradeBezier& to)
     {
-        std::swap(from.m_Params, to.m_Params);
-        std::swap(from.m_DerivedParams[0], to.m_DerivedParams[0]);
-        std::swap(from.m_DerivedParams[1], to.m_DerivedParams[1]);
-        std::swap(from.m_DerivedParams[2], to.m_DerivedParams[2]);
+        std::swap(from.m_Parameter, to.m_Parameter);
+        std::swap(from.m_DerivedParameter, to.m_DerivedParameter);
         std::swap(from.m_RangeLengthMap, to.m_RangeLengthMap);
         std::swap(from.m_LengthVector, to.m_LengthVector);
         std::swap(from.m_Length, to.m_Length);
@@ -417,38 +432,12 @@ private:
 
     void move(NGradeBezier&& from, NGradeBezier& to)
     {
-        m_Params = std::move(from.m_Params);
-        m_DerivedParams[0] = std::move(from.m_DerivedParams[0]);
-        m_DerivedParams[1] = std::move(from.m_DerivedParams[1]);
-        m_DerivedParams[2] = std::move(from.m_DerivedParams[2]);
+        m_Parameter = std::move(from.m_Parameter);
+        m_DerivedParameter = std::move(from.m_DerivedParameter);
         m_RangeLengthMap = std::move(from.m_RangeLengthMap);
         m_LengthVector = std::move(from.m_LengthVector);
         m_Length = std::move(from.m_Length);
         m_LengthDirty = std::move(from.m_LengthDirty);
-    }
-
-    void updateParams()
-    {
-        m_DerivedParams[0] = m_Params * getDerivedBernsteinMatrix<0>();
-        m_DerivedParams[1] = m_Params * getDerivedBernsteinMatrix<1>();
-        m_DerivedParams[2] = m_Params * getDerivedBernsteinMatrix<2>();
-    }
-
-    template<unsigned int DEV>
-    inline BezierPointType derived(const T& alpha) const
-    {
-        ComponentValuesType a_vec;
-
-        T ca = Identities.identityMult<T>();
-
-        for(size_t i = 0; i < N - DEV; i++)
-        {
-            a_vec[N - 1 - i - DEV] = ca;
-
-            ca *= alpha;
-        }
-
-        return m_DerivedParams[DEV] * a_vec;
     }
 
     void splitAtImpl(const BezierParamType& p, const T& a, BezierParamType& l, BezierParamType& r)
@@ -503,7 +492,7 @@ private:
         // calculate length between rangeLength->first ... a
         m_Length = T(0);
 
-        BezierParamType s = sectionImpl(m_Params, rangeLength.first, a);
+        BezierParamType s = sectionImpl(m_Parameter, rangeLength.first, a);
 
         lengthImpl(s, m_LengthError.m_Epsilon, m_LengthCacheDepth);
 
@@ -524,10 +513,10 @@ private:
         T len_c = Identities.identityAdd<T>();
         T s = Identities.identityMult<T>() / T(2);
 
-        for(unsigned int i = 0; i < N - 1; i++)
+        for(unsigned int i = 0; i < G; i++)
             len_a += (points.col(i + 1) - points.col(i)).norm();
 
-        len_c = (points.col(N - 1) - points.col(0)).norm();
+        len_c = (points.col(G) - points.col(0)).norm();
 
         if(std::abs(len_a - len_c) > error)
         {
@@ -564,7 +553,7 @@ private:
         // update length
         m_LengthVector.push_back(T(0));
 
-        lengthImpl(m_Params, m_LengthError.m_Epsilon, 0);
+        lengthImpl(m_Parameter, m_LengthError.m_Epsilon, 0);
 
         m_LengthVector.push_back(m_Length);
 
@@ -592,14 +581,6 @@ private:
     }
 
 private:
-    static const size_t m_Grade = G;
-    static const size_t m_Dim = D;
-    static const size_t m_NumPoints = N;
-    static const size_t m_Derivations = 2;
-
-    BezierParamType m_Params;
-    BezierParamType m_DerivedParams[m_Derivations + 1];
-
     bool m_LengthDirty;
     T m_Length;
 

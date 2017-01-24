@@ -27,10 +27,10 @@ struct PolynomialSolverTypeTrait<double>
 #define ConstTypeRef(T) const T&
 
 // define solver
-template <typename T, unsigned int G, unsigned int N = G + 1>
+template <typename T, unsigned int G>
 class PolynomialSolver : protected PolynomialSolverTypeTrait<T>
 {
-    static_assert(G >= 1 && G <= 4, "Grade must between 1 and 4");
+    static_assert(G >= 1, "Grade must be greater than 1");
 
 private:
     template<typename T, unsigned int G>
@@ -48,7 +48,7 @@ public:
     typedef PolynomialSolveResult<T, G> Result;
 
 private:
-    typedef Eigen::Matrix<T, N, 1> CoefVec;
+    typedef Eigen::Matrix<T, G + 1, 1> CoefVec;
 
 public:
     Result solve(const CoefVec& coef) const
@@ -216,4 +216,4 @@ private:
     }
 };
 
-#endif //_BASE_POLYNOMIALSOLVER_H_
+#endif //_BASE_POLYNOMILASOLVER_H_

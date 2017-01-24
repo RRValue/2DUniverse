@@ -1,121 +1,95 @@
 #ifndef _BASE_BERNSTEINMATRIX_H_
 #define _BASE_BERNSTEINMATRIX_H_
 
-#include "HalfEdge2D/Base/GroupElements.h"
+#include "HalfEdge2D/Base/Identities.h"
 
-template <typename T, unsigned int G, unsigned int N = G + 1>
-struct BernsteinMatrix
-{
-    typedef Eigen::Matrix<T, N, N> MatrixType;
-    typedef Eigen::Matrix<T, N, 1> MatrixRowType;
+#include <array>
+#include <algorithm>
 
-    template<unsigned int DEV>
-    inline static MatrixType& getDerivedBernsteinMatrix()
+template<typename T>
+struct BernsteinMatrixTypeTraits
     {
-        static MatrixType mat = []
+    BernsteinMatrixTypeTraits()
         {
-            MatrixType d_mat = getDerivedBernsteinMatrix<DEV - 1>();
-
-            MatrixRowType dvalues;
-            dvalues.setZero();
-
-            float cv = float(N - DEV);
-            for(size_t i = 0; i < N - DEV + 1; i++)
-            {
-                dvalues[i] = cv;
-                cv -= T(1);
-            }
-
-            for(size_t i = 0; i < N; i++)
-                d_mat.col(i) *= dvalues(i);
-
-            return d_mat;
-        }();
-
-        return mat;
+        static_assert(false, "BernsteinMatrix not defined for this Type");
     }
+};
 
-    template<>
-    inline static MatrixType& getDerivedBernsteinMatrix<0>()
+template<> struct BernsteinMatrixTypeTraits<float> {};
+template<> struct BernsteinMatrixTypeTraits<double> {};
+template<> struct BernsteinMatrixTypeTraits<int> {};
+template<> struct BernsteinMatrixTypeTraits<char> {};
+template<> struct BernsteinMatrixTypeTraits<long long> {};
+
+template <typename T, size_t G>
+class BernsteinMatrix
+            {
+public:
+    typedef typename Eigen::Matrix<T, G + 1, G + 1> MatrixType;
+    typedef typename Eigen::Matrix<T, G + 1, 1> MatrixRowType;
+    typedef typename std::array<MatrixType, G + 1> MatrixArrayType;
+
+public:
+    inline static const MatrixType& getBernsteinMatrix(const size_t& idx)
     {
-        return getBernsteinMatrix();
+        if(!m_Initialized)
+            initBersteinMatrices();
+
+        return m_BernsteinMatrices[idx];
     }
 
 private:
-    template<unsigned int M = N>
-    inline static MatrixType& getBernsteinMatrix()
+    inline static void initBersteinMatrices()
     {
-        static_assert(false, "not defned for this Grade");
+        for(size_t i = 0; i <= G; i++)
+            setDerivedBernsteinMatrix(i);
+
+        m_Initialized = true;
     }
 
-    template<>
-    inline static MatrixType& getBernsteinMatrix<1>()
+    inline static T sign(const size_t& v)
     {
-        static MatrixType mat = []
-        {
+        return v % 2 == 0 ? T(1) : T(-1);
+    }
+
+    static unsigned long long fakulty(const unsigned long long& v)
+    {
+        return (v != 0) ? (v * fakulty(v - 1)) : (1);
+    }
+
+    static T binom(const unsigned long long& n, const unsigned long long& k)
+    {
+        return (k > n) ? (0) : (T(fakulty(n) / (fakulty(k) * (fakulty(n - k)))));
+    }
+
+    inline static void setDerivedBernsteinMatrix(const size_t& idx)
+    {
             MatrixType m;
 
-            m(0, 0) = T(1);
+        m.setZero();
 
-            return m;
-        }();
+        for(size_t i = 0; i <= G - idx; i++)
+            for(size_t j = 0; j <= G - idx; j++)
+                m(i, j) =
+                    binom((unsigned long long)G - idx, (unsigned long long)j) *
+                    binom((unsigned long long)(G - idx - j), (unsigned long long)i) *
+                    sign(j + i + G + idx);
 
-        return mat;
+        m_BernsteinMatrices[idx] = m;
     }
 
-    template<>
-    inline static MatrixType& getBernsteinMatrix<2>()
-    {
-        static MatrixType mat = []
-        {
-            MatrixType m;
+private:
+    static bool m_Initialized;
+    static MatrixArrayType m_BernsteinMatrices;
 
-            m <<
-                T(-1), T(1),
-                T(1), T(0);
-
-            return m;
-        }();
-
-        return mat;
-    }
-
-    template<>
-    inline static MatrixType& getBernsteinMatrix<3>()
-    {
-        static MatrixType mat = []
-        {
-            MatrixType m;
-
-            m <<
-                T(1), T(-2), T(1),
-                T(-2), T(2), T(0),
-                T(1), T(0), T(0);
-
-            return m;
-        }();
-
-        return mat;
-    }
-
-    template<>
-    inline static MatrixType& getBernsteinMatrix<4>()
-    {
-        static MatrixType mat = []
-        {
-            MatrixType m;
-
-            m <<
-                T(-1), T(3), T(-3), T(1),
-                T(3), T(-6), T(3), T(0),
-                T(-3), T(3), T(0), T(0),
-                T(1), T(0), T(0), T(0);
-
-            return m;
-        }();
-
-        return mat;
-    }
+private:
+    static const BernsteinMatrixTypeTraits<T> m_Traits;
 };
+
+template <typename T, size_t G>
+bool BernsteinMatrix<T, G>::m_Initialized = false;
+
+template <typename T, size_t G>
+std::array<Eigen::Matrix<T, G + 1, G + 1>, G + 1> BernsteinMatrix<T, G>::m_BernsteinMatrices = std::array<Eigen::Matrix<T, G + 1, G + 1>, G + 1>();
 
 #endif //_BASE_BERNSTEINMATRIX_H_

@@ -1,5 +1,5 @@
-#ifndef _BASE_GROUPELEMENT_H_
-#define _BASE_GROUPELEMENT_H_
+#ifndef _BASE_IDENTITIES_H_
+#define _BASE_IDENTITIES_H_
 
 #include "HalfEdge2D/Base/Vector.h"
 
@@ -36,4 +36,4 @@ struct IdentitiesTpl
 
 static IdentitiesTpl Identities;
 
-#endif //_BASE_GROUPELEMENT_H_
+#endif //_BASE_IDENTITIES_H_
