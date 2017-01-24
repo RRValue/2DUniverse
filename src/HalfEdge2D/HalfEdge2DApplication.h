@@ -86,7 +86,7 @@ private:
     
     Controller* m_ActiveController;
 
-    std::map<std::string, Controller* const> m_Controller;
+    std::map<std::string, Controller*> m_Controller;
 
     float m_HPartition;
     float m_VPartition;

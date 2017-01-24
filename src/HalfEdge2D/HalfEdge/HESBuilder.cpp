@@ -39,12 +39,12 @@ bool HESBuilder::build()
     for(const auto& f : m_Mesh->getFaces())
     {
         const std::vector<size_t> face_idxs = f->getVertIds();
-        std::vector<HESVertex* const> vertices;
+        std::vector<HESVertex*> vertices;
 
         for(const auto& idx : face_idxs)
             vertices.push_back(m_Mesh->getHESVertex(idx));
 
-        std::vector<HESEdge* const> edges(vertices.size());
+        std::vector<HESEdge*> edges(vertices.size());
 
         for(auto& e : edges)
         {
@@ -59,7 +59,7 @@ bool HESBuilder::build()
     return true;
 }
 
-void HESBuilder::buildFace(const std::vector<HESVertex* const>& vertices, const std::vector<HESEdge* const>& edges, HESFace* const face)
+void HESBuilder::buildFace(const std::vector<HESVertex*>& vertices, const std::vector<HESEdge*>& edges, HESFace* const face)
 {
     size_t num_vertices = vertices.size();
 
@@ -93,7 +93,7 @@ void HESBuilder::buildFace(const std::vector<HESVertex* const>& vertices, const 
         vertices[i]->addEdge(edges[i]);
 }
 
-void HESBuilder::connectEdges(const std::vector<HESEdge* const>& edges)
+void HESBuilder::connectEdges(const std::vector<HESEdge*>& edges)
 {
     // check if one of the edges of to has from from
     for(const auto& e : edges)

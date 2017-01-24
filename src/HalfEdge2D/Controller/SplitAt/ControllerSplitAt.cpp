@@ -407,7 +407,7 @@ bool ControllerSplitAt::handleWheelEvent(QWheelEvent* const event)
 
 Point* const ControllerSplitAt::getPointAtPos(const Vec2d& pos, size_t* const idx) const
 {
-    std::vector<Point* const> c_points;
+    std::vector<Point*> c_points;
 
     switch(m_SplitType)
     {

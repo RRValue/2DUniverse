@@ -17,7 +17,7 @@ class HESFace;
 
 class QComboBox;
 
-typedef std::vector<HESFace* const> FaceVector;
+typedef std::vector<HESFace*> FaceVector;
 typedef std::vector<FaceVector> RingFacesVector;
 
 class LastFaceColour

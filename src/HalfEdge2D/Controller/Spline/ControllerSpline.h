@@ -58,7 +58,7 @@ private:
     size_t m_CurrentPointIdx;
     Vec2d m_CurrentHitDistance;
 
-    std::vector<Point* const> m_Points;
+    std::vector<Point*> m_Points;
     Spline* m_Spline;
 
     Ui_ControllerSplineOptionsWidget m_OptionWidgetSetUp;

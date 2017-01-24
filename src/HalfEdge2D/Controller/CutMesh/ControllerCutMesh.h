@@ -77,18 +77,18 @@ private:
     size_t m_CurrentPointIdx;
     Vec2d m_CurrentHitDistance;
 
-    std::vector<Point* const> m_LinePoints;
-    std::vector<Point* const> m_QBezierPoints;
-    std::vector<Point* const> m_CBezierPoints;
-    std::vector<Point* const> m_SplinePoints;
+    std::vector<Point*> m_LinePoints;
+    std::vector<Point*> m_QBezierPoints;
+    std::vector<Point*> m_CBezierPoints;
+    std::vector<Point*> m_SplinePoints;
 
     static const size_t m_NumLinePoints = 2;
     static const size_t m_NumQBezierPoints = 3;
     static const size_t m_NumCBezierPoints = 4;
     static const size_t m_NumSplinePoints = 10;
 
-    std::vector<Point* const> m_CutPoints;
-    std::vector<Line* const> m_CutLines;
+    std::vector<Point*> m_CutPoints;
+    std::vector<Line*> m_CutLines;
 
     Line* m_Line;
     QuadraticBezier* m_QBezier;

@@ -199,7 +199,7 @@ void Renderer::renderScene(QPainter* const painter, Scene* const scene)
     renderPoints(painter, scene->getPoints());
 }
 
-void Renderer::renderMeshes(QPainter* const painter, const std::set<Mesh* const>& meshes)
+void Renderer::renderMeshes(QPainter* const painter, const std::set<Mesh*>& meshes)
 {
     for(const auto& m : meshes)
         renderMesh(painter, m);
@@ -305,7 +305,7 @@ void Renderer::renderMesh(QPainter* const painter, Mesh* const mesh)
     }
 }
 
-void Renderer::renderPoints(QPainter* const painter, const std::set<Point* const>& points)
+void Renderer::renderPoints(QPainter* const painter, const std::set<Point*>& points)
 {
     for(const auto& p : points)
         renderPoint(painter, p);
@@ -337,7 +337,7 @@ void Renderer::renderPoint(QPainter* const painter, Point* point)
     painter->drawEllipse(trans(vert_pos), point_size_px, point_size_px);
 }
 
-void Renderer::renderCircles(QPainter* const painter, const std::set<Circle* const>& circles)
+void Renderer::renderCircles(QPainter* const painter, const std::set<Circle*>& circles)
 {
     for(const auto& c : circles)
         renderCircle(painter, c);
@@ -366,7 +366,7 @@ void Renderer::renderCircle(QPainter* const painter, Circle* const circle)
     painter->drawEllipse(trans(circle_pos), radius_px, radius_px);
 }
 
-void Renderer::renderLines(QPainter* const painter, const std::set<Line* const>& lines)
+void Renderer::renderLines(QPainter* const painter, const std::set<Line*>& lines)
 {
     for(const auto& l : lines)
         renderLine(painter, l);
@@ -408,7 +408,7 @@ void Renderer::renderLine(QPainter* const painter, const Line2D& line)
     painter->drawLine(pts[0], pts[1]);
 }
 
-void Renderer::renderQuadraticBeziers(QPainter* const painter, const std::set<QuadraticBezier* const>& beziers)
+void Renderer::renderQuadraticBeziers(QPainter* const painter, const std::set<QuadraticBezier*>& beziers)
 {
     for(const auto& b : beziers)
         renderQuadraticBezier(painter, b);
@@ -494,7 +494,7 @@ void Renderer::renderQuadraticBezier(QPainter* const painter, const QBezier2D& b
     painter->drawLines(lines);
 }
 
-void Renderer::renderCubicBeziers(QPainter* const painter, const std::set<CubicBezier* const>& beziers)
+void Renderer::renderCubicBeziers(QPainter* const painter, const std::set<CubicBezier*>& beziers)
 {
     for(const auto& b : beziers)
         renderCubicBezier(painter, b);
@@ -580,7 +580,7 @@ void Renderer::renderCubicBezier(QPainter* const painter, const CBezier2D& bezie
     painter->drawLines(lines);
 }
 
-void Renderer::renderSplines(QPainter* const painter, const std::set<Spline* const>& splines)
+void Renderer::renderSplines(QPainter* const painter, const std::set<Spline*>& splines)
 {
     for(const auto& s : splines)
         renderSpline(painter, s);

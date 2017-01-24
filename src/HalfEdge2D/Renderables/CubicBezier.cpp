@@ -31,7 +31,7 @@ IntersectionVector CubicBezier::intersect(Circle* const c, const bool& valuesFro
 
 IntersectionVector CubicBezier::intersect(Line* const l, const bool& valuesFromIntersector) const
 {
-    return ((Intersectable*)l)->intersect(const_cast<CubicBezier* const>(this), !valuesFromIntersector);
+    return ((Intersectable*)l)->intersect(const_cast<CubicBezier*>(this), !valuesFromIntersector);
 }
 IntersectionVector CubicBezier::intersect(QuadraticBezier* const b, const bool& valuesFromIntersector) const
 {

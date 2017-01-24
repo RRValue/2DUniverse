@@ -19,8 +19,8 @@ public:
     bool build(HESMesh* const mesh);
 
 private:
-    void buildFace(const std::vector<HESVertex* const>& vertices, const std::vector<HESEdge* const>& edges, HESFace* const face);
-    void connectEdges(const std::vector<HESEdge* const>& edges);
+    void buildFace(const std::vector<HESVertex*>& vertices, const std::vector<HESEdge*>& edges, HESFace* const face);
+    void connectEdges(const std::vector<HESEdge*>& edges);
 
 private:
     HESMesh* m_Mesh;

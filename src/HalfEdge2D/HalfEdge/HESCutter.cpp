@@ -345,7 +345,7 @@ void HESCutter::findCutPoints()
     IntersectionVector cur_cut_points;
 
     // get cut points from edges
-    std::deque<HESFace* const> faces_to_visit;
+    std::deque<HESFace*> faces_to_visit;
 
     for(const auto& e : m_BorderCutEdges)
     {
@@ -722,13 +722,13 @@ IntersectionVector HESCutter::cutImpl(const Line& line) const
     switch(m_CuttingMode)
     {
     case E_CM_LINE:
-            return m_Line->intersect(const_cast<Line* const>(&line));
+            return m_Line->intersect(const_cast<Line*>(&line));
     case E_CM_QBEZIER:
-        return m_QuadraticBezier->intersect(const_cast<Line* const>(&line));
+        return m_QuadraticBezier->intersect(const_cast<Line*>(&line));
     case E_CM_CBEZIER:
-        return m_CubicBezier->intersect(const_cast<Line* const>(&line));
+        return m_CubicBezier->intersect(const_cast<Line*>(&line));
     case E_CM_SPLINE:
-        return m_Spline->intersect(const_cast<Line* const>(&line));
+        return m_Spline->intersect(const_cast<Line*>(&line));
     default:
         return IntersectionVector();
     }

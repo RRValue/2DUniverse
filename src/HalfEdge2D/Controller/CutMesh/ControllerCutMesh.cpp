@@ -397,7 +397,7 @@ bool ControllerCutMesh::handleWheelEvent(QWheelEvent* const event)
 
 Point* const ControllerCutMesh::getPointAtPos(const Vec2d& pos, size_t* const idx) const
 {
-    const std::vector<Point* const>* current_point_list = nullptr;
+    const std::vector<Point*>* current_point_list = nullptr;
 
     switch(m_CutMode)
     {

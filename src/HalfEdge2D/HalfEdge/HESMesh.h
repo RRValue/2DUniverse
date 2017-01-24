@@ -12,8 +12,8 @@ class HESEdge;
 class HESBuilder;
 class HESCheck;
 
-typedef std::vector<HESEdge* const> HESEdgeConstVector;
-typedef std::vector<HESFace* const> HESFaceConstVector;
+typedef std::vector<HESEdge*> HESEdgeConstVector;
+typedef std::vector<HESFace*> HESFaceConstVector;
 
 class HESMesh : public Mesh
 {

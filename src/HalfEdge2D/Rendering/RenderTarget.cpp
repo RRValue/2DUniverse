@@ -20,7 +20,7 @@ const QSizeF& RenderTarget::getSize() const
     return m_Size;
 }
 
-const std::vector<ViewPort* const>& RenderTarget::getViewPorts() const
+const std::vector<ViewPort*>& RenderTarget::getViewPorts() const
 {
     return m_ViewPorts;
 }
@@ -68,7 +68,7 @@ void RenderTarget::addViewPort(ViewPort* const viewport)
     if(viewport == nullptr)
         return;
 
-    for(std::vector<ViewPort* const>::iterator iter = m_ViewPorts.begin(); iter != m_ViewPorts.end(); ++iter)
+    for(std::vector<ViewPort*>::iterator iter = m_ViewPorts.begin(); iter != m_ViewPorts.end(); ++iter)
         if(*iter == viewport)
             return;
 
@@ -77,7 +77,7 @@ void RenderTarget::addViewPort(ViewPort* const viewport)
 
 void RenderTarget::removeViewPort(ViewPort* const viewport)
 {
-    for(std::vector<ViewPort* const>::iterator iter = m_ViewPorts.begin(); iter != m_ViewPorts.end(); ++iter)
+    for(std::vector<ViewPort*>::iterator iter = m_ViewPorts.begin(); iter != m_ViewPorts.end(); ++iter)
     {
         if(*iter != viewport)
             continue;

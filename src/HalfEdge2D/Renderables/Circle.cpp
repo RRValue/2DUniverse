@@ -55,7 +55,7 @@ IntersectionVector Circle::intersect(Circle* const c, const bool& valuesFromInte
 
 IntersectionVector Circle::intersect(Line* const l, const bool& valuesFromIntersector) const
 {
-    return ((Intersectable*)l)->intersect(const_cast<Circle* const>(this), true);
+    return ((Intersectable*)l)->intersect(const_cast<Circle*>(this), true);
 }
 IntersectionVector Circle::intersect(QuadraticBezier* const b, const bool& valuesFromIntersector) const
 {

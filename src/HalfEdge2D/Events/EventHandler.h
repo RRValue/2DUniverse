@@ -46,7 +46,7 @@ private:
     QWidgetTarget* m_WidgetTarget;
 
     EventInterface* m_Navigator;
-    std::set<Controller* const> m_Controller;
+    std::set<Controller*> m_Controller;
     Controller* m_ActiveController;
 };
 

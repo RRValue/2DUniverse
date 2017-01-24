@@ -43,9 +43,9 @@ private:
     Point* m_CurrentPoint;
     Vec2d m_CurrentHitDistance;
 
-    std::vector<Point* const> m_Points;
-    std::vector<Circle* const> m_CircumCircles;
-    std::vector<Line* const> m_Lines;
+    std::vector<Point*> m_Points;
+    std::vector<Circle*> m_CircumCircles;
+    std::vector<Line*> m_Lines;
 };
 
 #endif //_CONTROLLER_CONTROLLERDELAUNAY_H_

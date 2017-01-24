@@ -33,7 +33,7 @@ class ControllerSplitAt : public QObject, public Controller
     Q_OBJECT;
 
 private:
-    typedef std::vector<Point* const> PointVector;
+    typedef std::vector<Point*> PointVector;
 
 public:
     ControllerSplitAt();

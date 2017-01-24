@@ -20,7 +20,7 @@ public:
 
     // getter
     const QSizeF& getSize() const;
-    const std::vector<ViewPort* const>& getViewPorts() const;
+    const std::vector<ViewPort*>& getViewPorts() const;
     ViewPort* const getViewPort(const size_t& idx) const;
     const Mat3f& getDeviceMatrix();
     const Mat3f& getInvDeviceMatrix();
@@ -40,7 +40,7 @@ protected:
 
     QSizeF m_Size;
 
-    std::vector<ViewPort* const> m_ViewPorts;
+    std::vector<ViewPort*> m_ViewPorts;
 
 private:
     void updateDeviceMatrices();

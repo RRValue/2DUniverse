@@ -21,21 +21,21 @@ public:
 
     void clear();
 
-    const std::set<Mesh* const>& getMeshes() const;
-    const std::set<Point* const>& getPoints() const;
-    const std::set<Circle* const>& getCircles() const;
-    const std::set<Line* const>& getLines() const;
-    const std::set<QuadraticBezier* const>& getQuadraticBeziers() const;
-    const std::set<CubicBezier* const>& getCubicBeziers() const;
-    const std::set<Spline* const>& getSplines() const;
+    const std::set<Mesh*>& getMeshes() const;
+    const std::set<Point*>& getPoints() const;
+    const std::set<Circle*>& getCircles() const;
+    const std::set<Line*>& getLines() const;
+    const std::set<QuadraticBezier*>& getQuadraticBeziers() const;
+    const std::set<CubicBezier*>& getCubicBeziers() const;
+    const std::set<Spline*>& getSplines() const;
 
-    void setMeshes(const std::set<Mesh* const>& meshes);
-    void setPoints(const std::set<Point* const>& points);
-    void setCircles(const std::set<Circle* const>& circles);
-    void setLines(const std::set<Line* const>& lines);
-    void setQuadraticBeziers(const std::set<QuadraticBezier* const>& beziers);
-    void setCubicBeziers(const std::set<CubicBezier* const>& beziers);
-    void setSplines(const std::set<Spline* const>& splines);
+    void setMeshes(const std::set<Mesh*>& meshes);
+    void setPoints(const std::set<Point*>& points);
+    void setCircles(const std::set<Circle*>& circles);
+    void setLines(const std::set<Line*>& lines);
+    void setQuadraticBeziers(const std::set<QuadraticBezier*>& beziers);
+    void setCubicBeziers(const std::set<CubicBezier*>& beziers);
+    void setSplines(const std::set<Spline*>& splines);
 
     void addMesh(Mesh* const mesh);
     void addPoint(Point* const point);
@@ -54,13 +54,13 @@ public:
     void removeSpline(Spline* const spline);
 
 private:
-    std::set<Mesh* const> m_Meshes;
-    std::set<Point* const> m_Points;
-    std::set<Circle* const> m_Circles;
-    std::set<Line* const> m_Lines;
-    std::set<QuadraticBezier* const> m_QuadraticBeziers;
-    std::set<CubicBezier* const> m_CubicBeziers;
-    std::set<Spline* const> m_Splines;
+    std::set<Mesh*> m_Meshes;
+    std::set<Point*> m_Points;
+    std::set<Circle*> m_Circles;
+    std::set<Line*> m_Lines;
+    std::set<QuadraticBezier*> m_QuadraticBeziers;
+    std::set<CubicBezier*> m_CubicBeziers;
+    std::set<Spline*> m_Splines;
 };
 
 #endif //_SCENE_SCENE_H_

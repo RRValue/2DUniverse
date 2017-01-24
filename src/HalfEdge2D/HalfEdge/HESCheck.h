@@ -8,7 +8,7 @@
 #include <map>
 #include <deque>
 
-typedef std::vector<HESEdge* const> HESEdgeConstVector;
+typedef std::vector<HESEdge*> HESEdgeConstVector;
 
 class HESCheck
 {
@@ -25,12 +25,12 @@ public:
 
 private:
     typedef std::vector<HESMesh*> HESMeshVector;
-    typedef std::vector<HESFace* const> HESFaceVector;
-    typedef std::deque<HESFace* const> HESFaceDeque;
-    typedef std::set<HESVertex* const> HESVertexConstSet;
+    typedef std::vector<HESFace*> HESFaceVector;
+    typedef std::deque<HESFace*> HESFaceDeque;
+    typedef std::set<HESVertex*> HESVertexConstSet;
 
     typedef std::map<HESFace*, HESEdgeConstVector> HESFaceBoundaryMap;
-    typedef std::set<HESFace* const> HESFaceSet;
+    typedef std::set<HESFace*> HESFaceSet;
 
     struct MeshPart
     {

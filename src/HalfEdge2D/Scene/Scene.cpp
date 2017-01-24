@@ -20,72 +20,72 @@ void Scene::clear()
     m_Splines.clear();
 }
 
-const std::set<Mesh* const>& Scene::getMeshes() const
+const std::set<Mesh*>& Scene::getMeshes() const
 {
     return m_Meshes;
 }
 
-const std::set<Point* const>& Scene::getPoints() const
+const std::set<Point*>& Scene::getPoints() const
 {
     return m_Points;
 }
 
-const std::set<Circle* const>& Scene::getCircles() const
+const std::set<Circle*>& Scene::getCircles() const
 {
     return m_Circles;
 }
 
-const std::set<Line* const>& Scene::getLines() const
+const std::set<Line*>& Scene::getLines() const
 {
     return m_Lines;
 }
 
-const std::set<QuadraticBezier* const>& Scene::getQuadraticBeziers() const
+const std::set<QuadraticBezier*>& Scene::getQuadraticBeziers() const
 {
     return m_QuadraticBeziers;
 }
 
-const std::set<CubicBezier* const>& Scene::getCubicBeziers() const
+const std::set<CubicBezier*>& Scene::getCubicBeziers() const
 {
     return m_CubicBeziers;
 }
 
-const std::set<Spline* const>& Scene::getSplines() const
+const std::set<Spline*>& Scene::getSplines() const
 {
     return m_Splines;
 }
 
-void Scene::setMeshes(const std::set<Mesh* const>& meshes)
+void Scene::setMeshes(const std::set<Mesh*>& meshes)
 {
     m_Meshes = meshes;
 }
 
-void Scene::setPoints(const std::set<Point* const>& points)
+void Scene::setPoints(const std::set<Point*>& points)
 {
     m_Points = points;
 }
 
-void Scene::setCircles(const std::set<Circle* const>& circles)
+void Scene::setCircles(const std::set<Circle*>& circles)
 {
     m_Circles = circles;
 }
 
-void Scene::setLines(const std::set<Line* const>& lines)
+void Scene::setLines(const std::set<Line*>& lines)
 {
     m_Lines = lines;
 }
 
-void Scene::setQuadraticBeziers(const std::set<QuadraticBezier* const>& beziers)
+void Scene::setQuadraticBeziers(const std::set<QuadraticBezier*>& beziers)
 {
     m_QuadraticBeziers = beziers;
 }
 
-void Scene::setCubicBeziers(const std::set<CubicBezier* const>& beziers)
+void Scene::setCubicBeziers(const std::set<CubicBezier*>& beziers)
 {
     m_CubicBeziers = beziers;
 }
 
-void Scene::setSplines(const std::set<Spline* const>& splines)
+void Scene::setSplines(const std::set<Spline*>& splines)
 {
     m_Splines = splines;
 }

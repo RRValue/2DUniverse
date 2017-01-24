@@ -33,7 +33,7 @@ IntersectionVector Spline::intersect(Circle* const c, const bool& valuesFromInte
 
 IntersectionVector Spline::intersect(Line* const l, const bool& valuesFromIntersector) const
 {
-    return l->intersect(const_cast<Spline* const>(this), !valuesFromIntersector);
+    return l->intersect(const_cast<Spline*>(this), !valuesFromIntersector);
 }
 IntersectionVector Spline::intersect(QuadraticBezier* const b, const bool& valuesFromIntersector) const
 {
