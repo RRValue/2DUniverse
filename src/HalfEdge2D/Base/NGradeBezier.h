@@ -73,7 +73,7 @@ public:
 
     NGradeBezier& operator=(NGradeBezier&& other)
     {
-        move(other, *this);
+        move(std::move(other), *this);
 
         return *this;
     }
