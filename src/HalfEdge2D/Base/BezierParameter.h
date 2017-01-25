@@ -83,7 +83,12 @@ protected:
             ca *= alpha;
         }
 
-        return m_DerivedParameter[d] * a_vec;
+        T factor = T(1);
+
+        for(size_t i = 1; i <= d; i++)
+            factor *= (G - i + 1);
+
+        return factor * m_DerivedParameter[d] * a_vec;
     }
 
     void updateParameter()
@@ -94,7 +99,7 @@ protected:
                 m_TmpParameterArray[0] = m_Parameter;
             else
                 for(size_t j = 0; j <= G - i; j++)
-                    m_TmpParameterArray[i].col(j) = (G - i + 1) * (m_TmpParameterArray[i - 1].col(j + 1) - m_TmpParameterArray[i - 1].col(j));
+                    m_TmpParameterArray[i].col(j) = m_TmpParameterArray[i - 1].col(j + 1) - m_TmpParameterArray[i - 1].col(j);
         }
 
         for(size_t i = 0; i <= G; i++)

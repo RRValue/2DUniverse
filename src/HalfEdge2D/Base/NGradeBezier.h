@@ -155,7 +155,7 @@ public:
     template<unsigned int Dim = D>
     BezierPointType biNormalAt(const T& alpha) const
     {
-        static_assert(false, "biNormalAt not defined for this Dimension")
+        static_assert(false, "biNormalAt not defined for this Dimension");
     }
 
     template<>
@@ -173,6 +173,17 @@ public:
             updateLength();
 
         return biNormalAt<D>(getAlphaAtLength(alpha * m_Length));
+    }
+
+    BezierPointType frenetAt(const size_t& d, const T& alpha) const
+    {
+        if(d == 0)
+            return get(1, alpha).normalized();
+
+        BezierPointType der_low = frenetAt(d - 1, alpha);
+        BezierPointType der = get(d + 1, alpha);
+
+        return (der - (der.dot(der_low) * der_low)).normalized();
     }
 
     template<size_t Derivation, unsigned int Dim = D>
