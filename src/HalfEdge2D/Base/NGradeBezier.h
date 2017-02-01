@@ -30,7 +30,7 @@ private:
     typedef Eigen::Matrix<T, D, 1> BezierPointType;
     typedef Eigen::Matrix<T, D + 1, 1> TransformPointType;
     typedef Eigen::Matrix<T, D + 1, D + 1> TransformType;
-    
+
     typedef typename std::pair<T, T> RangeLengthType;
     typedef typename std::map<T, T> RangeLengthMapType;
     typedef typename RangeLengthMapType::const_iterator RangeLengthMapContIterType;
@@ -43,7 +43,7 @@ public:
     static_assert(G <= 13, "13 Is max for NGradeBezier");
 
 public:
-    NGradeBezier() : 
+    NGradeBezier() :
         m_LengthCacheMax(size_t(std::pow(T(2), T(m_LengthCacheDepth)) + T(1))),
         m_LengthCacheStep(T(1) / (T(m_LengthCacheMax - 1)))
     {
@@ -121,103 +121,55 @@ public:
         return tangentAt(getAlphaAtLength(alpha * m_Length));
     }
 
-    template<unsigned int Dim = D>
     BezierPointType normalAt(const T& alpha) const
     {
-        static_assert(false, "normalAt not defined for this Dimension")
+        return frenetAt(1, alpha);
     }
 
-    template<>
-    BezierPointType normalAt<2>(const T& alpha) const
-    {
-        BezierPointType der1 = tangentAt(alpha);
-
-        return BezierPointType(-der1(1), der1(0));
-    }
-
-    template<>
-    BezierPointType normalAt<3>(const T& alpha) const
-    {
-        BezierPointType der1 = get(1, alpha);
-        BezierPointType der2 = get(2, alpha);
-
-        return der1.cross(der2).cross(der1).normalized();
-    }
-
-    BezierPointType normalAtL(const T& alpha) const
+    BezierPointType normalAtL(const T& alpha)
     {
         if(m_LengthDirty)
             updateLength();
 
-        return normalAt<D>(getAlphaAtLength(alpha * m_Length));
+        return normalAt(getAlphaAtLength(alpha * m_Length));
     }
 
-    template<unsigned int Dim = D>
     BezierPointType biNormalAt(const T& alpha) const
     {
-        static_assert(false, "biNormalAt not defined for this Dimension");
+        return frenetAt(2, alpha);
     }
 
-    template<>
-    BezierPointType biNormalAt<3>(const T& alpha) const
-    {
-        BezierPointType der1 = get(1, alpha);
-        BezierPointType der2 = get(1, alpha);
-
-        return der1.cross(der2).normalized();
-    }
-
-    BezierPointType biNormalAtL(const T& alpha) const
+    BezierPointType biNormalAtL(const T& alpha)
     {
         if(m_LengthDirty)
             updateLength();
 
-        return biNormalAt<D>(getAlphaAtLength(alpha * m_Length));
+        return biNormalAt(getAlphaAtLength(alpha * m_Length));
     }
 
     BezierPointType frenetAt(const size_t& d, const T& alpha) const
     {
         if(d == 0)
-            return get(1, alpha).normalized();
+            return tangentAt(alpha);
 
-        BezierPointType der_low = frenetAt(d - 1, alpha);
         BezierPointType der = get(d + 1, alpha);
+        BezierPointType frenet;
 
-        return (der - (der.dot(der_low) * der_low)).normalized();
+        for(size_t i = 1; i <= d; i++)
+        {
+            frenet = frenetAt(i - 1, alpha);
+            der -= der.dot(frenet) * frenet;
+        }
+
+        return der.normalized();
     }
 
-    template<size_t Derivation, unsigned int Dim = D>
-    BezierPointType getFrenetVector(const T& alpha) const
-    {
-        static_assert(Derivation < m_NumParams, "Not defined for this derivation");
-
-        BezierPointType der_low = getFrenetVector<Derivation - 1>(alpha);
-        BezierPointType der = get(Derivation + 1, alpha);
-
-        return (der - (der.dot(der_low) * der_low)).normalized();
-    }
-
-    template<>
-    BezierPointType getFrenetVector<0>(const T& alpha) const
-    {
-        return get(1, alpha).normalized();
-    }
-
-    template<>
-    BezierPointType getFrenetVector<1, 2>(const T& alpha) const
-    {
-        BezierPointType tangent = getFrenetVector<0>(alpha);
-
-        return BezierPointType(-tangent(1), tangent(0));
-    }
-
-    template<size_t Derivation>
-    BezierPointType getFrenetVectorAtL(const T& alpha)
+    BezierPointType frenetAtL(const size_t& d, const T& alpha)
     {
         if(m_LengthDirty)
             updateLength();
 
-        return getFrenetVector<Derivation>(getAlphaAtLength(alpha * m_Length));
+        return frenetAt(d, getAlphaAtLength(alpha * m_Length));
     }
 
     template<unsigned int Dim = D>
@@ -287,7 +239,7 @@ public:
     void splitAt(const float& a, NGradeBezier& l, NGradeBezier& r)
     {
         splitAtImpl(m_Parameter, a, l.m_Parameter, r.m_Parameter);
-        
+
         l.updateParameter();
         r.updateParameter();
 
@@ -330,7 +282,7 @@ public:
             return (++i1)->second - getLengthImpl(*i0, to);
         else if(i1->first == to)
             return getLengthImpl(*i0, from) - i0->second;
-        
+
         return getLengthImpl(*i1, to) - getLengthImpl(*i0, from);
     }
 
@@ -350,7 +302,7 @@ public:
         {
             if(iter->second <= targetLength)
                 it0 = iter;
-            
+
             if(iter->second >= targetLength)
             {
                 it1 = iter;
@@ -369,7 +321,7 @@ public:
 
         BezierParamType l, r;
         BezierParamType o = sectionImpl(m_Parameter, it0->first, it1->first);
-        
+
         bool add = true;
 
         while(range > m_LengthError.m_Epsilon)
@@ -485,9 +437,9 @@ private:
         o = p;
 
         splitAtImpl(o, from, l, r);
-        
+
         o = r;
-        
+
         splitAtImpl(o, (to - from) / (T(1) - from), l, r);
 
         o = l;
